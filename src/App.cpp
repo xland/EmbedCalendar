@@ -24,6 +24,10 @@ App* App::Get()
 {
 	return app.get();
 }
+MainWin* App::GetWin()
+{
+	return app->win.get();
+}
 void App::Cursor(LPWSTR id) {
 	if (!app->win.get()) {
 		return;

@@ -10,6 +10,7 @@ public:
 	App();
 	~App();
 	static App* Get();
+	static MainWin* GetWin();
 	static void Init(HINSTANCE instance, std::wstring&& cmd);
 	static void Cursor(LPWSTR id);
 public:

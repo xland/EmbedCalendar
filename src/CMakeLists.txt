@@ -12,4 +12,4 @@ target_sources(${PROJECT_NAME} PRIVATE
  "Ctrl/SwitchBtn.h" "Ctrl/SwitchBtn.cpp" 
  "Ctrl/ListHeader.h" "Ctrl/ListHeader.cpp" 
  "Ctrl/List.h" "Ctrl/List.cpp"
- "Ctrl/SettingMenu.h" "Ctrl/SettingMenu.cpp" "MainWinNative.cpp")
+ "Ctrl/SettingMenu.h" "Ctrl/SettingMenu.cpp" "MainWinNative.cpp" "Ctrl/ToolTip.h" "Ctrl/ToolTip.cpp")

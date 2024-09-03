@@ -1,4 +1,4 @@
-#include <string>
+﻿#include <string>
 #include <format>
 #include <windowsx.h>
 
@@ -22,13 +22,13 @@ void MainWin::createWindow()
     wcx.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wcx.lpszClassName = clsName.c_str();
     RegisterClassEx(&wcx);
-    hwnd = CreateWindowEx(0, clsName.c_str(), clsName.c_str(),
+    hwnd = CreateWindowEx(WS_EX_LAYERED, clsName.c_str(), clsName.c_str(),
         WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP,
         x, y, w, h, NULL, NULL, hinstance, static_cast<LPVOID>(this));
     ShowWindow(hwnd, SW_SHOW);
+    repaint();
     App::Cursor(IDC_CROSS);
-    UINT dpi = GetDpiForWindow(hwnd);
-    scaleFactor = dpi / 96.0f;
+
 }
 
 
@@ -41,84 +41,66 @@ LRESULT MainWin::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         LPVOID pThis = pCS->lpCreateParams;
         SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pThis));
     }
+    else if (msg == WM_SETCURSOR) {
+        return true;
+    }
     auto obj = reinterpret_cast<MainWin*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
     if (obj)
     {
-        return obj->processNativeMsg(msg,wParam, lParam);
+        obj->processNativeMsg(msg,wParam, lParam);
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-LRESULT MainWin::processNativeMsg(UINT msg, WPARAM wParam, LPARAM lParam)
-{
+void MainWin::processNativeMsg(UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg)
     {
-    case WM_SETCURSOR:
-    {
-        return true;
-    }
-    case WM_LBUTTONDOWN:
-    {
-        isMouseDown = true;
-        onLeftBtnDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        break;
-    }
-    case WM_LBUTTONUP:
-    {
-        isMouseDown = false;
-        onLeftBtnUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        break;
-    }
-    case WM_MOUSEMOVE:
-    {
-        if (isMouseDown) {
-            onMouseDrag(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        }
-        else
+        case WM_LBUTTONDOWN:
         {
-            onMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        }
-        break;
-    }
-    //case CustomMsgId: {
-    //    obj->onCustomMsg((EventType)wParam, (uint32_t)lParam);
-    //    break;
-    //}
-    case WM_TIMER: {
-        //if (wParam == RefreshTimerId) {
-        //    KillTimer(hWnd, RefreshTimerId);
-        //    obj->refreshFlag = false;
-        //    InvalidateRect(hWnd, nullptr, false);
-        //}
-        break;
-    }
-    case WM_KEYDOWN:
-    {
-        switch (wParam)
-        {
-        case 82: { //R
-            if (GetKeyState(VK_CONTROL) < 0)
-            {
-                return false;
-            }
-            [[fallthrough]];
-        }
-        case 72: { //H
-            if (GetKeyState(VK_CONTROL) < 0)
-            {
-                return false;
-            }
-            [[fallthrough]];
-        }
-        default: {
+            isMouseDown = true;
+            onLeftBtnDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             break;
         }
+        case WM_LBUTTONUP:
+        {
+            isMouseDown = false;
+            onLeftBtnUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            break;
         }
-        [[fallthrough]];
+        case WM_MOUSEMOVE:
+        {
+            if (isMouseDown) {
+                onMouseDrag(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            }
+            else
+            {
+                onMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            }
+            break;
+        }
+        case WM_DPICHANGED: {
+            UINT dpi = HIWORD(wParam);
+            scaleFactor = dpi / 96.0f;
+            RECT* const rect = (RECT*)lParam;
+            x = rect->left;
+            y = rect->top;
+            w = rect->right - rect->left;
+            h = rect->bottom - rect->top;
+            initCanvas();
+            SetWindowPos(hwnd, NULL,x,y,w, h,SWP_NOZORDER | SWP_NOACTIVATE);
+            break;
+        }
+        case CustomMsgId: {
+            onCustomMsg((EventType)wParam, (uint32_t)lParam);
+            break;
+        }
+        case WM_TIMER: {
+            if (wParam == RefreshTimerId) {
+                KillTimer(hwnd, RefreshTimerId);
+                refreshFlag = false;
+                repaint();
+            }
+            break;
+        }
     }
-    default:
-    {
-        break;
-    }
-    return DefWindowProc(hwnd, msg, wParam, lParam);
 }

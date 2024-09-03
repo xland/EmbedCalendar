@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <Windows.h>
 #include <vector>
 #include <functional>
@@ -11,14 +11,18 @@ public:
 	MainWin();
 	~MainWin();
 	void Init();
+	void Refresh();
 public:
 	HWND hwnd;
-	int x, y, w, h;
+	int x{ 100 }, y{ 100 }, w{ 580 }, h{580};
 	bool isMouseDown{ false };
 	float scaleFactor{ 1.0 };
 private:
 	void createWindow();
-	LRESULT processNativeMsg(UINT msg, WPARAM wParam, LPARAM lParam);
+	void repaint();
+	void getDpi();
+	void initCanvas();
+	void processNativeMsg(UINT msg, WPARAM wParam, LPARAM lParam);
 	void onLeftBtnDown(const int& x, const int& y);
 	void onLeftBtnUp(const int& x, const int& y);
 	void onMouseMove(const int& x, const int& y);
@@ -33,5 +37,8 @@ private:
 	std::vector<MouseEventCB> leftBtnUpHandlers;
 	std::vector<CustomEventCB> customEventHandlers;
 	std::vector<PaintEventCB> paintHandlers;
+	bool refreshFlag{ false };
+	std::vector<SkColor> winPix;
+	std::unique_ptr<SkCanvas> winCanvas;
 };
 
