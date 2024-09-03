@@ -26,9 +26,8 @@ void MainWin::createWindow()
         WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP,
         x, y, w, h, NULL, NULL, hinstance, static_cast<LPVOID>(this));
     ShowWindow(hwnd, SW_SHOW);
+    App::Cursor(IDC_ARROW);
     repaint();
-    App::Cursor(IDC_CROSS);
-
 }
 
 
@@ -79,8 +78,8 @@ void MainWin::processNativeMsg(UINT msg, WPARAM wParam, LPARAM lParam) {
             break;
         }
         case WM_DPICHANGED: {
-            UINT dpi = HIWORD(wParam);
-            scaleFactor = dpi / 96.0f;
+            UINT dpiVal = HIWORD(wParam);
+            dpi = dpiVal / 96.0f;
             RECT* const rect = (RECT*)lParam;
             x = rect->left;
             y = rect->top;
@@ -88,6 +87,8 @@ void MainWin::processNativeMsg(UINT msg, WPARAM wParam, LPARAM lParam) {
             h = rect->bottom - rect->top;
             initCanvas();
             SetWindowPos(hwnd, NULL,x,y,w, h,SWP_NOZORDER | SWP_NOACTIVATE);
+            onDpiChange();
+            Refresh();
             break;
         }
         case CustomMsgId: {

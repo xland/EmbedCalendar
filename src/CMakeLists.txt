@@ -4,6 +4,9 @@ target_sources(${PROJECT_NAME} PRIVATE
 "WsConn.h" "WsConn.cpp" 
 "MainWin.h" "MainWin.cpp"
 "EmbedHelper.h" "EmbedHelper.cpp"
+"MainWinNative.cpp" 
+"Skin.h" "Skin.cpp"
+"Font.h" "Font.cpp"
 
  "Ctrl/TitleBar.h" "Ctrl/TitleBar.cpp" 
  "Ctrl/CalendarHeader.h" "Ctrl/CalendarHeader.cpp" 
@@ -12,4 +15,7 @@ target_sources(${PROJECT_NAME} PRIVATE
  "Ctrl/SwitchBtn.h" "Ctrl/SwitchBtn.cpp" 
  "Ctrl/ListHeader.h" "Ctrl/ListHeader.cpp" 
  "Ctrl/List.h" "Ctrl/List.cpp"
- "Ctrl/SettingMenu.h" "Ctrl/SettingMenu.cpp" "MainWinNative.cpp" "Ctrl/ToolTip.h" "Ctrl/ToolTip.cpp")
+ "Ctrl/SettingMenu.h" "Ctrl/SettingMenu.cpp"  
+ "Ctrl/ToolTip.h" "Ctrl/ToolTip.cpp" 
+ "Ctrl/BaseCtrl.h" "Ctrl/BaseCtrl.cpp" 
+)

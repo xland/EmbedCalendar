@@ -1,5 +1,6 @@
 #include "App.h"
 #include "MainWin.h"
+#include "Font.h"
 
 namespace {
 	std::unique_ptr<App> app;
@@ -17,6 +18,7 @@ void App::Init(HINSTANCE instance, std::wstring&& cmd)
 {
 	app = std::make_unique<App>();
 	app->instance = instance;
+	Font::Init();
 	app->win = std::make_unique<MainWin>();
 	app->win->Init();
 }

@@ -1,6 +1,7 @@
 ﻿#include <shellscalingapi.h>
 
 #include "MainWin.h"
+#include "./Ctrl/TitleBar.h"
 
 MainWin::MainWin()
 {
@@ -12,6 +13,8 @@ MainWin::~MainWin()
 
 void MainWin::Init()
 {
+    titleBar = std::make_unique<TitleBar>();
+    titleBar->Init();
     getDpi();
     initCanvas();
     createWindow();
@@ -21,9 +24,10 @@ void MainWin::getDpi()
     UINT dpiX = 0, dpiY = 0;
     HMONITOR hMonitor = MonitorFromPoint(POINT{ 0, 0 }, MONITOR_DEFAULTTOPRIMARY);
     GetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY);
-    scaleFactor = dpiX / 96.0f;
-    w = w * scaleFactor;
-    h = h * scaleFactor;
+    dpi = dpiX / 96.0f;
+    w = w * dpi;
+    h = h * dpi;
+    onDpiChange();
 }
 
 void MainWin::initCanvas()
@@ -32,7 +36,7 @@ void MainWin::initCanvas()
     winPix.resize(dataSize, 0x00000000);
     SkImageInfo info = SkImageInfo::MakeN32Premul(w, h);
     auto rowSize = w * sizeof(SkColor);
-    winCanvas = SkCanvas::MakeRasterDirect(info, &winPix.front(), rowSize);
+    canvas = SkCanvas::MakeRasterDirect(info, &winPix.front(), rowSize);
 }
 void MainWin::Refresh()
 {
@@ -45,8 +49,11 @@ void MainWin::Refresh()
 
 void MainWin::repaint()
 {
-    //paintCanvas();
-    winCanvas->clear(0x88FFFF66);
+    canvas->clear(0x88000000);
+    for (size_t i = 0; i < paintHandlers.size(); i++)
+    {
+        paintHandlers[i](canvas.get());
+    }
     HDC hdc = GetDC(hwnd);
     HDC hCompatibleDC = CreateCompatibleDC(hdc);
     HBITMAP bitmap = CreateCompatibleBitmap(hdc, w, h);
@@ -91,6 +98,14 @@ void MainWin::onMouseDrag(const int& x, const int& y)
     for (size_t i = 0; i < mouseDragHandlers.size(); i++)
     {
         mouseDragHandlers[i](x, y);
+    }
+}
+
+void MainWin::onDpiChange()
+{
+    for (size_t i = 0; i < dpiHandlers.size(); i++)
+    {
+        dpiHandlers[i]();
     }
 }
 

@@ -16,5 +16,6 @@ enum class EventType {
 };
 
 using MouseEventCB = std::function<void(const int&, const int&)>;
+using DpiEventCB = std::function<void()>;
 using CustomEventCB = std::function<void(const EventType& type, const uint32_t& msg)>;
 using PaintEventCB = std::function<void(SkCanvas* canvas)>;
