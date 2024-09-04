@@ -5,8 +5,10 @@ project(${PROJECT_NAME})
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
+
 link_directories("D:\\sdk\\skia\\out")
 include_directories("D:\\sdk\\skia")
+include_directories("D:\\sdk\\rapidjson\\include")
 add_executable(${PROJECT_NAME})
 add_subdirectory(src)
 add_subdirectory(res)

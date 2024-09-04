@@ -4,6 +4,9 @@
 
 #include "MainWin.h"
 #include "./Ctrl/TitleBar.h"
+#include "./Ctrl/CalendarHeader.h"
+#include "WsConn.h"
+#include "Skin.h"
 
 MainWin::MainWin()
 {
@@ -26,9 +29,13 @@ void MainWin::Init()
 
 
     SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE);
-    
     titleBar = std::make_unique<TitleBar>();
     titleBar->Init();
+    calendarHeader = std::make_unique<CalendarHeader>();
+    calendarHeader->Init();
+    skin = std::make_unique<Skin>();
+    wsConn = std::make_unique<WsConn>();
+    wsConn->Init();
     getDpi();
     initCanvas();
     createWindow();
@@ -47,7 +54,7 @@ void MainWin::getDpi()
 void MainWin::initCanvas()
 {
     auto dataSize = h * w;
-    winPix.resize(dataSize, 0x00000000);
+    winPix.resize(dataSize);
     SkImageInfo info = SkImageInfo::MakeN32Premul(w, h);
     auto rowSize = w * sizeof(SkColor);
     canvas = SkCanvas::MakeRasterDirect(info, &winPix.front(), rowSize);
@@ -57,8 +64,7 @@ void MainWin::Refresh()
     if (refreshFlag) {
         return;
     }
-    refreshFlag = true;
-    SetTimer(hwnd, RefreshTimerId, 15, NULL);
+    refreshFlag = SetTimer(hwnd, RefreshTimerId, 15, NULL);
 }
 
 void MainWin::Close()
@@ -71,7 +77,7 @@ void MainWin::Close()
 
 void MainWin::repaint()
 {
-    canvas->clear(0xAA00FF00);
+    canvas->clear(skin->bg);
     for (size_t i = 0; i < paintHandlers.size(); i++)
     {
         paintHandlers[i](canvas.get());

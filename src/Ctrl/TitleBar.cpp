@@ -7,6 +7,7 @@
 #include "../MainWin.h"
 #include "../TypeDefine.h"
 #include "../EmbedHelper.h"
+#include "../Skin.h"
 
 
 TitleBar::TitleBar()
@@ -37,17 +38,18 @@ void TitleBar::Init()
 void TitleBar::OnPaint(SkCanvas* canvas)
 {
 	SkPaint paint;
+	auto win = App::GetWin();
 	if (mouseInPinBtn) {
-		paint.setColor(0x28000000);
+		paint.setColor(win->skin->hoverBg);
 		canvas->drawRect(pinRect, paint);
 	}
 	if (mouseInSettingBtn) {
-		paint.setColor(0x28000000);
+		paint.setColor(win->skin->hoverBg);
 		canvas->drawRect(settingRect, paint);
 	}
 	auto font = Font::GetIcon();
 	font->setSize(fontSize);
-	paint.setColor(0xFFffffff);
+	paint.setColor(win->skin->text1);
 	auto setting = (const char*)u8"\ue6e8";
 	auto pin = (const char*)u8"\ue70c";
 	SkRect measureRect;

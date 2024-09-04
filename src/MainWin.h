@@ -9,6 +9,9 @@
 #include "TypeDefine.h"
 
 class TitleBar;
+class WsConn;
+class Skin;
+class CalendarHeader;
 class MainWin
 {
 public:
@@ -25,7 +28,11 @@ public:
 	int x{ 100 }, y{ 100 }, w{ 580 }, h{580};
 	bool isMouseDown{ false };
 	float dpi{ 1.0 };
-public:	
+public:
+	std::unique_ptr<TitleBar> titleBar;
+	std::unique_ptr<CalendarHeader> calendarHeader;
+	std::unique_ptr<WsConn> wsConn;
+	std::unique_ptr<Skin> skin;
 	std::vector<MouseEventCB> mouseMoveHandlers;
 	std::vector<MouseEventCB> mouseDragHandlers;
 	std::vector<MouseEventCB> leftBtnDownHandlers;
@@ -49,7 +56,6 @@ private:
 
 private:
 	bool refreshFlag{ false };
-	std::unique_ptr<TitleBar> titleBar;
 	ID2D1Factory* sg_pID2D1Factory;
 	ID2D1HwndRenderTarget* renderTarget;
 	ID2D1Bitmap* bitmap;

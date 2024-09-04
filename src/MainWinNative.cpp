@@ -87,7 +87,7 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
             POINT pt;
             pt.x = GET_X_LPARAM(lParam);
             pt.y = GET_Y_LPARAM(lParam);
-            ScreenToClient(hwnd, &pt);
+            ScreenToClient(hWnd, &pt);
             auto flag = titleBar->IsInCaption(pt.x, pt.y);
             return flag ? HTCAPTION : HTCLIENT;
         }
@@ -98,7 +98,7 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
         case WM_LBUTTONDOWN:
         {
             isMouseDown = true;
-            SetCapture(hwnd);
+            SetCapture(hWnd);
             onLeftBtnDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             break;
         }
@@ -148,7 +148,7 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
             w = 580*dpi;
             h = 580*dpi;
             initCanvas();
-            SetWindowPos(hwnd, NULL,x,y,w, h,SWP_NOZORDER | SWP_NOACTIVATE);
+            SetWindowPos(hWnd, NULL,x,y,w, h,SWP_NOZORDER | SWP_NOACTIVATE);
             onDpiChange();
             Refresh();
             break;
@@ -159,9 +159,9 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
         }
         case WM_TIMER: {
             if (wParam == RefreshTimerId) {
-                KillTimer(hwnd, RefreshTimerId);
+                KillTimer(hWnd, RefreshTimerId);
                 refreshFlag = false;
-                InvalidateRect(hwnd, nullptr, false);
+                InvalidateRect(hWnd, nullptr, false);
             }
             break;
         }
