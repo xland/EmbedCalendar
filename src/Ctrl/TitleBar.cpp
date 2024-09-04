@@ -61,8 +61,8 @@ void TitleBar::OnPaint(SkCanvas* canvas)
 	auto setting = (const char*)u8"\ue6e8";
 	auto pin = (const char*)u8"\ue70c";
 	SkRect measureRect;
-	int length = std::mbstowcs(nullptr, setting, 0);
-	font->measureText(setting, 3, SkTextEncoding::kUTF8, &measureRect);
+	int length = std::mbstowcs(nullptr, setting, 0); //3
+	font->measureText(setting, length, SkTextEncoding::kUTF8, &measureRect);
 	auto x = settingRect.centerX() - measureRect.width() / 2 - measureRect.fLeft;
 	auto y = settingRect.centerY() - measureRect.height() / 2 - measureRect.fTop;
 	canvas->drawString(setting, x, y, *font, paint);

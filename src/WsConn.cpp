@@ -105,7 +105,7 @@ void WsConn::initJson()
 	auto theme =  data["backgroundTheme"].GetString();
 	auto alpha = data["backgroundOpacity"].GetFloat();
 	Skin::Init(theme,alpha);
-	CalendarHeader::Get()->yearMonthStr = data["activeDateMonth"].GetString();
+	CalendarHeader::Get()->SetText(data["activeDateMonth"].GetString());
 	MainWin::Get()->Refresh();
 
 }

@@ -14,11 +14,12 @@ public:
 	void OnDpi();
 	void OnLeftBtnDown(const int& x, const int& y);
 	void OnMouseMove(const int& x, const int& y);
+public:
+	SkRect dragRect;
 private:
 	bool mouseInSettingBtn{false};
 	bool mouseInPinBtn{ false };
 	float fontSize{ 14 };
 	SkRect settingRect;
 	SkRect pinRect;
-	SkRect dragRect;
 };

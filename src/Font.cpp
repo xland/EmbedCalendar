@@ -56,7 +56,7 @@ void Font::initFontIcon(SkFontMgr* fontMgr)
 
 void Font::initFontText(SkFontMgr* fontMgr)
 {
-    text = std::make_unique<SkFont>(fontMgr->matchFamilyStyle("NSimSun", {}));
+    text = std::make_unique<SkFont>(fontMgr->matchFamilyStyle("Microsoft YaHei UI", {}));
     text->setEdging(SkFont::Edging::kSubpixelAntiAlias);
     text->setSubpixel(true);
 }
