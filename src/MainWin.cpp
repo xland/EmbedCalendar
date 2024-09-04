@@ -1,4 +1,6 @@
 ﻿#include <shellscalingapi.h>
+#include <iostream>
+#include <sstream>
 
 #include "MainWin.h"
 #include "./Ctrl/TitleBar.h"
@@ -9,10 +11,22 @@ MainWin::MainWin()
 
 MainWin::~MainWin()
 {
+    SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE);
 }
 
 void MainWin::Init()
 {
+    //std::string hwndStr = "002C089C"; 
+    //std::stringstream ss;
+    //ss << std::hex << hwndStr;
+    //unsigned long hwndHex;
+    //ss >> hwndHex; 
+    //HWND hwnd = reinterpret_cast<HWND>(hwndHex);
+    //PostMessage(hwnd, WM_CLOSE, 0, 0);
+
+
+    SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE);
+    
     titleBar = std::make_unique<TitleBar>();
     titleBar->Init();
     getDpi();
@@ -25,8 +39,8 @@ void MainWin::getDpi()
     HMONITOR hMonitor = MonitorFromPoint(POINT{ 0, 0 }, MONITOR_DEFAULTTOPRIMARY);
     GetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY);
     dpi = dpiX / 96.0f;
-    w = w * dpi;
-    h = h * dpi;
+    w = 580 * dpi;
+    h = 580 * dpi;
     onDpiChange();
 }
 
@@ -47,26 +61,27 @@ void MainWin::Refresh()
     SetTimer(hwnd, RefreshTimerId, 15, NULL);
 }
 
+void MainWin::Close()
+{
+    CloseWindow(hwnd);
+    DestroyWindow(hwnd);
+    SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE);
+    PostQuitMessage(0);
+}
+
 void MainWin::repaint()
 {
-    canvas->clear(0x88000000);
+    canvas->clear(0xAA00FF00);
     for (size_t i = 0; i < paintHandlers.size(); i++)
     {
         paintHandlers[i](canvas.get());
     }
-    HDC hdc = GetDC(hwnd);
-    HDC hCompatibleDC = CreateCompatibleDC(hdc);
-    HBITMAP bitmap = CreateCompatibleBitmap(hdc, w, h);
-    DeleteObject(SelectObject(hCompatibleDC, bitmap));
-    BITMAPINFO info = { sizeof(BITMAPINFOHEADER), w, 0 - h, 1, 32, BI_RGB, w * 4 * h, 0, 0, 0, 0 };
-    SetDIBits(hdc, bitmap, 0, h, &winPix.front(), &info, DIB_RGB_COLORS);
-    BLENDFUNCTION blend = { .BlendOp{AC_SRC_OVER}, .SourceConstantAlpha{255}, .AlphaFormat{AC_SRC_ALPHA} };
-    POINT pSrc = { 0, 0 };
-    SIZE sizeWnd = { w, h };
-    UpdateLayeredWindow(hwnd, hdc, NULL, &sizeWnd, hCompatibleDC, &pSrc, NULL, &blend, ULW_ALPHA);
-    DeleteObject(bitmap);
-    DeleteDC(hCompatibleDC);
-    ReleaseDC(hwnd, hdc);
+    PAINTSTRUCT ps;
+    auto dc = BeginPaint(hwnd, &ps);
+    BITMAPINFO bmpInfo = { sizeof(BITMAPINFOHEADER), w, -h, 1, 32, BI_RGB, h * 4 * w, 0, 0, 0, 0 };
+    StretchDIBits(dc, 0, 0, w, h, 0, 0, w, h, &winPix.front(), &bmpInfo, DIB_RGB_COLORS, SRCCOPY);
+    ReleaseDC(hwnd, dc);
+    EndPaint(hwnd, &ps);
 }
 
 void MainWin::onLeftBtnDown(const int& x, const int& y)

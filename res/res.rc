@@ -25,12 +25,12 @@ BEGIN
         BLOCK "080404b0"
         BEGIN
             VALUE "CompanyName", "GitHub xland"
-            VALUE "FileDescription", "ScreenCapture"
+            VALUE "FileDescription", "EmbedCalendar"
             VALUE "FileVersion", "2.1.10.0"
-            VALUE "InternalName", "ScreenCapture.exe"
+            VALUE "InternalName", "EmbedCalendar.exe"
             VALUE "LegalCopyright", "Copyright (C) LiuXiaolun 2023-2024"
-            VALUE "OriginalFilename", "ScreenCapture.exe"
-            VALUE "ProductName", "ScreenCapture"
+            VALUE "OriginalFilename", "EmbedCalendar.exe"
+            VALUE "ProductName", "EmbedCalendar"
             VALUE "ProductVersion", "2.1.10.0"
         END
     END

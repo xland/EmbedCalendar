@@ -1,10 +1,38 @@
 ﻿#include <string>
 #include <format>
 #include <windowsx.h>
-
 #include "MainWin.h"
 #include "App.h"
+#include "Ctrl/TitleBar.h"
 
+bool MainWin::EnableAlpha(HWND hwnd)
+{
+    if (!IsWindowsVistaOrGreater()) { return false; }
+    BOOL is_composition_enable = false;
+    DwmIsCompositionEnabled(&is_composition_enable);
+    if (!is_composition_enable) { return true; }
+    DWORD current_color = 0;
+    BOOL is_opaque = false;
+    DwmGetColorizationColor(&current_color, &is_opaque);
+    if (!is_opaque || IsWindows8OrGreater())
+    {
+        HRGN region = CreateRectRgn(0, 0, -1, -1);
+        DWM_BLURBEHIND bb = { 0 };
+        bb.dwFlags = DWM_BB_ENABLE | DWM_BB_BLURREGION;
+        bb.hRgnBlur = region;
+        bb.fEnable = TRUE;
+        DwmEnableBlurBehindWindow(hwnd, &bb);
+        DeleteObject(region);
+        return true;
+    }
+    else // For Window7
+    {
+        DWM_BLURBEHIND bb = { 0 };
+        bb.dwFlags = DWM_BB_ENABLE;
+        DwmEnableBlurBehindWindow(hwnd, &bb);
+        return false;
+    }
+}
 
 void MainWin::createWindow()
 {
@@ -19,18 +47,15 @@ void MainWin::createWindow()
     wcx.hInstance = hinstance;
     wcx.hIcon = LoadIcon(hinstance, IDI_APPLICATION);
     wcx.hCursor = LoadCursor(hinstance, IDC_CROSS);
-    wcx.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcx.hbrBackground = (HBRUSH)COLOR_WINDOW;
     wcx.lpszClassName = clsName.c_str();
     RegisterClassEx(&wcx);
-    hwnd = CreateWindowEx(WS_EX_LAYERED, clsName.c_str(), clsName.c_str(),
-        WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP,
+    hwnd = CreateWindowEx(NULL, clsName.c_str(), clsName.c_str(), WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP,
         x, y, w, h, NULL, NULL, hinstance, static_cast<LPVOID>(this));
-    ShowWindow(hwnd, SW_SHOW);
+    EnableAlpha(hwnd);
     App::Cursor(IDC_ARROW);
-    repaint();
+    ShowWindow(hwnd, SW_SHOW);
 }
-
-
 
 LRESULT MainWin::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -43,17 +68,36 @@ LRESULT MainWin::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     else if (msg == WM_SETCURSOR) {
         return true;
     }
+    //else if (msg == WM_ERASEBKGND) {
+    //    return true;
+    //}
+    //else if (msg == WM_PAINT) {
+    //    return true;
+    //}
     auto obj = reinterpret_cast<MainWin*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
-    if (obj)
-    {
-        obj->processNativeMsg(msg,wParam, lParam);
-    }
-    return DefWindowProc(hWnd, msg, wParam, lParam);
+    return obj->processNativeMsg(hWnd, msg, wParam, lParam);
 }
 
-void MainWin::processNativeMsg(UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg)
     {
+        case WM_MOVE: {
+            x = GET_X_LPARAM(lParam);
+            y = GET_Y_LPARAM(lParam);
+            break;
+        }
+        case WM_NCHITTEST: {
+            POINT pt;
+            pt.x = GET_X_LPARAM(lParam);
+            pt.y = GET_Y_LPARAM(lParam);
+            ScreenToClient(hwnd, &pt);
+            auto flag = titleBar->IsInCaption(pt.x, pt.y);
+            return flag ? HTCAPTION : HTCLIENT;
+        }
+        case WM_PAINT: {
+            repaint();
+            break;
+        }
         case WM_LBUTTONDOWN:
         {
             isMouseDown = true;
@@ -83,8 +127,8 @@ void MainWin::processNativeMsg(UINT msg, WPARAM wParam, LPARAM lParam) {
             RECT* const rect = (RECT*)lParam;
             x = rect->left;
             y = rect->top;
-            w = rect->right - rect->left;
-            h = rect->bottom - rect->top;
+            w = 580*dpi;
+            h = 580*dpi;
             initCanvas();
             SetWindowPos(hwnd, NULL,x,y,w, h,SWP_NOZORDER | SWP_NOACTIVATE);
             onDpiChange();
@@ -99,9 +143,10 @@ void MainWin::processNativeMsg(UINT msg, WPARAM wParam, LPARAM lParam) {
             if (wParam == RefreshTimerId) {
                 KillTimer(hwnd, RefreshTimerId);
                 refreshFlag = false;
-                repaint();
+                InvalidateRect(hwnd, nullptr, false);
             }
             break;
         }
     }
+    return DefWindowProc(hWnd, msg, wParam, lParam);
 }

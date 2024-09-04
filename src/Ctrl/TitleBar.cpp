@@ -6,6 +6,7 @@
 #include "../Font.h"
 #include "../MainWin.h"
 #include "../TypeDefine.h"
+#include "../EmbedHelper.h"
 
 
 TitleBar::TitleBar()
@@ -16,15 +17,21 @@ TitleBar::~TitleBar()
 {
 }
 
+bool TitleBar::IsInCaption(const int& x, const int& y)
+{
+	if (dragRect.contains(x, y)) {
+		return true;
+	}
+	return false;
+}
+
 void TitleBar::Init()
 {
 	auto win = App::GetWin();
 	win->paintHandlers.push_back(std::bind(&TitleBar::OnPaint, this, std::placeholders::_1));
 	win->dpiHandlers.push_back(std::bind(&TitleBar::OnDpi, this));
 	win->mouseMoveHandlers.push_back(std::bind(&TitleBar::OnMouseMove, this, std::placeholders::_1, std::placeholders::_2));
-	win->mouseMoveHandlers.push_back(std::bind(&TitleBar::OnMouseDrag, this, std::placeholders::_1, std::placeholders::_2));
-	win->mouseMoveHandlers.push_back(std::bind(&TitleBar::OnLeftBtnDown, this, std::placeholders::_1, std::placeholders::_2));
-	win->mouseMoveHandlers.push_back(std::bind(&TitleBar::OnLeftBtnUp, this, std::placeholders::_1, std::placeholders::_2));
+	win->leftBtnDownHandlers.push_back(std::bind(&TitleBar::OnLeftBtnDown, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 void TitleBar::OnPaint(SkCanvas* canvas)
@@ -60,34 +67,49 @@ void TitleBar::OnDpi()
 	settingRect.setXYWH(win->w - margin - size, margin, size, size);
 	pinRect.setXYWH(settingRect.fLeft-margin-size, margin, size, size);
 	fontSize = 14 * win->dpi;
+	dragRect.setLTRB(0, 0, pinRect.fLeft - margin, 48 * win->dpi);
 }
 
 void TitleBar::OnLeftBtnDown(const int& x, const int& y)
 {
-}
-
-void TitleBar::OnLeftBtnUp(const int& x, const int& y)
-{
+	if (mouseInPinBtn) {
+		EmbedHelper::Embed();
+		auto win = App::GetWin();
+		SendMessage(win->hwnd, WM_LBUTTONUP, MK_LBUTTON, MAKELPARAM(x, y));
+	}
+	else if (mouseInSettingBtn) {
+		auto win = App::GetWin();
+		win->Close();
+	}
 }
 
 void TitleBar::OnMouseMove(const int& x, const int& y)
 {
-	auto flag1 = pinRect.contains(x, y);
-	auto flag2 = settingRect.contains(x, y);
-	if (flag1 != mouseInPinBtn || flag2 != mouseInSettingBtn) {
-		mouseInPinBtn = flag1;
-		mouseInSettingBtn = flag2;
-		auto win = App::GetWin();
+	auto pinFlag = pinRect.contains(x, y);
+	auto settingFlag = settingRect.contains(x, y);
+	auto win = App::GetWin();
+	if (mouseInPinBtn && !pinFlag) {
+		mouseInPinBtn = false;
+		App::Cursor(IDC_ARROW);
 		win->Refresh();
-		if (mouseInPinBtn || mouseInSettingBtn) {
-			App::Cursor(IDC_HAND);
-		}
-		else {
-			App::Cursor(IDC_ARROW);
-		}
+		return;
 	}
-}
-
-void TitleBar::OnMouseDrag(const int& x, const int& y)
-{
+	if (mouseInSettingBtn && !settingFlag) {
+		mouseInSettingBtn = false;
+		App::Cursor(IDC_ARROW);
+		win->Refresh();
+		return;
+	}
+	if (!mouseInPinBtn && pinFlag) {
+		mouseInPinBtn = true;
+		App::Cursor(IDC_HAND);
+		win->Refresh();
+		return;
+	}
+	if (!mouseInSettingBtn && settingFlag) {
+		mouseInSettingBtn = true;
+		App::Cursor(IDC_HAND);
+		win->Refresh();
+		return;
+	}
 }
