@@ -53,5 +53,6 @@ private:
 	ID2D1Factory* sg_pID2D1Factory;
 	ID2D1HwndRenderTarget* renderTarget;
 	ID2D1Bitmap* bitmap;
+	bool isTrackMouseEvent{ false };
 };
 

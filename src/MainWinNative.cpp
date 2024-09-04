@@ -71,9 +71,6 @@ LRESULT MainWin::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     //else if (msg == WM_ERASEBKGND) {
     //    return true;
     //}
-    //else if (msg == WM_PAINT) {
-    //    return true;
-    //}
     auto obj = reinterpret_cast<MainWin*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
     return obj->processNativeMsg(hWnd, msg, wParam, lParam);
 }
@@ -101,6 +98,7 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
         case WM_LBUTTONDOWN:
         {
             isMouseDown = true;
+            SetCapture(hwnd);
             onLeftBtnDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             break;
         }
@@ -108,10 +106,19 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
         {
             isMouseDown = false;
             onLeftBtnUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            ReleaseCapture();
             break;
         }
         case WM_MOUSEMOVE:
         {
+            //if (!isTrackMouseEvent) {
+            //    TRACKMOUSEEVENT tme = {};
+            //    tme.cbSize = sizeof(TRACKMOUSEEVENT);
+            //    tme.dwFlags = TME_HOVER|TME_LEAVE;
+            //    tme.hwndTrack = hWnd;
+            //    tme.dwHoverTime = HOVER_DEFAULT;
+            //    isTrackMouseEvent = TrackMouseEvent(&tme);
+            //}
             if (isMouseDown) {
                 onMouseDrag(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             }
@@ -121,6 +128,17 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
             }
             break;
         }
+        //case WM_MOUSELEAVE: {
+        //    TRACKMOUSEEVENT tme = {};
+        //    tme.cbSize = sizeof(TRACKMOUSEEVENT);
+        //    tme.dwFlags = TME_CANCEL | TME_HOVER | TME_LEAVE;
+        //    tme.hwndTrack = hWnd;
+        //    TrackMouseEvent(&tme);
+        //    isTrackMouseEvent = false;
+        //    onMouseMove(-888888, -888888);
+        //    isMouseDown = false;
+        //    break;
+        //}
         case WM_DPICHANGED: {
             UINT dpiVal = HIWORD(wParam);
             dpi = dpiVal / 96.0f;
