@@ -4,10 +4,13 @@
 #include <rapidjson/document.h>
 
 #include "WsConn.h"
-#include "App.h"
 #include "MainWin.h"
 #include "Skin.h"
 #include "Ctrl/CalendarHeader.h"
+
+namespace {
+	std::unique_ptr<WsConn> wsConn;
+}
 
 WsConn::WsConn()
 {
@@ -37,7 +40,13 @@ std::wstring strToWStr(const char* str)
 
 void WsConn::Init()
 {
-	initJson();
+	wsConn = std::make_unique<WsConn>();
+	wsConn->initJson();
+}
+
+WsConn* WsConn::Get()
+{
+	return wsConn.get();
 }
 
 void WsConn::initJson()
@@ -95,9 +104,8 @@ void WsConn::initJson()
 	auto data = d["data"].GetObj();
 	auto theme =  data["backgroundTheme"].GetString();
 	auto alpha = data["backgroundOpacity"].GetFloat();
-	auto win = App::GetWin();
-	win->skin->Init(theme,alpha);
-	win->calendarHeader->yearMonthStr = data["activeDateMonth"].GetString();
-	win->Refresh();
+	Skin::Init(theme,alpha);
+	CalendarHeader::Get()->yearMonthStr = data["activeDateMonth"].GetString();
+	MainWin::Get()->Refresh();
 
 }

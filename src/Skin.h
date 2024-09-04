@@ -7,7 +7,8 @@ class Skin
 public:
 	Skin();
 	~Skin();
-	void Init(const std::string& theme,const float& alpha);
+	static void Init(const std::string& theme,const float& alpha);
+	static Skin* Get();
 public:
 	SkColor bg;
 	SkColor text0;

@@ -7,7 +7,8 @@ class CalendarHeader
 public:
 	CalendarHeader();
 	~CalendarHeader();
-	void Init();
+	static void Init();
+	static CalendarHeader* Get();
 	void OnPaint(SkCanvas* canvas);
 	void OnDpi();
 	void OnLeftBtnDown(const int& x, const int& y);

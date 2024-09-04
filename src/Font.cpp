@@ -1,12 +1,13 @@
-#include "Font.h"
-#include "include/core/SkFontStyle.h"
-#include "include/core/SkData.h"
-#include "include/ports/SkTypeface_win.h"
+#include <include/core/SkFontStyle.h>
+#include <include/core/SkData.h>
+#include <include/ports/SkTypeface_win.h>
 #include <Windows.h>
 #include <shlobj.h>
-#include "../res/res.h"
-#include "App.h"
 #include <memory>
+
+#include "Font.h"
+#include "MainWin.h"
+#include "../res/res.h"
 
 namespace {
     std::unique_ptr<Font> font;
@@ -40,7 +41,7 @@ SkFont* Font::GetText()
 
 void Font::initFontIcon(SkFontMgr* fontMgr)
 {
-    auto instance = App::Get()->instance;
+    auto instance = MainWin::Get()->instance;
     HRSRC resID = FindResource(instance, MAKEINTRESOURCE(IDR_ICON_FONT), L"ICON_FONT");
     if (resID == 0) return;
     size_t resSize = SizeofResource(instance, resID);

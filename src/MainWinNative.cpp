@@ -2,7 +2,6 @@
 #include <format>
 #include <windowsx.h>
 #include "MainWin.h"
-#include "App.h"
 #include "Ctrl/TitleBar.h"
 
 bool MainWin::EnableAlpha(HWND hwnd)
@@ -38,22 +37,21 @@ void MainWin::createWindow()
 {
     static int num = 0;
     std::wstring clsName = std::format(L"EmbedCalendar{}", num++);
-    auto hinstance = App::Get()->instance;
     WNDCLASSEX wcx{};
     wcx.cbSize = sizeof(wcx);
     wcx.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
     wcx.lpfnWndProc = &MainWin::routeWinMsg;
     wcx.cbWndExtra = sizeof(MainWin*);
-    wcx.hInstance = hinstance;
-    wcx.hIcon = LoadIcon(hinstance, IDI_APPLICATION);
-    wcx.hCursor = LoadCursor(hinstance, IDC_CROSS);
+    wcx.hInstance = instance;
+    wcx.hIcon = LoadIcon(instance, IDI_APPLICATION);
+    wcx.hCursor = LoadCursor(instance, IDC_CROSS);
     wcx.hbrBackground = (HBRUSH)COLOR_WINDOW;
     wcx.lpszClassName = clsName.c_str();
     RegisterClassEx(&wcx);
     hwnd = CreateWindowEx(NULL, clsName.c_str(), clsName.c_str(), WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP,
-        x, y, w, h, NULL, NULL, hinstance, static_cast<LPVOID>(this));
+        x, y, w, h, NULL, NULL, instance, static_cast<LPVOID>(this));
     EnableAlpha(hwnd);
-    App::Cursor(IDC_ARROW);
+    MainWin::Cursor(IDC_ARROW);
     ShowWindow(hwnd, SW_SHOW);
 }
 
@@ -88,7 +86,7 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
             pt.x = GET_X_LPARAM(lParam);
             pt.y = GET_Y_LPARAM(lParam);
             ScreenToClient(hWnd, &pt);
-            auto flag = titleBar->IsInCaption(pt.x, pt.y);
+            auto flag = TitleBar::Get()->IsInCaption(pt.x, pt.y);
             return flag ? HTCAPTION : HTCLIENT;
         }
         case WM_PAINT: {

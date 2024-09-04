@@ -2,7 +2,6 @@
 #include <sstream>
 
 #include "EmbedHelper.h"
-#include "App.h"
 #include "MainWin.h"
 
 namespace {
@@ -13,7 +12,7 @@ namespace {
 bool checkMouse(POINT& point) {
     POINT globalPos;
     GetCursorPos(&globalPos);
-    auto win = App::GetWin();
+    auto win = MainWin::Get();
     if (globalPos.x > win->x && globalPos.y > win->y && 
         globalPos.x < win->x + win->w && globalPos.y < win->y + win->h) {
         point.x = globalPos.x - win->x;
@@ -45,11 +44,11 @@ RAWINPUT* getRawInput(HRAWINPUT lParam) {
 }
 
 void postMsg(UINT msg, WPARAM wParam, LPARAM lParam) {
-    auto win = App::GetWin();
+    auto win = MainWin::Get();
     PostMessage(win->hwnd, msg, wParam, lParam);
 }
 void postMsg(UINT msg, WPARAM wParam, const POINT& point) {
-    auto win = App::GetWin();
+    auto win = MainWin::Get();
     auto lParam = MAKELPARAM(point.x, point.y);
     PostMessage(win->hwnd, msg, wParam, lParam);
 }
@@ -99,7 +98,7 @@ LRESULT CALLBACK EmbedHelper::handleWindowMessage(HWND hWnd, UINT uMsg, WPARAM w
 }
 void EmbedHelper::roteInput()
 {
-    auto win = App::GetWin();
+    auto win = MainWin::Get();
     RAWINPUTDEVICE rids[1];
     rids[0].usUsagePage = 0x01;
     rids[0].usUsage = 0x02;
@@ -113,7 +112,7 @@ EmbedHelper::~EmbedHelper()
 }
 
 void EmbedHelper::Embed() { 
-    auto win = App::GetWin();
+    auto win = MainWin::Get();
     if (isEmbeded) {
         SetWindowLongPtr(win->hwnd, GWLP_WNDPROC, (LONG_PTR)OldProc);
         SetParent(win->hwnd, nullptr);

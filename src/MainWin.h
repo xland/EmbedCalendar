@@ -17,11 +17,14 @@ class MainWin
 public:
 	MainWin();
 	~MainWin();
-	void Init();
+	static void Init(HINSTANCE instance, std::wstring&& cmd);
+	static MainWin* Get();
+	static void Cursor(LPWSTR id);
 	void Refresh();
 	void Close();
 	bool EnableAlpha(HWND hwnd);
 public:
+	HINSTANCE instance;
 	std::unique_ptr<SkCanvas> canvas;
 	std::vector<SkColor> winPix;
 	HWND hwnd;
@@ -29,10 +32,6 @@ public:
 	bool isMouseDown{ false };
 	float dpi{ 1.0 };
 public:
-	std::unique_ptr<TitleBar> titleBar;
-	std::unique_ptr<CalendarHeader> calendarHeader;
-	std::unique_ptr<WsConn> wsConn;
-	std::unique_ptr<Skin> skin;
 	std::vector<MouseEventCB> mouseMoveHandlers;
 	std::vector<MouseEventCB> mouseDragHandlers;
 	std::vector<MouseEventCB> leftBtnDownHandlers;

@@ -7,8 +7,9 @@ class TitleBar
 public:
 	TitleBar();
 	~TitleBar();
+	static void Init();
+	static TitleBar* Get();
 	bool IsInCaption(const int& x, const int& y);
-	void Init();
 	void OnPaint(SkCanvas* canvas);
 	void OnDpi();
 	void OnLeftBtnDown(const int& x, const int& y);

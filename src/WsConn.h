@@ -4,7 +4,8 @@ class WsConn
 public:
 	WsConn();
 	~WsConn();
-	void Init();
+	static void Init();
+	static WsConn* Get();
 private:
 	void initJson();
 };

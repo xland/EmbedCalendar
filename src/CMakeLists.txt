@@ -1,6 +1,6 @@
 target_sources(${PROJECT_NAME} PRIVATE 
 "main.cpp" 
-"App.h" "App.cpp" 
+  
 "WsConn.h" "WsConn.cpp" 
 "MainWin.h" "MainWin.cpp"
 "EmbedHelper.h" "EmbedHelper.cpp"

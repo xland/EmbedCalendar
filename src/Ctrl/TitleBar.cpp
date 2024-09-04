@@ -2,13 +2,15 @@
 #include <include/core/SkPaint.h>
 
 #include "TitleBar.h"
-#include "../App.h"
 #include "../Font.h"
 #include "../MainWin.h"
 #include "../TypeDefine.h"
 #include "../EmbedHelper.h"
 #include "../Skin.h"
 
+namespace {
+	std::unique_ptr<TitleBar> titleBar;
+}
 
 TitleBar::TitleBar()
 {
@@ -16,6 +18,21 @@ TitleBar::TitleBar()
 
 TitleBar::~TitleBar()
 {
+}
+
+void TitleBar::Init()
+{
+	titleBar = std::make_unique<TitleBar>();
+	auto win = MainWin::Get();
+	win->paintHandlers.push_back(std::bind(&TitleBar::OnPaint, titleBar.get(), std::placeholders::_1));
+	win->dpiHandlers.push_back(std::bind(&TitleBar::OnDpi, titleBar.get()));
+	win->mouseMoveHandlers.push_back(std::bind(&TitleBar::OnMouseMove, titleBar.get(), std::placeholders::_1, std::placeholders::_2));
+	win->leftBtnDownHandlers.push_back(std::bind(&TitleBar::OnLeftBtnDown, titleBar.get(), std::placeholders::_1, std::placeholders::_2));
+}
+
+TitleBar* TitleBar::Get()
+{
+	return titleBar.get();
 }
 
 bool TitleBar::IsInCaption(const int& x, const int& y)
@@ -26,30 +43,21 @@ bool TitleBar::IsInCaption(const int& x, const int& y)
 	return false;
 }
 
-void TitleBar::Init()
-{
-	auto win = App::GetWin();
-	win->paintHandlers.push_back(std::bind(&TitleBar::OnPaint, this, std::placeholders::_1));
-	win->dpiHandlers.push_back(std::bind(&TitleBar::OnDpi, this));
-	win->mouseMoveHandlers.push_back(std::bind(&TitleBar::OnMouseMove, this, std::placeholders::_1, std::placeholders::_2));
-	win->leftBtnDownHandlers.push_back(std::bind(&TitleBar::OnLeftBtnDown, this, std::placeholders::_1, std::placeholders::_2));
-}
-
 void TitleBar::OnPaint(SkCanvas* canvas)
 {
 	SkPaint paint;
-	auto win = App::GetWin();
+	auto win = MainWin::Get();
 	if (mouseInPinBtn) {
-		paint.setColor(win->skin->hoverBg);
+		paint.setColor(Skin::Get()->hoverBg);
 		canvas->drawRect(pinRect, paint);
 	}
 	if (mouseInSettingBtn) {
-		paint.setColor(win->skin->hoverBg);
+		paint.setColor(Skin::Get()->hoverBg);
 		canvas->drawRect(settingRect, paint);
 	}
 	auto font = Font::GetIcon();
 	font->setSize(fontSize);
-	paint.setColor(win->skin->text1);
+	paint.setColor(Skin::Get()->text1);
 	auto setting = (const char*)u8"\ue6e8";
 	auto pin = (const char*)u8"\ue70c";
 	SkRect measureRect;
@@ -63,7 +71,7 @@ void TitleBar::OnPaint(SkCanvas* canvas)
 
 void TitleBar::OnDpi()
 {
-	auto win = App::GetWin();
+	auto win = MainWin::Get();
 	auto margin = 10 * win->dpi;
 	auto size = 28 * win->dpi;
 	settingRect.setXYWH(win->w - margin - size, margin, size, size);
@@ -76,11 +84,11 @@ void TitleBar::OnLeftBtnDown(const int& x, const int& y)
 {
 	if (mouseInPinBtn) {
 		EmbedHelper::Embed();
-		auto win = App::GetWin();
+		auto win = MainWin::Get();
 		SendMessage(win->hwnd, WM_LBUTTONUP, MK_LBUTTON, MAKELPARAM(x, y));
 	}
 	else if (mouseInSettingBtn) {
-		auto win = App::GetWin();
+		auto win = MainWin::Get();
 		win->Close();
 	}
 }
@@ -89,28 +97,28 @@ void TitleBar::OnMouseMove(const int& x, const int& y)
 {
 	auto pinFlag = pinRect.contains(x, y);
 	auto settingFlag = settingRect.contains(x, y);
-	auto win = App::GetWin();
+	auto win = MainWin::Get();
 	if (mouseInPinBtn && !pinFlag) {
 		mouseInPinBtn = false;
-		App::Cursor(IDC_ARROW);
+		MainWin::Cursor(IDC_ARROW);
 		win->Refresh();
 		return;
 	}
 	if (mouseInSettingBtn && !settingFlag) {
 		mouseInSettingBtn = false;
-		App::Cursor(IDC_ARROW);
+		MainWin::Cursor(IDC_ARROW);
 		win->Refresh();
 		return;
 	}
 	if (!mouseInPinBtn && pinFlag) {
 		mouseInPinBtn = true;
-		App::Cursor(IDC_HAND);
+		MainWin::Cursor(IDC_HAND);
 		win->Refresh();
 		return;
 	}
 	if (!mouseInSettingBtn && settingFlag) {
 		mouseInSettingBtn = true;
-		App::Cursor(IDC_HAND);
+		MainWin::Cursor(IDC_HAND);
 		win->Refresh();
 		return;
 	}

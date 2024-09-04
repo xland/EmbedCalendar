@@ -7,6 +7,11 @@
 #include "./Ctrl/CalendarHeader.h"
 #include "WsConn.h"
 #include "Skin.h"
+#include "Font.h"
+
+namespace {
+    std::unique_ptr<MainWin> win;
+}
 
 MainWin::MainWin()
 {
@@ -17,7 +22,7 @@ MainWin::~MainWin()
     SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE);
 }
 
-void MainWin::Init()
+void MainWin::Init(HINSTANCE instance, std::wstring&& cmd)
 {
     //std::string hwndStr = "002C089C"; 
     //std::stringstream ss;
@@ -26,19 +31,30 @@ void MainWin::Init()
     //ss >> hwndHex; 
     //HWND hwnd = reinterpret_cast<HWND>(hwndHex);
     //PostMessage(hwnd, WM_CLOSE, 0, 0);
-
-
+    
     SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE);
-    titleBar = std::make_unique<TitleBar>();
-    titleBar->Init();
-    calendarHeader = std::make_unique<CalendarHeader>();
-    calendarHeader->Init();
-    skin = std::make_unique<Skin>();
-    wsConn = std::make_unique<WsConn>();
-    wsConn->Init();
-    getDpi();
-    initCanvas();
-    createWindow();
+    win = std::make_unique<MainWin>();
+    win->instance = instance;
+    Font::Init();    
+    TitleBar::Init();
+    CalendarHeader::Init();
+    WsConn::Init();
+    win->getDpi();
+    win->initCanvas();
+    win->createWindow();
+}
+MainWin* MainWin::Get()
+{
+    return win.get();
+}
+void MainWin::Cursor(LPWSTR id)
+{
+    static auto _id{ IDC_NO };
+    if (_id == id) {
+        return;
+    }
+    _id = id;
+    SetCursor(LoadCursor(nullptr, id));
 }
 void MainWin::getDpi()
 {
@@ -77,7 +93,7 @@ void MainWin::Close()
 
 void MainWin::repaint()
 {
-    canvas->clear(skin->bg);
+    canvas->clear(Skin::Get()->bg);
     for (size_t i = 0; i < paintHandlers.size(); i++)
     {
         paintHandlers[i](canvas.get());

@@ -1,4 +1,10 @@
+#include <memory>
+
 #include "Skin.h"
+
+namespace {
+	std::unique_ptr<Skin> skin;
+}
 
 Skin::Skin()
 {
@@ -10,15 +16,21 @@ Skin::~Skin()
 
 void Skin::Init(const std::string& theme, const float& alpha)
 {
+	skin = std::make_unique<Skin>();
 	auto alphaVal = static_cast<int>(std::round(alpha*255));
 	if (theme == "type1") {
-		bg = SkColorSetARGB(alphaVal, 255, 255, 255);
-		initWhite();
+		skin->bg = SkColorSetARGB(alphaVal, 255, 255, 255);
+		skin->initWhite();
 	}
 	else {
-		bg = SkColorSetARGB(alphaVal, 0, 0, 0);
-		initBlack();
+		skin->bg = SkColorSetARGB(alphaVal, 0, 0, 0);
+		skin->initBlack();
 	}
+}
+
+Skin* Skin::Get()
+{
+	return skin.get();
 }
 
 void Skin::initBlack()

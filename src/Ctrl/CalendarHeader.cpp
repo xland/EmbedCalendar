@@ -1,13 +1,15 @@
 
 
 #include "CalendarHeader.h"
-#include "../App.h"
 #include "../Font.h"
 #include "../MainWin.h"
 #include "../TypeDefine.h"
 #include "../EmbedHelper.h"
 #include "../Skin.h"
 
+namespace {
+	std::unique_ptr<CalendarHeader> calendarHeader;
+}
 
 CalendarHeader::CalendarHeader()
 {
@@ -19,11 +21,17 @@ CalendarHeader::~CalendarHeader()
 
 void CalendarHeader::Init()
 {
-	auto win = App::GetWin();
-	win->paintHandlers.push_back(std::bind(&CalendarHeader::OnPaint, this, std::placeholders::_1));
-	win->dpiHandlers.push_back(std::bind(&CalendarHeader::OnDpi, this));
-	win->mouseMoveHandlers.push_back(std::bind(&CalendarHeader::OnMouseMove, this, std::placeholders::_1, std::placeholders::_2));
-	win->leftBtnDownHandlers.push_back(std::bind(&CalendarHeader::OnLeftBtnDown, this, std::placeholders::_1, std::placeholders::_2));
+	calendarHeader = std::make_unique<CalendarHeader>();
+	auto win = MainWin::Get();
+	win->paintHandlers.push_back(std::bind(&CalendarHeader::OnPaint, calendarHeader.get(), std::placeholders::_1));
+	win->dpiHandlers.push_back(std::bind(&CalendarHeader::OnDpi, calendarHeader.get()));
+	win->mouseMoveHandlers.push_back(std::bind(&CalendarHeader::OnMouseMove, calendarHeader.get(), std::placeholders::_1, std::placeholders::_2));
+	win->leftBtnDownHandlers.push_back(std::bind(&CalendarHeader::OnLeftBtnDown, calendarHeader.get(), std::placeholders::_1, std::placeholders::_2));
+}
+
+CalendarHeader* CalendarHeader::Get()
+{
+	return calendarHeader.get();
 }
 
 void CalendarHeader::OnPaint(SkCanvas* canvas)
