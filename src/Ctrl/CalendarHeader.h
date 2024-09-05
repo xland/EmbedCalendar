@@ -19,7 +19,6 @@ public:
 	float r;
 private:
 	void measure();
-	bool isInCircle(float px, float py, const SkPoint& center);
 private:
 	std::string yearMonthStr;
 	SkPoint textPos;

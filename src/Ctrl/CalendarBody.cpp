@@ -37,79 +37,100 @@ void CalendarBody::OnPaint(SkCanvas* canvas)
 	auto win = MainWin::Get();
 	auto skin = Skin::Get();
 	auto font = Font::GetText();
-	
-
 	SkPaint paint;
 	paint.setAntiAlias(true);
-
-
-
-	SkPoint pos{ SkPoint::Make(x,y) };
-	for (size_t yIndex = 0; yIndex < 6; yIndex++) {
-		pos.fY += 2 * win->dpi;
-		for (size_t xIndex = 0; xIndex < 7; xIndex++)
+	for (size_t i = 0; i < items.size(); i++)
+	{
+		auto& item = items[i];
+		if (item.isActive) {
+			paint.setColor(0xFFF02C38);
+			canvas->drawCircle(item.cX, item.cY, rr, paint);
+		}
+		else if(i == hoverIndex)
 		{
 			paint.setColor(skin->hoverBg);
-			canvas->drawCircle(pos.fX+r, pos.fY+r, r, paint);
-			auto& item = items[yIndex * 7 + xIndex];
-
-			paint.setColor(skin->text0);
-			font->setSize(numSize);
-			if (item.date.length() > 1) {
-				canvas->drawString(item.date.data(), pos.fX + numX2, pos.fY + numY, *font, paint);
-			}
-			else {
-				canvas->drawString(item.date.data(), pos.fX + numX1, pos.fY + numY, *font, paint);
-			}
-
-			paint.setColor(skin->text1);
-			font->setSize(textSize1);
-			if (item.lunar.size() > 6) {
-				canvas->drawString(item.lunar.data(), pos.fX + textX2, pos.fY + textY, *font, paint);
-			}
-			else {
-				canvas->drawString(item.lunar.data(), pos.fX + textX1, pos.fY + textY, *font, paint);
-			}
-
-			pos.fX += span;
+			canvas->drawCircle(item.cX, item.cY, rr, paint);
 		}
-		pos.fY += 2*r;
-		pos.fX = x;
+		if (item.isToday) {
+			paint.setColor(0xFFF02C38);
+			paint.setStroke(true);
+			paint.setStrokeWidth(1.6);
+			canvas->drawCircle(item.cX, item.cY, rr, paint);
+			paint.setStroke(false);
+		}
+		SkColor tColor{ skin->text2 };
+		if (item.isActive) {
+			tColor = 0xFFFFFFFF;
+		}
+		else if (item.isCurrt) {
+			tColor = skin->text0;
+		}
+		font->setSize(dateSize);
+		paint.setColor(tColor);
+		canvas->drawString(item.date.data(),item.dateX, item.dateY, *font, paint);
+
+		paint.setColor(item.isActive ? 0xFFFFFFFF : skin->text1);
+		font->setSize(lunarSize);
+		canvas->drawString(item.lunar.data(),item.lunarX,item.lunarY, *font, paint);
+
+		paint.setColor(item.isActive ? 0xFFFFFFFF : skin->text1);
+		font->setSize(badgeSize);
+		canvas->drawString(item.badge.data(),item.badgeX,item.badgeY, *font, paint);
+
+		if (item.hasSchdule) {
+			paint.setColor(tColor);
+			canvas->drawCircle(item.cX, item.cY + 23 * win->dpi, 3 * win->dpi, paint);
+		}
 	}
 }
 
 void CalendarBody::OnDpi()
 {
 	auto win = MainWin::Get();
-	r = 28 * win->dpi;
-	x = 30 * win->dpi;
-	y = WeekHeader::Get()->bottom + 6 * win->dpi;
+	rr = 28 * win->dpi;
+	l = 30 * win->dpi;
+	t = WeekHeader::Get()->bottom + 6 * win->dpi;
+	b = t+ 6 * 2 * win->dpi + 6 * (2*rr);
+	r = win->w - l;
 	span = (win->w - 20 * win->dpi * 2) / 7;
 
-	numSize = 20 * win->dpi;
-	textSize1 = 12* win->dpi;
+	dateSize = 20 * win->dpi;
+	lunarSize = 11 * win->dpi;
+	badgeSize = 10 * win->dpi;
 	auto font = Font::GetText();
-	font->setSize(numSize);
 	SkRect measureRect;
-	font->measureText("1", 1, SkTextEncoding::kUTF8, &measureRect);
-	numX1 = r - measureRect.width() / 2 - measureRect.fLeft;
-	numY = 0 - measureRect.fTop + 10*win->dpi;
 
-	font->measureText("11", 2, SkTextEncoding::kUTF8, &measureRect);
-	numX2 = r - measureRect.width() / 2 - measureRect.fLeft;
+	SkPoint pos{ SkPoint::Make(l,t) };
+	for (size_t yIndex = 0; yIndex < 6; yIndex++) 
+	{
+		pos.fY += 2 * win->dpi;
+		for (size_t xIndex = 0; xIndex < 7; xIndex++)
+		{
+			auto& item = items[yIndex * 7 + xIndex];
+			item.cX = pos.fX + rr;
+			item.cY = pos.fY + rr;
+			font->setSize(dateSize);
+			font->measureText(item.date.data(), item.date.size(), SkTextEncoding::kUTF8, &measureRect);
+			item.dateX = pos.fX + rr - measureRect.width() / 2 - measureRect.fLeft;
+			item.dateY= pos.fY + 0 - measureRect.fTop + 12 * win->dpi;
+		
+		
+			font->setSize(lunarSize);
+			font->measureText(item.lunar.data(), item.lunar.size(), SkTextEncoding::kUTF8, &measureRect);
+			item.lunarX = pos.fX + rr - measureRect.width() / 2 - measureRect.fLeft;
+			item.lunarY = pos.fY + 0 - measureRect.fTop + 32 * win->dpi;
+		
+		
+			font->setSize(badgeSize);
+			font->measureText(item.badge.data(), item.badge.size(), SkTextEncoding::kUTF8, &measureRect);
+			item.badgeX = pos.fX + 0 - measureRect.width() / 2 - measureRect.fLeft + 46 * win->dpi - 2;
+			item.badgeY = pos.fY + (0 - measureRect.fTop + 8 * win->dpi);
 
-
-	font->setSize(textSize1);
-
-	auto str = Util::ToStr(L"初一");
-	font->measureText(str.data(), str.size(), SkTextEncoding::kUTF8, &measureRect);
-	textX1 = r - measureRect.width() / 2 - measureRect.fLeft + 2;
-	textY = 0 - measureRect.fTop + 30 * win->dpi;
-
-	str = Util::ToStr(L"七夕节");
-	font->measureText(str.data(), str.size(), SkTextEncoding::kUTF8, &measureRect);
-	textX2 = r - measureRect.width() / 2 - measureRect.fLeft + 2;
-
+			pos.fX += span;
+		}
+		pos.fY += 2 * rr;
+		pos.fX = l;
+	}	
 }
 
 void CalendarBody::OnLeftBtnDown(const int& x, const int& y)
@@ -119,6 +140,39 @@ void CalendarBody::OnLeftBtnDown(const int& x, const int& y)
 
 void CalendarBody::OnMouseMove(const int& x, const int& y)
 {
+	if (x<l || x>r || y<t || y>b) {
+
+		if (hoverIndex>=0) {
+			hoverIndex = -1;
+			MainWin::Cursor(IDC_ARROW);
+			auto win = MainWin::Get();
+			win->Refresh();
+		}
+
+		return;
+	}
+	int index{-1};
+	SkPoint mousePos{ SkPoint::Make(x,y) };
+	for (size_t i = 0; i < items.size(); i++)
+	{
+		SkPoint center{ SkPoint::Make(items[i].cX,items[i].cY) };
+		bool flag = Util::IsInCircle(center, rr, mousePos);
+		if (flag) {
+			index = i;
+			break;
+		}
+	}
+	if (index != hoverIndex) {
+		hoverIndex = index;
+		auto win = MainWin::Get();
+		win->Refresh();
+	}
+	if (hoverIndex>=0) {
+		MainWin::Cursor(IDC_HAND);
+	}
+	else {
+		MainWin::Cursor(IDC_ARROW);
+	}
 }
 
 void CalendarBody::SetText(std::vector<DateItem>&& param)

@@ -6,6 +6,7 @@
 #include "../TypeDefine.h"
 #include "../Skin.h"
 #include "TitleBar.h"
+#include "../Util.h"
 
 namespace {
 	std::unique_ptr<CalendarHeader> calendarHeader;
@@ -85,8 +86,9 @@ void CalendarHeader::OnMouseMove(const int& x, const int& y)
 			win->Refresh();
 		}
 	}
-	auto leftFlag = isInCircle(x, y,c1Center);
-	auto rightFlag = isInCircle(x, y, c2Center);
+	SkPoint mousePos{ SkPoint::Make(x, y) };
+	auto leftFlag = Util::IsInCircle(c1Center,r, mousePos);
+	auto rightFlag = Util::IsInCircle(c2Center, r, mousePos);
 	if (mouseInLeft && !leftFlag) {
 		mouseInLeft = false;
 		MainWin::Cursor(IDC_ARROW);
@@ -148,10 +150,4 @@ void CalendarHeader::measure()
 
 	icon2Pos.fY = icon1Pos.fY;
 	icon2Pos.fX = c2Center.fX - (c1Center.fX - icon1Pos.fX);
-}
-bool CalendarHeader::isInCircle(float px, float py, const SkPoint& center) {
-	float dx = px - center.fX;
-	float dy = py - center.fY;
-	float distance = std::sqrt(dx * dx + dy * dy);
-	return distance <= r;
 }

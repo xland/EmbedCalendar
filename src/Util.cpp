@@ -30,6 +30,14 @@ void Util::InitDebuger() {
     std::cout << "log start:" << std::endl;
 }
 
+bool Util::IsInCircle(const SkPoint& center, const float& r, const SkPoint& mousePos)
+{
+    float dx = mousePos.fX - center.fX;
+    float dy = mousePos.fY - center.fY;
+    float distance = std::sqrt(dx * dx + dy * dy);
+    return distance <= r;
+}
+
 std::string Util::ToStr(const wchar_t* wstr)
 {
 	const int count = WideCharToMultiByte(CP_UTF8, 0, wstr, wcslen(wstr), NULL, 0, NULL, NULL);

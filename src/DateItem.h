@@ -14,6 +14,11 @@ public:
 	bool isActive;
 	bool isToday;
 	bool isCurrt;
+	float dateX, dateY;
+	float lunarX, lunarY;
+	float badgeX, badgeY;
+	float cX, cY;
+	bool isHover;
 private:
 
 };

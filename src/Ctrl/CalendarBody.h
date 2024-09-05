@@ -20,9 +20,7 @@ public:
 
 private:
 	std::vector<DateItem> items;
-	float r,x,y,span;
-	float numX1, numX2, numY;
-	float textX1, textX2, textY;
-	float badgeX, badgeY;
-	float numSize, textSize1, textSize2;
+	float rr,l,t,b,r,span;
+	float dateSize, lunarSize, badgeSize;
+	int hoverIndex{ -1 };
 };
