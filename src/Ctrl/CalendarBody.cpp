@@ -1,8 +1,9 @@
-#include "CalendarBody.h"
+﻿#include "CalendarBody.h"
 #include "../Font.h"
 #include "../MainWin.h"
 #include "../TypeDefine.h"
 #include "../Skin.h"
+#include "../Util.h"
 #include "WeekHeader.h"
 namespace {
 	std::unique_ptr<CalendarBody> calendarBody;
@@ -60,7 +61,15 @@ void CalendarBody::OnPaint(SkCanvas* canvas)
 			else {
 				canvas->drawString(item.date.data(), pos.fX + numX1, pos.fY + numY, *font, paint);
 			}
-			
+
+			paint.setColor(skin->text1);
+			font->setSize(textSize1);
+			if (item.lunar.size() > 6) {
+				canvas->drawString(item.lunar.data(), pos.fX + textX2, pos.fY + textY, *font, paint);
+			}
+			else {
+				canvas->drawString(item.lunar.data(), pos.fX + textX1, pos.fY + textY, *font, paint);
+			}
 
 			pos.fX += span;
 		}
@@ -78,6 +87,7 @@ void CalendarBody::OnDpi()
 	span = (win->w - 20 * win->dpi * 2) / 7;
 
 	numSize = 20 * win->dpi;
+	textSize1 = 12* win->dpi;
 	auto font = Font::GetText();
 	font->setSize(numSize);
 	SkRect measureRect;
@@ -87,6 +97,18 @@ void CalendarBody::OnDpi()
 
 	font->measureText("11", 2, SkTextEncoding::kUTF8, &measureRect);
 	numX2 = r - measureRect.width() / 2 - measureRect.fLeft;
+
+
+	font->setSize(textSize1);
+
+	auto str = Util::ToStr(L"初一");
+	font->measureText(str.data(), str.size(), SkTextEncoding::kUTF8, &measureRect);
+	textX1 = r - measureRect.width() / 2 - measureRect.fLeft + 2;
+	textY = 0 - measureRect.fTop + 30 * win->dpi;
+
+	str = Util::ToStr(L"七夕节");
+	font->measureText(str.data(), str.size(), SkTextEncoding::kUTF8, &measureRect);
+	textX2 = r - measureRect.width() / 2 - measureRect.fLeft + 2;
 
 }
 

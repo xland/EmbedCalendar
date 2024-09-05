@@ -2,10 +2,13 @@
 
 #include <Windows.h>
 #include <functional>
+#include <iostream>
+
 #include "include/core/SkCanvas.h"
 
-const uint32_t CustomMsgId{ WM_APP + 1 };
-const uint32_t RefreshTimerId{ WM_APP + 2 };
+constexpr unsigned int CustomMsgId{ WM_APP + 1 };
+constexpr unsigned int RefreshTimerId{ WM_APP + 2 };
+constexpr unsigned int CheckWallPaperTimerId{ WM_APP + 3 };
 
 enum class EventType {
     maskReady = 0,

@@ -3,6 +3,7 @@
 #include <format>
 #include <rapidjson/document.h>
 
+#include "Util.h"
 #include "WsConn.h"
 #include "MainWin.h"
 #include "Skin.h"
@@ -21,24 +22,6 @@ WsConn::WsConn()
 
 WsConn::~WsConn()
 {
-}
-
-std::string wStrToStr(const wchar_t* wstr)
-{
-	const int count = WideCharToMultiByte(CP_UTF8, 0, wstr, wcslen(wstr), NULL, 0, NULL, NULL);
-	std::string str(count, 0);
-	WideCharToMultiByte(CP_UTF8, 0, wstr, -1, &str[0], count, NULL, NULL);
-	return str;
-}
-std::wstring strToWStr(const char* str)
-{
-	int count = MultiByteToWideChar(CP_UTF8, 0, str, -1, 0, 0);
-	std::wstring wstr(count, 0);
-	MultiByteToWideChar(CP_UTF8, 0, str, -1, &wstr[0], count);
-	if (wstr.length() == 1 && str[0] == L'\0') {
-		wstr = std::wstring{};
-	}
-	return wstr;
 }
 
 void WsConn::Init()
@@ -101,7 +84,7 @@ void WsConn::initJson()
 "displayScheduleList":true,"scheduleList":[{"title":"日程标题日程标题11","desc":"日程摘要xxx11","isAllowEdit":false,"calendarColor":"#000000", "calendarNo":"xxxx","scheduleNo":"yyyy"},
 {"title":"日程标题日程标题22","desc":"日程摘要xxx22","isAllowEdit":true,"calendarColor":"#000000", "calendarNo":"xxxx22","scheduleNo":"yyyy22"}],)" };
 	jsonStr += viewData;
-	auto str = wStrToStr(jsonStr.data());
+	auto str = Util::ToStr(jsonStr.data());
 	rapidjson::Document d;
 	d.Parse(str.data());
 	auto data = d["data"].GetObj();
@@ -140,6 +123,8 @@ void WsConn::initJson()
 		}
 		CalendarBody::Get()->SetText(std::move(param));
 	}
-	MainWin::Get()->Refresh();
-
+	auto win = MainWin::Get();
+	if (win->hwnd) {
+		win->Refresh();
+	}
 }

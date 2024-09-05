@@ -3,10 +3,14 @@
 
 #include "EmbedHelper.h"
 #include "MainWin.h"
+#include "Util.h"
 
 namespace {
     bool isEmbeded{ false };
-    WNDPROC OldProc;
+    WNDPROC oldProc;
+    HWND workerW;
+    bool isPureColor;
+    SkColor pureColor;
 }
 
 bool checkMouse(POINT& point) {
@@ -94,7 +98,7 @@ LRESULT CALLBACK EmbedHelper::handleWindowMessage(HWND hWnd, UINT uMsg, WPARAM w
             }
         }
     }
-    return CallWindowProc(OldProc, hWnd, uMsg, wParam, lParam);
+    return CallWindowProc(oldProc, hWnd, uMsg, wParam, lParam);
 }
 void EmbedHelper::roteInput()
 {
@@ -105,7 +109,7 @@ void EmbedHelper::roteInput()
     rids[0].dwFlags = 0x00000100;
     rids[0].hwndTarget = win->hwnd;
     RegisterRawInputDevices(rids, 1, sizeof(rids[0]));
-    OldProc = (WNDPROC)SetWindowLongPtr(win->hwnd, GWLP_WNDPROC, (LONG_PTR)EmbedHelper::handleWindowMessage);
+    oldProc = (WNDPROC)SetWindowLongPtr(win->hwnd, GWLP_WNDPROC, (LONG_PTR)EmbedHelper::handleWindowMessage);
 }
 EmbedHelper::~EmbedHelper()
 {
@@ -114,26 +118,56 @@ EmbedHelper::~EmbedHelper()
 void EmbedHelper::Embed() { 
     auto win = MainWin::Get();
     if (isEmbeded) {
-        SetWindowLongPtr(win->hwnd, GWLP_WNDPROC, (LONG_PTR)OldProc);
-        SetParent(win->hwnd, nullptr);
-        isEmbeded = false;
         SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE);
+        SetWindowLongPtr(win->hwnd, GWLP_WNDPROC, (LONG_PTR)oldProc);
+        SetParent(win->hwnd, nullptr);
+        Util::DisableAlpha(workerW);
+        SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE);
+        isEmbeded = false;
     }
     else {
         HWND progman = FindWindow(L"Progman", NULL);
         SendMessageTimeout(progman, 0x052C, 0, 0, SMTO_NORMAL, 1000, NULL);
-        HWND workerW{ nullptr };
         EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL {
             HWND defView = FindWindowEx(hwnd, NULL, L"SHELLDLL_DefView", NULL);
             if (defView != NULL) {
-                HWND* ww = (HWND*)lParam;
-                *ww = FindWindowEx(NULL, hwnd, L"WorkerW", NULL);
+                workerW = FindWindowEx(NULL, hwnd, L"WorkerW", NULL);
             }
             return TRUE;
-            }, (LPARAM)&workerW); 
-        win->EnableAlpha(workerW);
+            },NULL); 
+
+        std::wstring wallpaperPath(MAX_PATH, L'\0');
+        SystemParametersInfoW(SPI_GETDESKWALLPAPER, MAX_PATH, &wallpaperPath.front(), 0);
+        wallpaperPath.resize(wcslen(wallpaperPath.c_str()));
+        isPureColor = wallpaperPath.empty();
+        if (isPureColor) {
+            HDC hdc = GetDC(workerW);
+            COLORREF color = GetPixel(hdc, 67, 30);
+            auto r = (unsigned)GetRValue(color);
+            auto g = (unsigned)GetGValue(color);
+            auto b = (unsigned)GetBValue(color);
+            ReleaseDC(NULL, hdc);
+            pureColor = SkColorSetARGB(255, r, g, b);
+        }
+        else {
+            Util::EnableAlpha(workerW);
+        }
         SetParent(win->hwnd, workerW);
         roteInput();
+
+
+        //HDC dc = GetDC(workerW);
+        //BITMAPINFO bmpInfo = { sizeof(BITMAPINFOHEADER), win->w, -win->h, 1, 32, BI_RGB, win->h * 4 * win->w, 0, 0, 0, 0 };
+        //StretchDIBits(dc, win->x, win->y, win->w, win->h, 0, 0, win->w, win->h, &win->winPix.front(), &bmpInfo, DIB_RGB_COLORS, SRCCOPY);
+        //ReleaseDC(workerW, dc);
+
+
+
+
+
+
+
+
         isEmbeded = true;
     }
 }
@@ -141,4 +175,12 @@ void EmbedHelper::Embed() {
 bool EmbedHelper::IsEmbed()
 {
     return isEmbeded;
+}
+
+SkColor EmbedHelper::GetPureColor()
+{
+    return pureColor;
+}
+bool EmbedHelper::IsPureColor() {
+    return isPureColor;
 }

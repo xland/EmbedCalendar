@@ -2,9 +2,7 @@
 #include <Windows.h>
 #include <vector>
 #include <functional>
-#include <d2d1.h>
-#include <dwmapi.h>
-#include <versionhelpers.h>
+
 
 #include "TypeDefine.h"
 
@@ -22,12 +20,11 @@ public:
 	static void Cursor(LPWSTR id);
 	void Refresh();
 	void Close();
-	bool EnableAlpha(HWND hwnd);
 public:
 	HINSTANCE instance;
 	std::unique_ptr<SkCanvas> canvas;
 	std::vector<SkColor> winPix;
-	HWND hwnd;
+	HWND hwnd{nullptr};
 	int x{ 100 }, y{ 100 }, w{ 580 }, h{580};
 	bool isMouseDown{ false };
 	float dpi{ 1.0 };
@@ -55,9 +52,6 @@ private:
 
 private:
 	bool refreshFlag{ false };
-	ID2D1Factory* sg_pID2D1Factory;
-	ID2D1HwndRenderTarget* renderTarget;
-	ID2D1Bitmap* bitmap;
 	bool isTrackMouseEvent{ false };
 };
 

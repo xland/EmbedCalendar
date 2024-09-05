@@ -6,6 +6,7 @@
 #include "WsConn.h"
 #include "Skin.h"
 #include "Font.h"
+#include "Embedder.h"
 #include "Ctrl/TitleBar.h"
 #include "Ctrl/CalendarHeader.h"
 #include "Ctrl/WeekHeader.h"
@@ -24,6 +25,8 @@ MainWin::~MainWin()
     SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE);
 }
 
+
+
 void MainWin::Init(HINSTANCE instance, std::wstring&& cmd)
 {
     //std::string hwndStr = "002C089C"; 
@@ -34,9 +37,11 @@ void MainWin::Init(HINSTANCE instance, std::wstring&& cmd)
     //HWND hwnd = reinterpret_cast<HWND>(hwndHex);
     //PostMessage(hwnd, WM_CLOSE, 0, 0);
     
+
     SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE);
     win = std::make_unique<MainWin>();
     win->instance = instance;
+    Embedder::Init();
     Font::Init();    
     TitleBar::Init();
     CalendarHeader::Init();
@@ -97,7 +102,16 @@ void MainWin::Close()
 
 void MainWin::repaint()
 {
-    canvas->clear(Skin::Get()->bg);
+    auto embedder = Embedder::Get();
+    if (embedder->isEmbedded && embedder->isColorWallPaper) {
+        canvas->clear(embedder->wallPaperColor);
+        SkPaint paint;
+        paint.setColor(Skin::Get()->bg);
+        canvas->drawPaint(paint);
+    }
+    else {
+        canvas->clear(Skin::Get()->bg);
+    }    
     for (size_t i = 0; i < paintHandlers.size(); i++)
     {
         paintHandlers[i](canvas.get());

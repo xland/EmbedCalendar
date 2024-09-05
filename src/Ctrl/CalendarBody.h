@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <include/core/SkCanvas.h>
 #include <include/core/SkRect.h>
 #include <vector>
@@ -22,6 +22,7 @@ private:
 	std::vector<DateItem> items;
 	float r,x,y,span;
 	float numX1, numX2, numY;
-	float textX1, textY1, textX2, textY2;
+	float textX1, textX2, textY;
+	float badgeX, badgeY;
 	float numSize, textSize1, textSize2;
 };

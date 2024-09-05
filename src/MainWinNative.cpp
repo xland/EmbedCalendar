@@ -3,35 +3,8 @@
 #include <windowsx.h>
 #include "MainWin.h"
 #include "Ctrl/TitleBar.h"
-
-bool MainWin::EnableAlpha(HWND hwnd)
-{
-    if (!IsWindowsVistaOrGreater()) { return false; }
-    BOOL is_composition_enable = false;
-    DwmIsCompositionEnabled(&is_composition_enable);
-    if (!is_composition_enable) { return true; }
-    DWORD current_color = 0;
-    BOOL is_opaque = false;
-    DwmGetColorizationColor(&current_color, &is_opaque);
-    if (!is_opaque || IsWindows8OrGreater())
-    {
-        HRGN region = CreateRectRgn(0, 0, -1, -1);
-        DWM_BLURBEHIND bb = { 0 };
-        bb.dwFlags = DWM_BB_ENABLE | DWM_BB_BLURREGION;
-        bb.hRgnBlur = region;
-        bb.fEnable = TRUE;
-        DwmEnableBlurBehindWindow(hwnd, &bb);
-        DeleteObject(region);
-        return true;
-    }
-    else // For Window7
-    {
-        DWM_BLURBEHIND bb = { 0 };
-        bb.dwFlags = DWM_BB_ENABLE;
-        DwmEnableBlurBehindWindow(hwnd, &bb);
-        return false;
-    }
-}
+#include "Util.h"
+#include "Embedder.h"
 
 void MainWin::createWindow()
 {
@@ -50,7 +23,7 @@ void MainWin::createWindow()
     RegisterClassEx(&wcx);
     hwnd = CreateWindowEx(NULL, clsName.c_str(), clsName.c_str(), WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP,
         x, y, w, h, NULL, NULL, instance, static_cast<LPVOID>(this));
-    EnableAlpha(hwnd);
+    Util::EnableAlpha(hwnd);
     MainWin::Cursor(IDC_ARROW);
     ShowWindow(hwnd, SW_SHOW);
 }
@@ -64,6 +37,9 @@ LRESULT MainWin::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pThis));
     }
     else if (msg == WM_SETCURSOR) {
+        return true;
+    }
+    else if (msg == WM_SETTINGCHANGE) {
         return true;
     }
     //else if (msg == WM_ERASEBKGND) {
@@ -127,6 +103,7 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
             break;
         }
         case WM_MOUSELEAVE: {
+            if (Embedder::Get()->isEmbedded) return 0;
             TRACKMOUSEEVENT tme = {};
             tme.cbSize = sizeof(TRACKMOUSEEVENT);
             tme.dwFlags = TME_CANCEL | TME_HOVER | TME_LEAVE;
@@ -159,6 +136,9 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
                 KillTimer(hWnd, RefreshTimerId);
                 refreshFlag = false;
                 InvalidateRect(hWnd, nullptr, false);
+            }
+            else if (wParam == CheckWallPaperTimerId) {
+                Embedder::Get()->TimerCB();
             }
             break;
         }

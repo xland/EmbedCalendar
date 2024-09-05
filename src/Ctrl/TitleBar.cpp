@@ -5,7 +5,7 @@
 #include "../Font.h"
 #include "../MainWin.h"
 #include "../TypeDefine.h"
-#include "../EmbedHelper.h"
+#include "../Embedder.h"
 #include "../Skin.h"
 
 namespace {
@@ -54,6 +54,7 @@ void TitleBar::OnPaint(SkCanvas* canvas)
 	if (mouseInSettingBtn) {
 		paint.setColor(Skin::Get()->hoverBg);
 		canvas->drawRect(settingRect, paint);
+		std::cout << "paint setting btn" << std::endl;
 	}
 	auto font = Font::GetIcon();
 	font->setSize(fontSize);
@@ -86,7 +87,13 @@ void TitleBar::OnDpi()
 void TitleBar::OnLeftBtnDown(const int& x, const int& y)
 {
 	if (mouseInPinBtn) {
-		EmbedHelper::Embed();
+		auto embedder = Embedder::Get();
+		if (embedder->isEmbedded) {
+			embedder->UnEmbed();
+		}
+		else {
+			embedder->Embed();
+		}
 		auto win = MainWin::Get();
 		SendMessage(win->hwnd, WM_LBUTTONUP, MK_LBUTTON, MAKELPARAM(x, y));
 	}
@@ -122,6 +129,7 @@ void TitleBar::OnMouseMove(const int& x, const int& y)
 	if (!mouseInSettingBtn && settingFlag) {
 		mouseInSettingBtn = true;
 		MainWin::Cursor(IDC_HAND);
+		std::cout << "in setting btn" << std::endl;
 		win->Refresh();
 		return;
 	}
