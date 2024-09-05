@@ -19,7 +19,11 @@ public:
 private:
 	bool mouseInSettingBtn{false};
 	bool mouseInPinBtn{ false };
-	float fontSize{ 14 };
+	float fontSize;
 	SkRect settingRect;
 	SkRect pinRect;
+	const char* settingIcon{ (const char*)u8"\ue6e8" };
+	const char* pinIcon{ (const char*)u8"\ue70c" };
+	SkPoint pinPos;
+	SkPoint settingPos;
 };

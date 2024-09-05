@@ -11,6 +11,4 @@ public:
 private:
 	static void roteInput();
 	static LRESULT CALLBACK handleWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static bool isMouseOnDesktop();
-	static POINT getMousePosInWin();
 };

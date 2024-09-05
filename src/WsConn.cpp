@@ -6,7 +6,10 @@
 #include "WsConn.h"
 #include "MainWin.h"
 #include "Skin.h"
+#include "DateItem.h"
 #include "Ctrl/CalendarHeader.h"
+#include "Ctrl/WeekHeader.h"
+#include "Ctrl/CalendarBody.h"
 
 namespace {
 	std::unique_ptr<WsConn> wsConn;
@@ -102,10 +105,41 @@ void WsConn::initJson()
 	rapidjson::Document d;
 	d.Parse(str.data());
 	auto data = d["data"].GetObj();
-	auto theme =  data["backgroundTheme"].GetString();
-	auto alpha = data["backgroundOpacity"].GetFloat();
-	Skin::Init(theme,alpha);
-	CalendarHeader::Get()->SetText(data["activeDateMonth"].GetString());
+	{
+		auto theme = data["backgroundTheme"].GetString();
+		auto alpha = data["backgroundOpacity"].GetFloat();
+		Skin::Init(theme, alpha);
+	}
+	{
+		auto header = data["activeDateMonth"].GetString();
+		CalendarHeader::Get()->SetText(std::move(header));
+	}
+	{
+		auto arr = data["weekLables"].GetArray();
+		std::vector<std::string> param;
+		for (size_t i = 0; i < arr.Size(); i++)
+		{
+			param.push_back(arr[i].GetString());
+		}
+		WeekHeader::Get()->SetText(std::move(param));
+	}
+	{
+		auto arr = data["viewData"].GetArray();
+		std::vector<DateItem> param;
+		for (auto& data:arr)
+		{
+			DateItem item;
+			item.date = std::to_string(data["date"].GetUint());
+			item.hasSchdule = data["hasSchdule"].GetBool();
+			item.isActive = data["isActive"].GetBool();
+			item.isToday = data["isToday"].GetBool();
+			item.lunar = data["lunarInfo"].GetString();
+			item.isCurrt = data["type"].GetString() == "currt";
+			item.badge = data["docStatus"].GetString();
+			param.push_back(std::move(item));
+		}
+		CalendarBody::Get()->SetText(std::move(param));
+	}
 	MainWin::Get()->Refresh();
 
 }

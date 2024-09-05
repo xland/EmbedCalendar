@@ -4,13 +4,11 @@
 #include "../Font.h"
 #include "../MainWin.h"
 #include "../TypeDefine.h"
-#include "../EmbedHelper.h"
 #include "../Skin.h"
 #include "TitleBar.h"
 
 namespace {
 	std::unique_ptr<CalendarHeader> calendarHeader;
-
 }
 
 CalendarHeader::CalendarHeader()
@@ -44,7 +42,7 @@ void CalendarHeader::OnPaint(SkCanvas* canvas)
 	auto skin = Skin::Get();
 	SkPaint paint;
 	paint.setAntiAlias(true);
-	font->setSize(textSize * win->dpi);
+	font->setSize(textSize);
 	paint.setColor(skin->text0);
 	canvas->drawString(yearMonthStr.c_str(), textPos.fX, textPos.fY, *font, paint);
 	if (mouseInLeft) {
@@ -62,7 +60,7 @@ void CalendarHeader::OnPaint(SkCanvas* canvas)
 	canvas->drawCircle(c2Center, r, paint);	
 	paint.setStroke(false);
 	paint.setColor(skin->text0);
-	fontIcon->setSize(iconSize * win->dpi);
+	fontIcon->setSize(iconSize);
 	canvas->drawString(leftIcon, icon1Pos.fX, icon1Pos.fY, *fontIcon, paint);
 	canvas->drawString(rightIcon, icon2Pos.fX, icon2Pos.fY, *fontIcon, paint);
 }
@@ -78,9 +76,17 @@ void CalendarHeader::OnLeftBtnDown(const int& x, const int& y)
 
 void CalendarHeader::OnMouseMove(const int& x, const int& y)
 {
+	auto win = MainWin::Get();
+	if (x<c1Center.fX - r || x>c2Center.fX + r || y>c1Center.fY - r || y<c1Center.fY + r){
+		if (mouseInLeft || mouseInRight) {
+			mouseInLeft = false;
+			mouseInRight = false;
+			MainWin::Cursor(IDC_ARROW);
+			win->Refresh();
+		}
+	}
 	auto leftFlag = isInCircle(x, y,c1Center);
 	auto rightFlag = isInCircle(x, y, c2Center);
-	auto win = MainWin::Get();
 	if (mouseInLeft && !leftFlag) {
 		mouseInLeft = false;
 		MainWin::Cursor(IDC_ARROW);
@@ -107,7 +113,7 @@ void CalendarHeader::OnMouseMove(const int& x, const int& y)
 	}
 }
 
-void CalendarHeader::SetText(const std::string& text)
+void CalendarHeader::SetText(std::string&& text)
 {
 	yearMonthStr = text;
 	measure();
@@ -118,20 +124,22 @@ void CalendarHeader::measure()
 	auto win = MainWin::Get();
 	auto font = Font::GetText();
 	auto fontIcon = Font::GetIcon();
+	textSize = 28 * win->dpi;
+	iconSize = 14 * win->dpi;
+	r = 16 * win->dpi;
 
-	font->setSize(textSize * win->dpi);
+	font->setSize(textSize);
 	SkRect measureRect;
 	font->measureText(yearMonthStr.c_str(), yearMonthStr.size(), SkTextEncoding::kUTF8, &measureRect);
 	textPos.fX = win->w / 2 - measureRect.width() / 2 - measureRect.fLeft;
-	c1Center.fY = TitleBar::Get()->dragRect.fBottom + 32 * win->dpi / 2;
+	c1Center.fY = TitleBar::Get()->dragRect.fBottom + 6 * win->dpi + 32 * win->dpi / 2 ;
 	c2Center.fY = c1Center.fY;
 	textPos.fY = c1Center.fY - measureRect.height() / 2 - measureRect.fTop;
-
-	r = 16 * win->dpi;
+	
 	c1Center.fX = textPos.fX - 28 * win->dpi - r;
 	c2Center.fX = textPos.fX + measureRect.width() + 28 * win->dpi + r;
 
-	fontIcon->setSize(iconSize * win->dpi);
+	fontIcon->setSize(iconSize);
 	int length = std::mbstowcs(nullptr, leftIcon, 0);
 	fontIcon->measureText(leftIcon, length, SkTextEncoding::kUTF8, &measureRect);
 

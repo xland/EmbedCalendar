@@ -3,11 +3,13 @@
 #include <sstream>
 
 #include "MainWin.h"
-#include "./Ctrl/TitleBar.h"
-#include "./Ctrl/CalendarHeader.h"
 #include "WsConn.h"
 #include "Skin.h"
 #include "Font.h"
+#include "Ctrl/TitleBar.h"
+#include "Ctrl/CalendarHeader.h"
+#include "Ctrl/WeekHeader.h"
+#include "Ctrl/CalendarBody.h"
 
 namespace {
     std::unique_ptr<MainWin> win;
@@ -38,6 +40,8 @@ void MainWin::Init(HINSTANCE instance, std::wstring&& cmd)
     Font::Init();    
     TitleBar::Init();
     CalendarHeader::Init();
+    WeekHeader::Init();
+    CalendarBody::Init();
     WsConn::Init();
     win->getDpi();
     win->initCanvas();

@@ -58,26 +58,29 @@ void TitleBar::OnPaint(SkCanvas* canvas)
 	auto font = Font::GetIcon();
 	font->setSize(fontSize);
 	paint.setColor(Skin::Get()->text1);
-	auto setting = (const char*)u8"\ue6e8";
-	auto pin = (const char*)u8"\ue70c";
-	SkRect measureRect;
-	int length = std::mbstowcs(nullptr, setting, 0); //3
-	font->measureText(setting, length, SkTextEncoding::kUTF8, &measureRect);
-	auto x = settingRect.centerX() - measureRect.width() / 2 - measureRect.fLeft;
-	auto y = settingRect.centerY() - measureRect.height() / 2 - measureRect.fTop;
-	canvas->drawString(setting, x, y, *font, paint);
-	canvas->drawString(pin, x-(settingRect.fLeft-pinRect.fLeft), y, *font, paint);
+	canvas->drawString(settingIcon, settingPos.fX, settingPos.fY, *font, paint);
+	canvas->drawString(pinIcon, pinPos.fX, pinPos.fY, *font, paint);
 }
 
 void TitleBar::OnDpi()
 {
 	auto win = MainWin::Get();
-	auto margin = 10 * win->dpi;
+	fontSize = 18 * win->dpi;
+	auto margin = 12 * win->dpi;
 	auto size = 28 * win->dpi;
 	settingRect.setXYWH(win->w - margin - size, margin, size, size);
-	pinRect.setXYWH(settingRect.fLeft-margin-size, margin, size, size);
-	fontSize = 14 * win->dpi;
+	pinRect.setXYWH(settingRect.fLeft-margin-size, margin, size, size);	
 	dragRect.setLTRB(0, 0, pinRect.fLeft - margin, 48 * win->dpi);
+
+	auto font = Font::GetIcon();
+	font->setSize(fontSize);
+	SkRect measureRect;
+	int length = std::mbstowcs(nullptr, settingIcon, 0); //3
+	font->measureText(settingIcon, length, SkTextEncoding::kUTF8, &measureRect);
+	settingPos.fX = settingRect.centerX() - measureRect.width() / 2 - measureRect.fLeft;
+	settingPos.fY = settingRect.centerY() - measureRect.height() / 2 - measureRect.fTop;
+	pinPos.fX = settingPos.fX - (settingRect.fLeft - pinRect.fLeft);
+	pinPos.fY = settingPos.fY;
 }
 
 void TitleBar::OnLeftBtnDown(const int& x, const int& y)
