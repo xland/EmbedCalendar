@@ -8,16 +8,6 @@
 #include <fcntl.h>
 #include "Util.h"
 
-
-
-Util::Util()
-{
-}
-
-Util::~Util()
-{
-}
-
 void Util::InitDebuger() {
     AttachConsole(ATTACH_PARENT_PROCESS);
     AllocConsole();
@@ -80,5 +70,12 @@ void Util::DisableAlpha(HWND hwnd)
     bb.dwFlags = DWM_BB_ENABLE;
     bb.fEnable = FALSE;
     HRESULT hr = DwmEnableBlurBehindWindow(hwnd, &bb);
+}
+
+SkColor Util::ToColor(const std::string& colorStr) {
+    auto str = colorStr.substr(1);
+    unsigned int r, g, b;
+    sscanf(str.data(), "%02x%02x%02x", &r, &g, &b);
+    return SkColorSetARGB(255,r, g, b);
 }
 

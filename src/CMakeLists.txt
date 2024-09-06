@@ -2,6 +2,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 "main.cpp" 
 
 "DateItem.h"  
+"ListItem.h"
 "WsConn.h" "WsConn.cpp" 
 "MainWin.h" "MainWin.cpp"
 "MainWinNative.cpp" 

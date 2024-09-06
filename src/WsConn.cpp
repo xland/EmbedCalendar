@@ -8,10 +8,12 @@
 #include "MainWin.h"
 #include "Skin.h"
 #include "DateItem.h"
+#include "ListItem.h"
 #include "Ctrl/CalendarHeader.h"
 #include "Ctrl/WeekHeader.h"
 #include "Ctrl/CalendarBody.h"
 #include "Ctrl/ListHeader.h"
+#include "Ctrl/ListBody.h"
 
 namespace {
 	std::unique_ptr<WsConn> wsConn;
@@ -82,8 +84,8 @@ void WsConn::initJson()
 {"type":"next","year":2024,"month":8,"date":6,"startTimeStamp":1725552000000,"endTimeStamp":1725638400000,"lunarInfo":"初四","docStatus":"班","isToday":false,"isActive":false,"hasSchdule":false}] }})" };
 	std::wstring jsonStr{ LR"({"msgType": "EmbedCalendar","msgName": "updateRenderData","data":{"isCn":true,"backgroundTheme":"type1","backgroundOpacity":0.7,"activeDateMonth":"2024年8月",
 "activeDateDay":"周二 七月十七","weekLables":["六","日","一","二","三","四","五"],
-"displayScheduleList":true,"scheduleList":[{"title":"日程标题日程标题11","desc":"日程摘要xxx11","isAllowEdit":false,"calendarColor":"#000000", "calendarNo":"xxxx","scheduleNo":"yyyy"},
-{"title":"日程标题日程标题22","desc":"日程摘要xxx22","isAllowEdit":true,"calendarColor":"#000000", "calendarNo":"xxxx22","scheduleNo":"yyyy22"}],)" };
+"displayScheduleList":true,"scheduleList":[{"title":"日程标题日程标题11","desc":"日程摘要xxx11","isAllowEdit":false,"calendarColor":"#FF8866", "calendarNo":"xxxx","scheduleNo":"yyyy"},
+{"title":"日程标题日程标题22","desc":"日程摘要xxx22","isAllowEdit":true,"calendarColor":"#4A53E7", "calendarNo":"xxxx22","scheduleNo":"yyyy22"}],)" };
 	jsonStr += viewData;
 	auto str = Util::ToStr(jsonStr.data());
 	rapidjson::Document d;
@@ -109,7 +111,7 @@ void WsConn::initJson()
 	}
 	{
 		auto arr = data["viewData"].GetArray();
-		static std::string currtStr = Util::ToStr(L"currt");
+		std::string currtStr = Util::ToStr(L"currt");
 		std::vector<DateItem> param;
 		for (auto& data:arr)
 		{
@@ -127,6 +129,22 @@ void WsConn::initJson()
 	}
 	{
 		ListHeader::Get()->text = data["activeDateDay"].GetString();
+	}
+	{
+		auto arr = data["scheduleList"].GetArray();
+		std::vector<ListItem> param;
+		for (auto& data : arr)
+		{
+			ListItem item;
+			item.title = data["title"].GetString();
+			item.desc = data["desc"].GetString();
+			item.isAllowEdit = data["isAllowEdit"].GetBool();
+			item.color = Util::ToColor(data["calendarColor"].GetString());
+			item.calendarNo = data["calendarNo"].GetString();
+			item.scheduleNo = data["scheduleNo"].GetString();
+			param.push_back(std::move(item));
+		}
+		ListBody::Get()->SetText(std::move(param));
 	}
 	auto win = MainWin::Get();
 	if (win->hwnd) {
