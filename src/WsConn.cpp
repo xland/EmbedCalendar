@@ -11,6 +11,7 @@
 #include "Ctrl/CalendarHeader.h"
 #include "Ctrl/WeekHeader.h"
 #include "Ctrl/CalendarBody.h"
+#include "Ctrl/ListHeader.h"
 
 namespace {
 	std::unique_ptr<WsConn> wsConn;
@@ -123,6 +124,9 @@ void WsConn::initJson()
 			param.push_back(std::move(item));
 		}
 		CalendarBody::Get()->SetText(std::move(param));
+	}
+	{
+		ListHeader::Get()->text = data["activeDateDay"].GetString();
 	}
 	auto win = MainWin::Get();
 	if (win->hwnd) {

@@ -52,14 +52,12 @@ void SwitchBtn::OnPaint(SkCanvas* canvas)
 		canvas->drawString(btnText.data(), textX, textY, *fontText, paint);
 		const char* iconCode{ (const char*)u8"\ue708" };
 		canvas->drawString(iconCode, iconX, textY, *fontIcon, paint);
-		Embedder::Get()->RefreshDesktop();
 	}
 	else {
 		std::string btnText = Util::ToStr(L"显示日程");
 		canvas->drawString(btnText.data(), textX, textY, *fontText, paint);
 		const char* iconCode{ (const char*)u8"\ue70f" };
 		canvas->drawString(iconCode, iconX, textY, *fontIcon, paint);
-		
 	}
 }
 
@@ -78,21 +76,21 @@ void SwitchBtn::OnDpi()
 
 void SwitchBtn::OnLeftBtnDown(const int& x, const int& y)
 {
-	if (isMouseIn) {
-		isMouseIn = false;
-		auto win = MainWin::Get();
-		if (listVisible) {
-			win->HideList();
-			OnDpi();
-			listVisible = false;
-		}
-		else {
-			win->ShowList();
-			OnDpi();
-			listVisible = true;
-		}	
-		Embedder::Get()->RefreshDesktop();
+	if (!isMouseIn) return;
+	isMouseIn = false;
+	auto win = MainWin::Get();
+	if (listVisible) {
+		win->HideList();
+		OnDpi();
+		listVisible = false;
 	}
+	else {
+		win->ShowList();
+		OnDpi();
+		listVisible = true;
+		MainWin::Cursor(IDC_ARROW);
+	}
+	Embedder::Get()->RefreshDesktop();
 }
 
 void SwitchBtn::OnMouseMove(const int& x, const int& y)

@@ -17,10 +17,11 @@ public:
 	void OnLeftBtnDown(const int& x, const int& y);
 	void OnMouseMove(const int& x, const int& y);
 	void SetText(std::vector<DateItem>&& param);
-
+public:
+	float l, t, b, r;
 private:
 	std::vector<DateItem> items;
-	float rr,l,t,b,r,span;
+	float rr,span;
 	float dateSize, lunarSize, badgeSize;
 	int hoverIndex{ -1 };
 };

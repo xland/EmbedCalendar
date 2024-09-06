@@ -12,6 +12,8 @@
 #include "Ctrl/WeekHeader.h"
 #include "Ctrl/CalendarBody.h"
 #include "Ctrl/SwitchBtn.h"
+#include "Ctrl/ListHeader.h"
+#include "Ctrl/ListBody.h"
 
 namespace {
     std::unique_ptr<MainWin> win;
@@ -49,6 +51,8 @@ void MainWin::Init(HINSTANCE instance, std::wstring&& cmd)
     WeekHeader::Init();
     CalendarBody::Init();
     SwitchBtn::Init();
+    ListHeader::Init();
+    ListBody::Init();
     WsConn::Init();
     win->getDpi();
     win->initCanvas();

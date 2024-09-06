@@ -86,6 +86,7 @@ void TitleBar::OnDpi()
 void TitleBar::OnLeftBtnDown(const int& x, const int& y)
 {
 	if (mouseInPinBtn) {
+		mouseInPinBtn = false;
 		auto embedder = Embedder::Get();
 		if (embedder->isEmbedded) {
 			embedder->UnEmbed();
