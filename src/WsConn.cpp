@@ -3,6 +3,16 @@
 #include <format>
 #include <rapidjson/document.h>
 
+#include <iostream>
+#include <thread>
+#include <string>
+#include <vector>
+#include <chrono>
+#include <curl/curl.h>
+#include <atomic>
+
+
+
 #include "Util.h"
 #include "WsConn.h"
 #include "MainWin.h"
@@ -17,19 +27,40 @@
 
 namespace {
 	std::unique_ptr<WsConn> wsConn;
+	std::atomic<bool> running(true);
 }
 
-WsConn::WsConn()
-{
+size_t writeCB(char* ptr, size_t size, size_t nmemb, void* userdata) {
+	std::string data(ptr, size * nmemb);
+	std::cout << "Received: " << data << std::endl;
+	return size * nmemb;
+}
+void receiveMessages(CURL* curl) {
+	curl_multi_perform(curl, NULL);
+	CURLM* multiHandle = curl_multi_init();
+	curl_multi_add_handle(multiHandle, curl);
+	int stillRunning = 1;
+	while (running) {
+		curl_multi_perform(multiHandle, &stillRunning);
+		if (stillRunning) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		}
+	}
+	curl_multi_cleanup(multiHandle);
 }
 
-WsConn::~WsConn()
-{
+void connect() {
+	curl_global_init(CURL_GLOBAL_DEFAULT);
+	CURL* curl = curl_easy_init();
+	curl_easy_setopt(curl, CURLOPT_URL, "ws://124.222.224.186:8800");
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCB);
+	std::thread receiverThread(receiveMessages, curl);
 }
 
 void WsConn::Init()
 {
 	wsConn = std::make_unique<WsConn>();
+	connect();
 	wsConn->initJson();
 }
 

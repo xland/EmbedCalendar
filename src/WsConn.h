@@ -1,9 +1,12 @@
 #pragma once
+
+#define ASIO_STANDALONE
+
 class WsConn
 {
 public:
-	WsConn();
-	~WsConn();
+	WsConn() = default;
+	~WsConn() = default;
 	static void Init();
 	static WsConn* Get();
 private:
