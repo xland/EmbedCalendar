@@ -20,6 +20,8 @@ public:
 	static void Cursor(LPWSTR id);
 	void Refresh();
 	void Close();
+	void ShowList();
+	void HideList();
 public:
 	HINSTANCE instance;
 	std::unique_ptr<SkCanvas> canvas;

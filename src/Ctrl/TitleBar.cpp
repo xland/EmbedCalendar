@@ -54,7 +54,6 @@ void TitleBar::OnPaint(SkCanvas* canvas)
 	if (mouseInSettingBtn) {
 		paint.setColor(Skin::Get()->hoverBg);
 		canvas->drawRect(settingRect, paint);
-		std::cout << "paint setting btn" << std::endl;
 	}
 	auto font = Font::GetIcon();
 	font->setSize(fontSize);
@@ -129,7 +128,6 @@ void TitleBar::OnMouseMove(const int& x, const int& y)
 	if (!mouseInSettingBtn && settingFlag) {
 		mouseInSettingBtn = true;
 		MainWin::Cursor(IDC_HAND);
-		std::cout << "in setting btn" << std::endl;
 		win->Refresh();
 		return;
 	}

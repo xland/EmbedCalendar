@@ -11,6 +11,7 @@
 #include "Ctrl/CalendarHeader.h"
 #include "Ctrl/WeekHeader.h"
 #include "Ctrl/CalendarBody.h"
+#include "Ctrl/SwitchBtn.h"
 
 namespace {
     std::unique_ptr<MainWin> win;
@@ -47,6 +48,7 @@ void MainWin::Init(HINSTANCE instance, std::wstring&& cmd)
     CalendarHeader::Init();
     WeekHeader::Init();
     CalendarBody::Init();
+    SwitchBtn::Init();
     WsConn::Init();
     win->getDpi();
     win->initCanvas();
@@ -72,7 +74,7 @@ void MainWin::getDpi()
     GetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY);
     dpi = dpiX / 96.0f;
     w = 580 * dpi;
-    h = 580 * dpi;
+    h = 580 * dpi; //todo
     onDpiChange();
 }
 
@@ -98,6 +100,20 @@ void MainWin::Close()
     DestroyWindow(hwnd);
     SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE);
     PostQuitMessage(0);
+}
+
+void MainWin::ShowList()
+{
+    h = 860 * dpi;
+    initCanvas();
+    SetWindowPos(hwnd, NULL, x, y, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
+void MainWin::HideList()
+{
+    h = 580 * dpi;
+    initCanvas();
+    SetWindowPos(hwnd, NULL, x, y, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
 void MainWin::repaint()

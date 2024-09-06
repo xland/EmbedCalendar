@@ -120,7 +120,7 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
             x = rect->left;
             y = rect->top;
             w = 580*dpi;
-            h = 580*dpi;
+            h = 580*dpi;  //todo 
             initCanvas();
             SetWindowPos(hWnd, NULL,x,y,w, h,SWP_NOZORDER | SWP_NOACTIVATE);
             onDpiChange();
