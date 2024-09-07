@@ -5,6 +5,7 @@
 #include "Ctrl/TitleBar.h"
 #include "Util.h"
 #include "Embedder.h"
+#include "Ctrl/SwitchBtn.h"
 
 void MainWin::createWindow()
 {
@@ -120,7 +121,12 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
             x = rect->left;
             y = rect->top;
             w = 580*dpi;
-            h = 580*dpi;  //todo 
+            if (SwitchBtn::Get()->listVisible) {
+                h = 860 * dpi;
+            }
+            else {
+                h = 580 * dpi;  //todo 
+            }            
             initCanvas();
             SetWindowPos(hWnd, NULL,x,y,w, h,SWP_NOZORDER | SWP_NOACTIVATE);
             onDpiChange();

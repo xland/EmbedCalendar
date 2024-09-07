@@ -8,8 +8,9 @@
 #include <string>
 #include <vector>
 #include <chrono>
-#include <curl/curl.h>
 #include <atomic>
+#include <libwebsockets.h>
+#include <signal.h>
 
 
 
@@ -30,31 +31,110 @@ namespace {
 	std::atomic<bool> running(true);
 }
 
-size_t writeCB(char* ptr, size_t size, size_t nmemb, void* userdata) {
-	std::string data(ptr, size * nmemb);
-	std::cout << "Received: " << data << std::endl;
-	return size * nmemb;
-}
-void receiveMessages(CURL* curl) {
-	curl_multi_perform(curl, NULL);
-	CURLM* multiHandle = curl_multi_init();
-	curl_multi_add_handle(multiHandle, curl);
-	int stillRunning = 1;
-	while (running) {
-		curl_multi_perform(multiHandle, &stillRunning);
-		if (stillRunning) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+static struct my_conn {
+	lws_sorted_usec_list_t	sul;	     /* schedule connection retry */
+	struct lws* wsi;	     /* related wsi if any */
+	uint16_t		retry_count; /* count of consequetive retries */
+} mco;
+static int interrupted;
+static struct lws_context* context;
+static const uint32_t backoff_ms[] = { 1000, 2000, 3000, 4000, 5000 };
+
+static const lws_retry_bo_t retry = {
+	.retry_ms_table = backoff_ms,
+	.retry_ms_table_count = LWS_ARRAY_SIZE(backoff_ms),
+	.conceal_count = LWS_ARRAY_SIZE(backoff_ms),
+
+	.secs_since_valid_ping = 3,  /* force PINGs after secs idle */
+	.secs_since_valid_hangup = 10, /* hangup after secs idle */
+
+	.jitter_percent = 20,
+};
+static void connect_client(lws_sorted_usec_list_t* sul)
+{
+	struct my_conn* m = lws_container_of(sul, struct my_conn, sul);
+	struct lws_client_connect_info i;
+
+	memset(&i, 0, sizeof(i));
+
+	i.context = context;
+	i.port = 8800;
+	i.address = "124.222.224.186";
+	i.path = "/";
+	i.host = i.address;
+	i.origin = i.address;
+	i.protocol = "dumb-increment-protocol";
+	i.local_protocol_name = "lws-minimal-client";
+	i.pwsi = &m->wsi;
+	i.retry_and_idle_policy = &retry;
+	i.userdata = m;
+
+	if (!lws_client_connect_via_info(&i))
+		/*
+		 * Failed... schedule a retry... we can't use the _retry_wsi()
+		 * convenience wrapper api here because no valid wsi at this
+		 * point.
+		 */
+		if (lws_retry_sul_schedule(context, 0, sul, &retry,
+			connect_client, &m->retry_count)) {
+			lwsl_err("%s: connection attempts exhausted\n", __func__);
+			interrupted = 1;
 		}
+}
+
+static int callback_minimal(struct lws* wsi, enum lws_callback_reasons reason, void* user, void* in, size_t len)
+{
+	struct my_conn* m = (struct my_conn*)user;
+	switch (reason) {
+		case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
+			lwsl_err("CLIENT_CONNECTION_ERROR: %s\n", in ? (char*)in : "(null)");
+			break;
+		case LWS_CALLBACK_CLIENT_RECEIVE: {
+			//((char*)in)[len] = '\0';
+			//std::string msgStr((char*)in, len);
+			//auto wmsgStr = Util::ToWStr((char*)in);
+			lwsl_hexdump_notice(in, len);
+			break;
+		}
+		case LWS_CALLBACK_CLIENT_ESTABLISHED: //链接建立
+			lwsl_user("%s: established\n", __func__);
+			break;
+		case LWS_CALLBACK_CLIENT_CLOSED:
+			lwsl_err("CLIENT_CONNECTION_ERROR: %s\n", in ? (char*)in : "(null)");
+			break;
+		default:
+			break;
 	}
-	curl_multi_cleanup(multiHandle);
+	return lws_callback_http_dummy(wsi, reason, user, in, len);
+}
+
+static const struct lws_protocols protocols[] = {
+	{ "lws-minimal-client", callback_minimal, 0, 0, 0, NULL, 0 },
+	LWS_PROTOCOL_LIST_TERM
+};
+
+static void sigint_handler(int sig)
+{
+	interrupted = 1;
 }
 
 void connect() {
-	curl_global_init(CURL_GLOBAL_DEFAULT);
-	CURL* curl = curl_easy_init();
-	curl_easy_setopt(curl, CURLOPT_URL, "ws://124.222.224.186:8800");
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCB);
-	std::thread receiverThread(receiveMessages, curl);
+	struct lws_context_creation_info info;
+	const char* p;
+	int n = 0;
+	signal(SIGINT, sigint_handler);
+	memset(&info, 0, sizeof info);
+	lwsl_user("LWS minimal ws client\n");
+	info.port = CONTEXT_PORT_NO_LISTEN; /* we do not run any server */
+	info.protocols = protocols;
+	info.fd_limit_per_thread = 1 + 1 + 1;
+	context = lws_create_context(&info);
+	lws_sul_schedule(context, 0, &mco.sul, connect_client, 1);
+	while (n >= 0 && !interrupted) {
+		n = lws_service(context, 0);
+	}		
+	lws_context_destroy(context);
+	lwsl_user("Completed\n");
 }
 
 void WsConn::Init()
