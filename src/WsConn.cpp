@@ -28,35 +28,32 @@
 
 namespace {
 	std::unique_ptr<WsConn> wsConn;
+
 	std::atomic<bool> running(true);
+	static struct my_conn {
+		lws_sorted_usec_list_t	sul; /* schedule connection retry */
+		struct lws* wsi; /* related wsi if any */
+		uint16_t retry_count; /* count of consequetive retries */
+	} mco;
+	static int interrupted;
+	static struct lws_context* context;
+	static const uint32_t backoff_ms[] = { 1000, 2000, 3000, 4000, 5000 };
+	static const lws_retry_bo_t retry = {
+		.retry_ms_table = backoff_ms,
+		.retry_ms_table_count = LWS_ARRAY_SIZE(backoff_ms),
+		.conceal_count = LWS_ARRAY_SIZE(backoff_ms),
+		.secs_since_valid_ping = 3,  /* force PINGs after secs idle */
+		.secs_since_valid_hangup = 10, /* hangup after secs idle */
+		.jitter_percent = 20,
+	};
 }
 
-static struct my_conn {
-	lws_sorted_usec_list_t	sul;	     /* schedule connection retry */
-	struct lws* wsi;	     /* related wsi if any */
-	uint16_t		retry_count; /* count of consequetive retries */
-} mco;
-static int interrupted;
-static struct lws_context* context;
-static const uint32_t backoff_ms[] = { 1000, 2000, 3000, 4000, 5000 };
 
-static const lws_retry_bo_t retry = {
-	.retry_ms_table = backoff_ms,
-	.retry_ms_table_count = LWS_ARRAY_SIZE(backoff_ms),
-	.conceal_count = LWS_ARRAY_SIZE(backoff_ms),
-
-	.secs_since_valid_ping = 3,  /* force PINGs after secs idle */
-	.secs_since_valid_hangup = 10, /* hangup after secs idle */
-
-	.jitter_percent = 20,
-};
 static void connect_client(lws_sorted_usec_list_t* sul)
 {
 	struct my_conn* m = lws_container_of(sul, struct my_conn, sul);
 	struct lws_client_connect_info i;
-
 	memset(&i, 0, sizeof(i));
-
 	i.context = context;
 	i.port = 8800;
 	i.address = "124.222.224.186";
@@ -68,15 +65,13 @@ static void connect_client(lws_sorted_usec_list_t* sul)
 	i.pwsi = &m->wsi;
 	i.retry_and_idle_policy = &retry;
 	i.userdata = m;
-
 	if (!lws_client_connect_via_info(&i))
 		/*
 		 * Failed... schedule a retry... we can't use the _retry_wsi()
 		 * convenience wrapper api here because no valid wsi at this
 		 * point.
 		 */
-		if (lws_retry_sul_schedule(context, 0, sul, &retry,
-			connect_client, &m->retry_count)) {
+		if (lws_retry_sul_schedule(context, 0, sul, &retry,connect_client, &m->retry_count)) {
 			lwsl_err("%s: connection attempts exhausted\n", __func__);
 			interrupted = 1;
 		}
@@ -92,7 +87,7 @@ static int callback_minimal(struct lws* wsi, enum lws_callback_reasons reason, v
 		case LWS_CALLBACK_CLIENT_RECEIVE: {
 			//((char*)in)[len] = '\0';
 			//std::string msgStr((char*)in, len);
-			//auto wmsgStr = Util::ToWStr((char*)in);
+			auto wmsgStr = Util::ToWStr((char*)in);
 			lwsl_hexdump_notice(in, len);
 			break;
 		}
@@ -129,7 +124,7 @@ void connect() {
 	info.protocols = protocols;
 	info.fd_limit_per_thread = 1 + 1 + 1;
 	context = lws_create_context(&info);
-	lws_sul_schedule(context, 0, &mco.sul, connect_client, 1);
+	lws_sul_schedule(context, 0, &mco.sul, connect_client, 6);
 	while (n >= 0 && !interrupted) {
 		n = lws_service(context, 0);
 	}		
