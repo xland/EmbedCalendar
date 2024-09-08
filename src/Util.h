@@ -15,6 +15,7 @@ public:
 	static void InitDebuger();
 	static bool IsInCircle(const SkPoint& center, const float& r, const SkPoint& mousePos);
 	static SkColor ToColor(const std::string& colorStr);
+	static void RefreshDesktop();
 private:
 
 };

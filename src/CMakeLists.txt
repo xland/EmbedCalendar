@@ -9,7 +9,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 "Skin.h" "Skin.cpp"
 "Font.h" "Font.cpp"
 "Util.h" "Util.cpp"
- "Embedder.h" "Embedder.cpp"
+"Embedder.h" "Embedder.cpp"
 
  "Ctrl/TitleBar.h" "Ctrl/TitleBar.cpp" 
  "Ctrl/CalendarHeader.h" "Ctrl/CalendarHeader.cpp" 
@@ -21,4 +21,4 @@ target_sources(${PROJECT_NAME} PRIVATE
  "Ctrl/SettingMenu.h" "Ctrl/SettingMenu.cpp"  
  "Ctrl/ToolTip.h" "Ctrl/ToolTip.cpp" 
  "Ctrl/BaseCtrl.h" "Ctrl/BaseCtrl.cpp" 
-)
+  )

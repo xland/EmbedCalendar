@@ -52,7 +52,7 @@ void Embedder::UnEmbed()
     SetWindowLongPtr(win->hwnd, GWLP_WNDPROC, (LONG_PTR)oldProc);
     SetParent(win->hwnd, nullptr);
     Util::DisableAlpha(workerW);
-    RefreshDesktop();
+    Util::RefreshDesktop();
     isEmbedded = false;
 }
 
@@ -63,13 +63,13 @@ void Embedder::TimerCB()
     if (!flag && isColorWallPaper) {
         Util::DisableAlpha(workerW);
         MainWin::Get()->Refresh();
-        RefreshDesktop();
+        Util::RefreshDesktop();
         return;
     }
     if (flag && !isColorWallPaper) {
         Util::EnableAlpha(workerW);
         MainWin::Get()->Refresh();
-        RefreshDesktop();
+        Util::RefreshDesktop();
         return;
     }
     if (isColorWallPaper) {
@@ -80,11 +80,6 @@ void Embedder::TimerCB()
             return;
         }
     }
-}
-
-void Embedder::RefreshDesktop()
-{
-    SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE);
 }
 
 void Embedder::findWorkerW()

@@ -90,7 +90,7 @@ void SwitchBtn::OnLeftBtnDown(const int& x, const int& y)
 		listVisible = true;
 		MainWin::Cursor(IDC_ARROW);
 	}
-	Embedder::Get()->RefreshDesktop();
+	Util::RefreshDesktop();
 }
 
 void SwitchBtn::OnMouseMove(const int& x, const int& y)

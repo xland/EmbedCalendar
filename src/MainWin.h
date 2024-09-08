@@ -13,10 +13,11 @@ class CalendarHeader;
 class MainWin
 {
 public:
-	MainWin();
-	~MainWin();
+	MainWin(HINSTANCE instance);
+	~MainWin() = default;
 	static void Init(HINSTANCE instance, std::wstring&& cmd);
 	static MainWin* Get();
+	static void Dispose();
 	static void Cursor(LPWSTR id);
 	void Refresh();
 	void Close();

@@ -12,7 +12,6 @@ public:
 	void Embed();
 	void UnEmbed();
 	void TimerCB();
-	void RefreshDesktop();
 public:
 	bool isEmbedded{false};
 	bool isColorWallPaper{false};

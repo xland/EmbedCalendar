@@ -7,6 +7,7 @@
 #include "Skin.h"
 #include "Font.h"
 #include "Embedder.h"
+#include "Util.h"
 #include "Ctrl/TitleBar.h"
 #include "Ctrl/CalendarHeader.h"
 #include "Ctrl/WeekHeader.h"
@@ -15,17 +16,13 @@
 #include "Ctrl/ListHeader.h"
 #include "Ctrl/ListBody.h"
 
+
 namespace {
     std::unique_ptr<MainWin> win;
 }
 
-MainWin::MainWin()
+MainWin::MainWin(HINSTANCE _instance) :instance{_instance}
 {
-}
-
-MainWin::~MainWin()
-{
-    SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE);
 }
 
 
@@ -39,11 +36,9 @@ void MainWin::Init(HINSTANCE instance, std::wstring&& cmd)
     //ss >> hwndHex; 
     //HWND hwnd = reinterpret_cast<HWND>(hwndHex);
     //PostMessage(hwnd, WM_CLOSE, 0, 0);
-    
-
-    SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE);
-    win = std::make_unique<MainWin>();
-    win->instance = instance;
+    Util::RefreshDesktop();
+    Util::InitDebuger();
+    win = std::make_unique<MainWin>(instance);
     Embedder::Init();
     Font::Init();    
     TitleBar::Init();
@@ -61,6 +56,11 @@ void MainWin::Init(HINSTANCE instance, std::wstring&& cmd)
 MainWin* MainWin::Get()
 {
     return win.get();
+}
+void MainWin::Dispose()
+{
+    WsConn::Dispose();
+    Util::RefreshDesktop();
 }
 void MainWin::Cursor(LPWSTR id)
 {

@@ -1,6 +1,6 @@
 #pragma once
-
-#define ASIO_STANDALONE
+#include <thread>
+#include <memory>
 
 class WsConn
 {
@@ -9,7 +9,9 @@ public:
 	~WsConn() = default;
 	static void Init();
 	static WsConn* Get();
+	static void Dispose();
 private:
 	void initJson();
+	std::unique_ptr<std::jthread> wsThread;
 };
 

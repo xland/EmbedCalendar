@@ -78,4 +78,8 @@ SkColor Util::ToColor(const std::string& colorStr) {
     sscanf(str.data(), "%02x%02x%02x", &r, &g, &b);
     return SkColorSetARGB(255,r, g, b);
 }
+void Util::RefreshDesktop()
+{
+    SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE);
+}
 

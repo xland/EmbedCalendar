@@ -2,14 +2,10 @@
 #include <Windows.h>
 #include <format>
 #include <rapidjson/document.h>
-#include <thread>
-#include <chrono>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <libwebsockets.h>
-
-
 
 #include "Util.h"
 #include "WsConn.h"
@@ -93,6 +89,17 @@ static int wsCB(struct lws* wsi, enum lws_callback_reasons reason, void* user, v
 			lwsl_user("%s: established\n", __func__);
 			break;
 		}
+		case LWS_CALLBACK_CLIENT_WRITEABLE:
+		{
+			std::string msgStr;
+			break;
+			//msgStr.insert(0, LWS_PRE, ' ');
+			//auto sendSize = lws_write(wsi, (unsigned char*)msgStr.c_str() + LWS_PRE, msgStr.length() - LWS_PRE, LWS_WRITE_TEXT);
+			//if (sendSize < 0) {
+			//	lwsl_err("Error sending\n");
+			//	return -1;
+			//}
+		}
 		case LWS_CALLBACK_CLIENT_CLOSED:
 		{
 			lwsl_err("CLIENT_CONNECTION_ERROR: %s\n", in ? (char*)in : "(null)");
@@ -114,6 +121,7 @@ static const struct lws_protocols protocols[] = {
 	LWS_PROTOCOL_LIST_TERM
 };
 
+
 void initWs(std::stop_token token) {
 	struct lws_context_creation_info info;
 	memset(&info, 0, sizeof(info));
@@ -124,24 +132,38 @@ void initWs(std::stop_token token) {
 	context = lws_create_context(&info);
 	lws_sul_schedule(context, 0, &mco.sul, startConnect, 6);
 	int n = 0;
-	while (n >= 0 && !wsStopFlag && !token.stop_requested()) {
+	while (n >= 0 && !wsStopFlag && !token.stop_requested()) { // 
 		n = lws_service(context, 0);
 	}		
 	lws_context_destroy(context);
 	lwsl_user("Completed\n");
+
+
+	//using namespace std::literals::chrono_literals;
+	//static int value{ 1 };
+	//while (!token.stop_requested())
+	//{
+	//	std::cout << value++ << std::endl << std::flush;
+	//	std::this_thread::sleep_for(200ms);
+	//}
+	//std::cout << "thread stop" << std::endl;
 }
 
 void WsConn::Init()
 {
 	wsConn = std::make_unique<WsConn>();
-	std::jthread thread(initWs);
+	wsConn->wsThread = std::make_unique<std::jthread>(initWs);
 	wsConn->initJson();
-	thread.detach();
 }
 
 WsConn* WsConn::Get()
 {
 	return wsConn.get();
+}
+
+void WsConn::Dispose()
+{
+	wsConn.reset();
 }
 
 void WsConn::initJson()
