@@ -2,15 +2,12 @@
 #include <Windows.h>
 #include <format>
 #include <rapidjson/document.h>
-
-#include <iostream>
 #include <thread>
+#include <chrono>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <chrono>
-#include <atomic>
 #include <libwebsockets.h>
-#include <signal.h>
 
 
 
@@ -28,20 +25,18 @@
 
 namespace {
 	std::unique_ptr<WsConn> wsConn;
-
-	std::atomic<bool> running(true);
+	bool wsStopFlag{ false };
 	static struct my_conn {
 		lws_sorted_usec_list_t	sul; /* schedule connection retry */
 		struct lws* wsi; /* related wsi if any */
 		uint16_t retry_count; /* count of consequetive retries */
 	} mco;
-	static int interrupted;
 	static struct lws_context* context;
-	static const uint32_t backoff_ms[] = { 1000, 2000, 3000, 4000, 5000 };
+	static const uint32_t backoffMs[] = { 1000, 2000, 3000, 4000, 5000 };
 	static const lws_retry_bo_t retry = {
-		.retry_ms_table = backoff_ms,
-		.retry_ms_table_count = LWS_ARRAY_SIZE(backoff_ms),
-		.conceal_count = LWS_ARRAY_SIZE(backoff_ms),
+		.retry_ms_table = backoffMs,
+		.retry_ms_table_count = LWS_ARRAY_SIZE(backoffMs),
+		.conceal_count = LWS_ARRAY_SIZE(backoffMs),
 		.secs_since_valid_ping = 3,  /* force PINGs after secs idle */
 		.secs_since_valid_hangup = 10, /* hangup after secs idle */
 		.jitter_percent = 20,
@@ -49,7 +44,7 @@ namespace {
 }
 
 
-static void connect_client(lws_sorted_usec_list_t* sul)
+static void startConnect(lws_sorted_usec_list_t* sul)
 {
 	struct my_conn* m = lws_container_of(sul, struct my_conn, sul);
 	struct lws_client_connect_info i;
@@ -65,25 +60,27 @@ static void connect_client(lws_sorted_usec_list_t* sul)
 	i.pwsi = &m->wsi;
 	i.retry_and_idle_policy = &retry;
 	i.userdata = m;
-	if (!lws_client_connect_via_info(&i))
-		/*
-		 * Failed... schedule a retry... we can't use the _retry_wsi()
-		 * convenience wrapper api here because no valid wsi at this
-		 * point.
-		 */
-		if (lws_retry_sul_schedule(context, 0, sul, &retry,connect_client, &m->retry_count)) {
+	if (!lws_client_connect_via_info(&i))		
+		//Failed... schedule a retry... we can't use the _retry_wsi() convenience wrapper api here because no valid wsi at this point.		
+		if (lws_retry_sul_schedule(context, 0, sul, &retry, startConnect, &m->retry_count)) {
 			lwsl_err("%s: connection attempts exhausted\n", __func__);
-			interrupted = 1;
+			wsStopFlag = true;
 		}
 }
 
-static int callback_minimal(struct lws* wsi, enum lws_callback_reasons reason, void* user, void* in, size_t len)
+static int wsCB(struct lws* wsi, enum lws_callback_reasons reason, void* user, void* in, size_t len)
 {
 	struct my_conn* m = (struct my_conn*)user;
 	switch (reason) {
 		case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
+		{
 			lwsl_err("CLIENT_CONNECTION_ERROR: %s\n", in ? (char*)in : "(null)");
-			break;
+			if (lws_retry_sul_schedule_retry_wsi(wsi, &m->sul, startConnect, &m->retry_count)) {
+				lwsl_err("%s: connection attempts exhausted\n", __func__);
+				wsStopFlag = true;
+			}
+			return 0;
+		}
 		case LWS_CALLBACK_CLIENT_RECEIVE: {
 			//((char*)in)[len] = '\0';
 			//std::string msgStr((char*)in, len);
@@ -92,40 +89,42 @@ static int callback_minimal(struct lws* wsi, enum lws_callback_reasons reason, v
 			break;
 		}
 		case LWS_CALLBACK_CLIENT_ESTABLISHED: //链接建立
+		{
 			lwsl_user("%s: established\n", __func__);
 			break;
+		}
 		case LWS_CALLBACK_CLIENT_CLOSED:
+		{
 			lwsl_err("CLIENT_CONNECTION_ERROR: %s\n", in ? (char*)in : "(null)");
+			if (lws_retry_sul_schedule_retry_wsi(wsi, &m->sul, startConnect, &m->retry_count)) {
+				lwsl_err("%s: connection attempts exhausted\n", __func__);
+				wsStopFlag = true;
+			}
+			return 0;
+		}
+		default: {
 			break;
-		default:
-			break;
+		}			
 	}
 	return lws_callback_http_dummy(wsi, reason, user, in, len);
 }
 
 static const struct lws_protocols protocols[] = {
-	{ "lws-minimal-client", callback_minimal, 0, 0, 0, NULL, 0 },
+	{ "embedCalendar", wsCB, 0, 0, 0, NULL, 0 },
 	LWS_PROTOCOL_LIST_TERM
 };
 
-static void sigint_handler(int sig)
-{
-	interrupted = 1;
-}
-
-void connect() {
+void initWs(std::stop_token token) {
 	struct lws_context_creation_info info;
-	const char* p;
-	int n = 0;
-	signal(SIGINT, sigint_handler);
-	memset(&info, 0, sizeof info);
+	memset(&info, 0, sizeof(info));
 	lwsl_user("LWS minimal ws client\n");
 	info.port = CONTEXT_PORT_NO_LISTEN; /* we do not run any server */
 	info.protocols = protocols;
 	info.fd_limit_per_thread = 1 + 1 + 1;
 	context = lws_create_context(&info);
-	lws_sul_schedule(context, 0, &mco.sul, connect_client, 6);
-	while (n >= 0 && !interrupted) {
+	lws_sul_schedule(context, 0, &mco.sul, startConnect, 6);
+	int n = 0;
+	while (n >= 0 && !wsStopFlag && !token.stop_requested()) {
 		n = lws_service(context, 0);
 	}		
 	lws_context_destroy(context);
@@ -135,7 +134,7 @@ void connect() {
 void WsConn::Init()
 {
 	wsConn = std::make_unique<WsConn>();
-	connect();
+	std::jthread thread(initWs);
 	wsConn->initJson();
 }
 
