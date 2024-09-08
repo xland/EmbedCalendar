@@ -136,6 +136,7 @@ void WsConn::Init()
 	wsConn = std::make_unique<WsConn>();
 	std::jthread thread(initWs);
 	wsConn->initJson();
+	thread.detach();
 }
 
 WsConn* WsConn::Get()
