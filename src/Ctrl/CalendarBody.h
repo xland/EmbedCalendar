@@ -20,6 +20,8 @@ public:
 public:
 	float l, t, b, r;
 private:
+	void setItemPos(std::vector<DateItem>& items);
+private:
 	std::vector<DateItem> items;
 	float rr,span;
 	float dateSize, lunarSize, badgeSize;

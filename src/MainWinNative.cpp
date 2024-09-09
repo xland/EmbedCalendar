@@ -13,7 +13,7 @@ void MainWin::createWindow()
     std::wstring clsName = std::format(L"EmbedCalendar{}", num++);
     WNDCLASSEX wcx{};
     wcx.cbSize = sizeof(wcx);
-    wcx.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+    wcx.style = CS_HREDRAW | CS_VREDRAW;
     wcx.lpfnWndProc = &MainWin::routeWinMsg;
     wcx.cbWndExtra = sizeof(MainWin*);
     wcx.hInstance = instance;
@@ -133,7 +133,7 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
             break;
         }
         case CustomMsgId: {
-            onCustomMsg((EventType)wParam, (uint32_t)lParam);
+            onCustomMsg((uint32_t)wParam, (uint32_t)lParam);
             break;
         }
         case WM_TIMER: {

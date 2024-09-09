@@ -51,7 +51,7 @@ private:
 	void onMouseMove(const int& x, const int& y);
 	void onMouseDrag(const int& x, const int& y);
 	void onDpiChange();
-	void onCustomMsg(const EventType& type, const uint32_t& msg);
+	void onCustomMsg(const uint32_t& type, const uint32_t& msg);
 	static LRESULT CALLBACK routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 private:

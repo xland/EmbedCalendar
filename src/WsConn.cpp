@@ -1,6 +1,5 @@
 ﻿#include <Windows.h>
 #include <format>
-#include <rapidjson/document.h>
 #include <iostream>
 #include <vector>
 #include <sstream>
@@ -31,27 +30,25 @@ size_t WsConn::msgCB(char* ptr, size_t size, size_t nmemb, void* userdata) {
 	auto frame = curl_ws_meta(self->curl);
 	auto result{ size * nmemb };
 	{
-		std::string msgTemp;
+		std::lock_guard<std::mutex> lock(mtx);
+		self->msg.append(ptr, result);
+		if (frame->bytesleft > 0)
 		{
-			std::lock_guard<std::mutex> lock(mtx);
-			self->msg.append(ptr, result);
-			if (frame->bytesleft > 0)
-			{
-				return result;
-			}
-			msgTemp = self->msg;
-			self->msg.clear();
+			return result;
 		}
-		std::cout << "Received message: " << std::endl;
-		self->initJson(std::move(msgTemp));
-		
+		self->d.Parse(self->msg.data());
+		self->msg.clear();
 	}
+	PostMessage(MainWin::Get()->hwnd, CustomMsgId, DataReadyId, 0);
+	std::wcout << L"Received message: " << std::endl;
 	return result;
 }
 void WsConn::Init(std::wstring&& cmdLine)
 {
 	std::wcout << L"cmdLine." << cmdLine.data() << std::endl;
 	wsConn = std::make_unique<WsConn>();
+	auto win = MainWin::Get();
+	win->customEventHandlers.push_back(std::bind(&WsConn::OnCustomEvent, wsConn.get(), std::placeholders::_1, std::placeholders::_2));
 	wsConn->initWsUrl(std::move(cmdLine));
 	wsConn->connectWs();
 }
@@ -109,7 +106,7 @@ void WsConn::initWsUrl(std::wstring&& cmdLine)
 	}
 }
 
-void WsConn::initJson(std::string&& jsonStr)
+void WsConn::OnCustomEvent(const uint32_t& type, const uint32_t& msg)
 {
 #ifdef TESTDATA
 	std::wstring viewData{ LR"("viewData":[{"type":"prev","year":2024,"month":6,"date":0,"startTimeStamp":1722009600000,"endTimeStamp":1722096000000,"lunarInfo":"廿二","docStatus":"","isToday":false,"isActive":false,"hasSchdule":false},
@@ -161,8 +158,8 @@ void WsConn::initJson(std::string&& jsonStr)
 	msgData += viewData;
 	msg = Util::ToStr(msgData.data());
 #endif	
-	rapidjson::Document d;
-	d.Parse(jsonStr.data());
+	if (type != DataReadyId) return;
+	
 	auto data = d["data"].GetObj();
 	{
 		auto theme = data["backgroundTheme"].GetString();
@@ -190,7 +187,8 @@ void WsConn::initJson(std::string&& jsonStr)
 		{
 			DateItem item;
 			item.date = std::to_string(data["date"].GetUint());
-			item.hasSchdule = data["hasSchdule"].GetBool();
+			//auto str = Util::ToWStr(jsonStr.data());
+			item.hasSchdule = data.HasMember("hasSchdule")?data["hasSchdule"].GetBool():false;
 			item.isActive = data["isActive"].GetBool();
 			item.isToday = data["isToday"].GetBool();
 			item.lunar = data["lunarInfo"].GetString();

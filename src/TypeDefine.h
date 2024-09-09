@@ -9,16 +9,9 @@
 constexpr unsigned int CustomMsgId{ WM_APP + 1 };
 constexpr unsigned int RefreshTimerId{ WM_APP + 2 };
 constexpr unsigned int CheckWallPaperTimerId{ WM_APP + 3 };
-
-enum class EventType {
-    maskReady = 0,
-    undoDisable,
-    redoDisable,
-    unselectAllTool,
-    showHideSubTool
-};
+constexpr unsigned int DataReadyId{ WM_APP + 4 };
 
 using MouseEventCB = std::function<void(const int&, const int&)>;
 using DpiEventCB = std::function<void()>;
-using CustomEventCB = std::function<void(const EventType& type, const uint32_t& msg)>;
+using CustomEventCB = std::function<void(const uint32_t& type, const uint32_t& msg)>;
 using PaintEventCB = std::function<void(SkCanvas* canvas)>;

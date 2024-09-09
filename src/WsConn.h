@@ -5,6 +5,7 @@
 #include <mutex>
 #include <string>
 #include <curl/curl.h>
+#include <rapidjson/document.h>
 
 class WsConn
 {
@@ -16,12 +17,13 @@ public:
 	static void Dispose();
 	void PostMsg(std::string&& msg);
 	void connectWs();
+	void OnCustomEvent(const uint32_t& type, const uint32_t& msg);
 private:
 	void initWsUrl(std::wstring&& cmdLine);
-	void initJson(std::string&& jsonStr);
 	static size_t msgCB(char* ptr, size_t size, size_t nmemb, void* userdata);
 private:
 	bool dataReady{ false };
+	rapidjson::Document d;
 	std::unique_ptr<std::jthread> wsThread;
 	CURLM* multiHandle;
 	CURL* curl;

@@ -5,6 +5,7 @@
 #include "../Skin.h"
 #include "../Util.h"
 #include "WeekHeader.h"
+
 namespace {
 	std::unique_ptr<CalendarBody> calendarBody;
 }
@@ -71,6 +72,9 @@ void CalendarBody::OnPaint(SkCanvas* canvas)
 
 		paint.setColor(item.isActive ? 0xFFFFFFFF : skin->text1);
 		font->setSize(lunarSize);
+
+		auto lunarStr = Util::ToWStr(item.lunar.data());
+
 		canvas->drawString(item.lunar.data(),item.lunarX,item.lunarY, *font, paint);
 
 		paint.setColor(item.isActive ? 0xFFFFFFFF : skin->text1);
@@ -90,18 +94,24 @@ void CalendarBody::OnDpi()
 	rr = 28 * win->dpi;
 	l = 30 * win->dpi;
 	t = WeekHeader::Get()->bottom + 6 * win->dpi;
-	b = t+ 6 * 2 * win->dpi + 6 * (2*rr);
+	b = t + 6 * 2 * win->dpi + 6 * (2 * rr);
 	r = win->w - l;
 	span = (win->w - 20 * win->dpi * 2) / 7;
 
 	dateSize = 20 * win->dpi;
 	lunarSize = 11 * win->dpi;
 	badgeSize = 10 * win->dpi;
+
+	setItemPos(items);
+}
+
+void CalendarBody::setItemPos(std::vector<DateItem>& items)
+{
+	auto win = MainWin::Get();
 	auto font = Font::GetText();
 	SkRect measureRect;
-
 	SkPoint pos{ SkPoint::Make(l,t) };
-	for (size_t yIndex = 0; yIndex < 6; yIndex++) 
+	for (size_t yIndex = 0; yIndex < 6; yIndex++)
 	{
 		pos.fY += 2 * win->dpi;
 		for (size_t xIndex = 0; xIndex < 7; xIndex++)
@@ -112,15 +122,15 @@ void CalendarBody::OnDpi()
 			font->setSize(dateSize);
 			font->measureText(item.date.data(), item.date.size(), SkTextEncoding::kUTF8, &measureRect);
 			item.dateX = pos.fX + rr - measureRect.width() / 2 - measureRect.fLeft;
-			item.dateY= pos.fY + 0 - measureRect.fTop + 12 * win->dpi;
-		
-		
+			item.dateY = pos.fY + 0 - measureRect.fTop + 12 * win->dpi;
+
+
 			font->setSize(lunarSize);
 			font->measureText(item.lunar.data(), item.lunar.size(), SkTextEncoding::kUTF8, &measureRect);
 			item.lunarX = pos.fX + rr - measureRect.width() / 2 - measureRect.fLeft;
 			item.lunarY = pos.fY + 0 - measureRect.fTop + 32 * win->dpi;
-		
-		
+
+
 			font->setSize(badgeSize);
 			font->measureText(item.badge.data(), item.badge.size(), SkTextEncoding::kUTF8, &measureRect);
 			item.badgeX = pos.fX + 0 - measureRect.width() / 2 - measureRect.fLeft + 46 * win->dpi - 2;
@@ -130,7 +140,7 @@ void CalendarBody::OnDpi()
 		}
 		pos.fY += 2 * rr;
 		pos.fX = l;
-	}	
+	}
 }
 
 void CalendarBody::OnLeftBtnDown(const int& x, const int& y)
@@ -177,6 +187,7 @@ void CalendarBody::OnMouseMove(const int& x, const int& y)
 
 void CalendarBody::SetText(std::vector<DateItem>&& param)
 {
+	setItemPos(param);
 	items = std::move(param);
-	OnDpi();
+	
 }

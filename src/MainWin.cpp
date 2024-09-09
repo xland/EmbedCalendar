@@ -39,13 +39,10 @@ void MainWin::Init(HINSTANCE instance, std::wstring&& cmd)
     SwitchBtn::Init();
     ListHeader::Init();
     ListBody::Init();
-    WsConn::Init(std::move(cmd));
     win->getDpi();
     win->initCanvas();
     win->createWindow();
-
-    //win->getDpi();
-    //win->ShowWindow(hwnd, SW_SHOW);
+    WsConn::Init(std::move(cmd));
 }
 MainWin* MainWin::Get()
 {
@@ -130,10 +127,12 @@ void MainWin::repaint()
     }
     else {
         canvas->clear(Skin::Get()->bg);
-    }    
-    for (size_t i = 0; i < paintHandlers.size(); i++)
+    }  
     {
-        paintHandlers[i](canvas.get());
+        for (size_t i = 0; i < paintHandlers.size(); i++)
+        {
+            paintHandlers[i](canvas.get());
+        }
     }
     PAINTSTRUCT ps;
     auto dc = BeginPaint(hwnd, &ps);
@@ -183,7 +182,7 @@ void MainWin::onDpiChange()
     }
 }
 
-void MainWin::onCustomMsg(const EventType& type, const uint32_t& msg)
+void MainWin::onCustomMsg(const uint32_t& type, const uint32_t& msg)
 {
     for (size_t i = 0; i < customEventHandlers.size(); i++)
     {
