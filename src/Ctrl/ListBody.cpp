@@ -207,4 +207,5 @@ void ListBody::OnMouseMove(const int& x, const int& y)
 void ListBody::SetText(std::vector<ListItem>&& param)
 {
 	items = std::move(param);
+	measureList();
 }
