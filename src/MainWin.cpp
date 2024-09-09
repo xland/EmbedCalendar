@@ -13,6 +13,8 @@
 #include "Ctrl/SwitchBtn.h"
 #include "Ctrl/ListHeader.h"
 #include "Ctrl/ListBody.h"
+#include "Ctrl/SettingMenu.h"
+#include "Ctrl/ToolTip.h"
 
 
 namespace {
@@ -39,6 +41,8 @@ void MainWin::Init(HINSTANCE instance, std::wstring&& cmd)
     SwitchBtn::Init();
     ListHeader::Init();
     ListBody::Init();
+    SettingMenu::Init();
+    ToolTip::Init();
     win->getDpi();
     win->initCanvas();
     win->createWindow();
@@ -183,7 +187,7 @@ void MainWin::onDpiChange()
     }
 }
 
-void MainWin::onCustomMsg(const uint32_t& type, const uint32_t& msg)
+void MainWin::onCustomMsg(const uint64_t& type, const uint64_t& msg)
 {
     for (size_t i = 0; i < customEventHandlers.size(); i++)
     {

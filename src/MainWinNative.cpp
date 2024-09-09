@@ -134,7 +134,7 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
             break;
         }
         case CustomMsgId: {
-            onCustomMsg((uint32_t)wParam, (uint32_t)lParam);
+            onCustomMsg(wParam, lParam);
             break;
         }
         case WM_TIMER: {

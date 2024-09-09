@@ -46,7 +46,6 @@ bool TitleBar::IsInCaption(const int& x, const int& y)
 void TitleBar::OnPaint(SkCanvas* canvas)
 {
 	SkPaint paint;
-	auto win = MainWin::Get();
 	if (mouseInPinBtn) {
 		paint.setColor(Skin::Get()->hoverBg);
 		canvas->drawRect(pinRect, paint);

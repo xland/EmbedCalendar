@@ -5,7 +5,7 @@
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPTSTR lpCmdLine, _In_ int nCmdShow)
 {
     //MainWin::Init(hInstance, std::wstring(lpCmdLine));
-    MainWin::Init(hInstance, std::wstring(L"EmbedCalendar_50423"));
+    MainWin::Init(hInstance, std::wstring(L"EmbedCalendar_63005"));
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0))
     {

@@ -18,6 +18,7 @@
 #include "Ctrl/CalendarBody.h"
 #include "Ctrl/ListHeader.h"
 #include "Ctrl/ListBody.h"
+#include "Ctrl/SettingMenu.h"
 
 namespace {
 	std::unique_ptr<WsConn> wsConn;
@@ -29,6 +30,7 @@ size_t WsConn::msgCB(char* ptr, size_t size, size_t nmemb, void* userdata) {
 	auto self = static_cast<WsConn*>(userdata);
 	auto frame = curl_ws_meta(self->curl);
 	auto result{ size * nmemb };
+	rapidjson::Document* doc = new rapidjson::Document();
 	{
 		std::lock_guard<std::mutex> lock(mtx);
 		self->msg.append(ptr, result);
@@ -36,11 +38,11 @@ size_t WsConn::msgCB(char* ptr, size_t size, size_t nmemb, void* userdata) {
 		{
 			return result;
 		}
-		self->d.Parse(self->msg.data());
+		doc->Parse(self->msg.data());
 		self->msg.clear();
 	}
-	PostMessage(MainWin::Get()->hwnd, CustomMsgId, DataReadyId, 0);
-	std::wcout << L"Received message: " << std::endl;
+	PostMessage(MainWin::Get()->hwnd, CustomMsgId, DataReadyId, (LPARAM)doc);
+	std::wcout << L"Received message" << std::endl;
 	return result;
 }
 void WsConn::Init(std::wstring&& cmdLine)
@@ -106,7 +108,7 @@ void WsConn::initWsUrl(std::wstring&& cmdLine)
 	}
 }
 
-void WsConn::OnCustomEvent(const uint32_t& type, const uint32_t& msg)
+void WsConn::OnCustomEvent(const uint64_t& type, const uint64_t& msg)
 {
 #ifdef TESTDATA
 	std::wstring viewData{ LR"("viewData":[{"type":"prev","year":2024,"month":6,"date":0,"startTimeStamp":1722009600000,"endTimeStamp":1722096000000,"lunarInfo":"廿二","docStatus":"","isToday":false,"isActive":false,"hasSchdule":false},
@@ -159,7 +161,7 @@ void WsConn::OnCustomEvent(const uint32_t& type, const uint32_t& msg)
 	msg = Util::ToStr(msgData.data());
 #endif	
 	if (type != DataReadyId) return;
-	
+	auto& d = *(rapidjson::Document*)msg;
 	auto data = d["data"].GetObj();
 	{
 		auto theme = data["backgroundTheme"].GetString();
@@ -219,6 +221,15 @@ void WsConn::OnCustomEvent(const uint32_t& type, const uint32_t& msg)
 		}
 		ListBody::Get()->SetText(std::move(param));
 	}
+	{
+		auto lang = data["lang"].GetObj();
+		auto settingMenu = SettingMenu::Get();
+		settingMenu->menuText[0] = std::string{ lang["setting"].GetString() };
+		settingMenu->menuText[1] = std::string{lang["help"].GetString() };
+		settingMenu->menuText[2] = std::string{lang["advise"].GetString() };
+		settingMenu->menuText[3] = std::string{lang["signout"].GetString() };
+	}
+	delete (rapidjson::Document*)msg;
 	if (dataReady) {
 		MainWin::Get()->Refresh();
 	}
@@ -226,7 +237,8 @@ void WsConn::OnCustomEvent(const uint32_t& type, const uint32_t& msg)
 	{
 		MainWin::Get()->OnWsDataReady();
 		dataReady = true;
-	}	
+	}
+
 }
 
 void WsConn::connectWs()

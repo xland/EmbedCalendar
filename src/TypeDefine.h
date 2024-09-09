@@ -14,5 +14,5 @@ constexpr unsigned int RefreshDataTimerId{ WM_APP + 5 };
 
 using MouseEventCB = std::function<void(const int&, const int&)>;
 using DpiEventCB = std::function<void()>;
-using CustomEventCB = std::function<void(const uint32_t& type, const uint32_t& msg)>;
+using CustomEventCB = std::function<void(const uint64_t& type, const uint64_t& msg)>;
 using PaintEventCB = std::function<void(SkCanvas* canvas)>;
