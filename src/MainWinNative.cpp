@@ -23,7 +23,7 @@ void MainWin::createWindow()
     wcx.hbrBackground = (HBRUSH)COLOR_WINDOW;
     wcx.lpszClassName = clsName.c_str();
     RegisterClassEx(&wcx);
-    hwnd = CreateWindowEx(NULL, clsName.c_str(), clsName.c_str(), WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP,
+    hwnd = CreateWindowEx(NULL, clsName.c_str(), L"HikLink桌面日历", WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP,
         x, y, w, h, NULL, NULL, instance, static_cast<LPVOID>(this));
     Util::EnableAlpha(hwnd);
     MainWin::Cursor(IDC_ARROW);
