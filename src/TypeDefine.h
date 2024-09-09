@@ -10,6 +10,7 @@ constexpr unsigned int CustomMsgId{ WM_APP + 1 };
 constexpr unsigned int RefreshTimerId{ WM_APP + 2 };
 constexpr unsigned int CheckWallPaperTimerId{ WM_APP + 3 };
 constexpr unsigned int DataReadyId{ WM_APP + 4 };
+constexpr unsigned int RefreshDataTimerId{ WM_APP + 5 };
 
 using MouseEventCB = std::function<void(const int&, const int&)>;
 using DpiEventCB = std::function<void()>;

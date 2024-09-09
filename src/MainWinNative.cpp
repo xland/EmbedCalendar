@@ -2,10 +2,11 @@
 #include <format>
 #include <windowsx.h>
 #include "MainWin.h"
-#include "Ctrl/TitleBar.h"
 #include "Util.h"
 #include "Embedder.h"
+#include "WsConn.h"
 #include "Ctrl/SwitchBtn.h"
+#include "Ctrl/TitleBar.h"
 
 void MainWin::createWindow()
 {
@@ -144,6 +145,10 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
             }
             else if (wParam == CheckWallPaperTimerId) {
                 Embedder::Get()->TimerCB();
+            }
+            else if (wParam == RefreshDataTimerId) {
+                std::cout << "1 hour later" << std::endl;
+                WsConn::Get()->PostMsg(R"({"msgName":"updateRenderData"})");
             }
             break;
         }

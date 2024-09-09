@@ -114,6 +114,7 @@ void MainWin::OnWsDataReady()
 {
     onDpiChange();
     ShowWindow(hwnd, SW_SHOW);
+    SetTimer(hwnd, RefreshDataTimerId, 1000*60*60, NULL);
 }
 
 void MainWin::repaint()
