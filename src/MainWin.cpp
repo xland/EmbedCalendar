@@ -1,6 +1,4 @@
 ﻿#include <shellscalingapi.h>
-#include <iostream>
-#include <sstream>
 
 #include "MainWin.h"
 #include "WsConn.h"
@@ -29,13 +27,6 @@ MainWin::MainWin(HINSTANCE _instance) :instance{_instance}
 
 void MainWin::Init(HINSTANCE instance, std::wstring&& cmd)
 {
-    //std::string hwndStr = "002C089C"; 
-    //std::stringstream ss;
-    //ss << std::hex << hwndStr;
-    //unsigned long hwndHex;
-    //ss >> hwndHex; 
-    //HWND hwnd = reinterpret_cast<HWND>(hwndHex);
-    //PostMessage(hwnd, WM_CLOSE, 0, 0);
     Util::RefreshDesktop();
     Util::InitDebuger();
     win = std::make_unique<MainWin>(instance);
@@ -48,10 +39,13 @@ void MainWin::Init(HINSTANCE instance, std::wstring&& cmd)
     SwitchBtn::Init();
     ListHeader::Init();
     ListBody::Init();
-    WsConn::Init();
+    WsConn::Init(std::move(cmd));
     win->getDpi();
     win->initCanvas();
     win->createWindow();
+
+    //win->getDpi();
+    //win->ShowWindow(hwnd, SW_SHOW);
 }
 MainWin* MainWin::Get()
 {
@@ -78,8 +72,7 @@ void MainWin::getDpi()
     GetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY);
     dpi = dpiX / 96.0f;
     w = 580 * dpi;
-    h = 580 * dpi; //todo
-    onDpiChange();
+    h = 580 * dpi; //todo    
 }
 
 void MainWin::initCanvas()
@@ -118,6 +111,12 @@ void MainWin::HideList()
     h = 580 * dpi;
     initCanvas();
     SetWindowPos(hwnd, NULL, x, y, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
+void MainWin::OnWsDataReady()
+{
+    onDpiChange();
+    ShowWindow(hwnd, SW_SHOW);
 }
 
 void MainWin::repaint()

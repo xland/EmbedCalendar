@@ -178,4 +178,5 @@ void CalendarBody::OnMouseMove(const int& x, const int& y)
 void CalendarBody::SetText(std::vector<DateItem>&& param)
 {
 	items = std::move(param);
+	OnDpi();
 }

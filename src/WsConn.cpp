@@ -1,12 +1,13 @@
-﻿#include <string>
-#include <Windows.h>
+﻿#include <Windows.h>
 #include <format>
 #include <rapidjson/document.h>
 #include <iostream>
-#include <string>
 #include <vector>
-#include <libwebsockets.h>
+#include <sstream>
+#include <iomanip>
 
+
+#include "TypeDefine.h"
 #include "Util.h"
 #include "WsConn.h"
 #include "MainWin.h"
@@ -21,139 +22,38 @@
 
 namespace {
 	std::unique_ptr<WsConn> wsConn;
-	bool wsStopFlag{ false };
-	static struct my_conn {
-		lws_sorted_usec_list_t	sul; /* schedule connection retry */
-		struct lws* wsi; /* related wsi if any */
-		uint16_t retry_count; /* count of consequetive retries */
-	} mco;
-	static struct lws_context* context;
-	static const uint32_t backoffMs[] = { 1000, 2000, 3000, 4000, 5000 };
-	static const lws_retry_bo_t retry = {
-		.retry_ms_table = backoffMs,
-		.retry_ms_table_count = LWS_ARRAY_SIZE(backoffMs),
-		.conceal_count = LWS_ARRAY_SIZE(backoffMs),
-		.secs_since_valid_ping = 3,  /* force PINGs after secs idle */
-		.secs_since_valid_hangup = 10, /* hangup after secs idle */
-		.jitter_percent = 20,
-	};
+	std::mutex mtx;
 }
 
 
-static void startConnect(lws_sorted_usec_list_t* sul)
-{
-	struct my_conn* m = lws_container_of(sul, struct my_conn, sul);
-	struct lws_client_connect_info i;
-	memset(&i, 0, sizeof(i));
-	i.context = context;
-	i.port = 8800;
-	i.address = "124.222.224.186";
-	i.path = "/";
-	i.host = i.address;
-	i.origin = i.address;
-	i.protocol = "dumb-increment-protocol";
-	i.local_protocol_name = "lws-minimal-client";
-	i.pwsi = &m->wsi;
-	i.retry_and_idle_policy = &retry;
-	i.userdata = m;
-	if (!lws_client_connect_via_info(&i))		
-		//Failed... schedule a retry... we can't use the _retry_wsi() convenience wrapper api here because no valid wsi at this point.		
-		if (lws_retry_sul_schedule(context, 0, sul, &retry, startConnect, &m->retry_count)) {
-			lwsl_err("%s: connection attempts exhausted\n", __func__);
-			wsStopFlag = true;
-		}
-}
-
-static int wsCB(struct lws* wsi, enum lws_callback_reasons reason, void* user, void* in, size_t len)
-{
-	struct my_conn* m = (struct my_conn*)user;
-	switch (reason) {
-		case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
+size_t WsConn::msgCB(char* ptr, size_t size, size_t nmemb, void* userdata) {
+	auto self = static_cast<WsConn*>(userdata);
+	auto frame = curl_ws_meta(self->curl);
+	auto result{ size * nmemb };
+	{
+		std::string msgTemp;
 		{
-			lwsl_err("CLIENT_CONNECTION_ERROR: %s\n", in ? (char*)in : "(null)");
-			if (lws_retry_sul_schedule_retry_wsi(wsi, &m->sul, startConnect, &m->retry_count)) {
-				lwsl_err("%s: connection attempts exhausted\n", __func__);
-				wsStopFlag = true;
+			std::lock_guard<std::mutex> lock(mtx);
+			self->msg.append(ptr, result);
+			if (frame->bytesleft > 0)
+			{
+				return result;
 			}
-			return 0;
+			msgTemp = self->msg;
+			self->msg.clear();
 		}
-		case LWS_CALLBACK_CLIENT_RECEIVE: {
-			//((char*)in)[len] = '\0';
-			//std::string msgStr((char*)in, len);
-			auto wmsgStr = Util::ToWStr((char*)in);
-			lwsl_hexdump_notice(in, len);
-			break;
-		}
-		case LWS_CALLBACK_CLIENT_ESTABLISHED: //链接建立
-		{
-			lwsl_user("%s: established\n", __func__);
-			break;
-		}
-		case LWS_CALLBACK_CLIENT_WRITEABLE:
-		{
-			std::string msgStr;
-			break;
-			//msgStr.insert(0, LWS_PRE, ' ');
-			//auto sendSize = lws_write(wsi, (unsigned char*)msgStr.c_str() + LWS_PRE, msgStr.length() - LWS_PRE, LWS_WRITE_TEXT);
-			//if (sendSize < 0) {
-			//	lwsl_err("Error sending\n");
-			//	return -1;
-			//}
-		}
-		case LWS_CALLBACK_CLIENT_CLOSED:
-		{
-			lwsl_err("CLIENT_CONNECTION_ERROR: %s\n", in ? (char*)in : "(null)");
-			if (lws_retry_sul_schedule_retry_wsi(wsi, &m->sul, startConnect, &m->retry_count)) {
-				lwsl_err("%s: connection attempts exhausted\n", __func__);
-				wsStopFlag = true;
-			}
-			return 0;
-		}
-		default: {
-			break;
-		}			
+		std::cout << "Received message: " << std::endl;
+		self->initJson(std::move(msgTemp));
+		
 	}
-	return lws_callback_http_dummy(wsi, reason, user, in, len);
+	return result;
 }
-
-static const struct lws_protocols protocols[] = {
-	{ "embedCalendar", wsCB, 0, 0, 0, NULL, 0 },
-	LWS_PROTOCOL_LIST_TERM
-};
-
-
-void initWs(std::stop_token token) {
-	struct lws_context_creation_info info;
-	memset(&info, 0, sizeof(info));
-	lwsl_user("LWS minimal ws client\n");
-	info.port = CONTEXT_PORT_NO_LISTEN; /* we do not run any server */
-	info.protocols = protocols;
-	info.fd_limit_per_thread = 1 + 1 + 1;
-	context = lws_create_context(&info);
-	lws_sul_schedule(context, 0, &mco.sul, startConnect, 6);
-	int n = 0;
-	while (n >= 0 && !wsStopFlag && !token.stop_requested()) { // 
-		n = lws_service(context, 0);
-	}		
-	lws_context_destroy(context);
-	lwsl_user("Completed\n");
-
-
-	//using namespace std::literals::chrono_literals;
-	//static int value{ 1 };
-	//while (!token.stop_requested())
-	//{
-	//	std::cout << value++ << std::endl << std::flush;
-	//	std::this_thread::sleep_for(200ms);
-	//}
-	//std::cout << "thread stop" << std::endl;
-}
-
-void WsConn::Init()
+void WsConn::Init(std::wstring&& cmdLine)
 {
+	std::wcout << L"cmdLine." << cmdLine.data() << std::endl;
 	wsConn = std::make_unique<WsConn>();
-	wsConn->wsThread = std::make_unique<std::jthread>(initWs);
-	wsConn->initJson();
+	wsConn->initWsUrl(std::move(cmdLine));
+	wsConn->connectWs();
 }
 
 WsConn* WsConn::Get()
@@ -163,11 +63,55 @@ WsConn* WsConn::Get()
 
 void WsConn::Dispose()
 {
+	auto self = wsConn.get();
+	self->wsThread.reset();
+	curl_multi_remove_handle(self->multiHandle, self->curl);
+	curl_easy_cleanup(self->curl);
+	curl_multi_cleanup(self->multiHandle);
+	curl_global_cleanup();
 	wsConn.reset();
 }
 
-void WsConn::initJson()
+void WsConn::PostMsg(std::string&& msg)
 {
+	msg.insert(1, R"("msgType":"EmbedCalendar",)");
+	size_t sent{ 0 };
+	CURLcode res;
+	{
+		res = curl_ws_send(curl, msg.c_str(), msg.size(), &sent, 0, CURLWS_TEXT);
+	}
+	if (res != CURLE_OK || sent == 0) {
+		std::cerr << "Failed to send WebSocket message: " << curl_easy_strerror(res) << std::endl;
+	}
+	else {
+		std::cout << "Message sent successfully." << std::endl;
+	}
+}
+
+void WsConn::initWsUrl(std::wstring&& cmdLine)
+{
+	std::wistringstream stream(cmdLine);
+	std::wstring arg;
+	while (stream >> std::quoted(arg)) {
+		auto pos = arg.find(L"_");
+		if (pos == std::wstring::npos) {
+			continue;
+		}
+		else
+		{
+			auto portStr = Util::ToStr(arg.substr(pos + 1).data());
+			auto pathStr = Util::ToStr(arg.substr(0, pos).data());
+			//"ws://127.0.0.1:4000";
+			this->wsUrl = std::format("ws://127.0.0.1:{}/{}", portStr, pathStr);
+			std::cout << "ws url." << this->wsUrl << std::endl;
+			break;
+		}
+	}
+}
+
+void WsConn::initJson(std::string&& jsonStr)
+{
+#ifdef TESTDATA
 	std::wstring viewData{ LR"("viewData":[{"type":"prev","year":2024,"month":6,"date":0,"startTimeStamp":1722009600000,"endTimeStamp":1722096000000,"lunarInfo":"廿二","docStatus":"","isToday":false,"isActive":false,"hasSchdule":false},
 {"type":"prev","year":2024,"month":6,"date":28,"startTimeStamp":1722096000000,"endTimeStamp":1722182400000,"lunarInfo":"廿三","docStatus":"","isToday":false,"isActive":false,"hasSchdule":false},
 {"type":"prev","year":2024,"month":6,"date":29,"startTimeStamp":1722182400000,"endTimeStamp":1722268800000,"lunarInfo":"廿四","docStatus":"","isToday":false,"isActive":false,"hasSchdule":false},
@@ -210,14 +154,15 @@ void WsConn::initJson()
 {"type":"next","year":2024,"month":8,"date":4,"startTimeStamp":1725379200000,"endTimeStamp":1725465600000,"lunarInfo":"初二","docStatus":"","isToday":false,"isActive":false,"hasSchdule":false},
 {"type":"next","year":2024,"month":8,"date":5,"startTimeStamp":1725465600000,"endTimeStamp":1725552000000,"lunarInfo":"初三","docStatus":"","isToday":false,"isActive":false,"hasSchdule":false},
 {"type":"next","year":2024,"month":8,"date":6,"startTimeStamp":1725552000000,"endTimeStamp":1725638400000,"lunarInfo":"初四","docStatus":"班","isToday":false,"isActive":false,"hasSchdule":false}] }})" };
-	std::wstring jsonStr{ LR"({"msgType": "EmbedCalendar","msgName": "updateRenderData","data":{"isCn":true,"backgroundTheme":"type1","backgroundOpacity":0.7,"activeDateMonth":"2024年8月",
+	std::wstring msgData =  LR"({"msgType": "EmbedCalendar","msgName": "updateRenderData","data":{"isCn":true,"backgroundTheme":"type1","backgroundOpacity":0.7,"activeDateMonth":"2024年8月",
 "activeDateDay":"周二 七月十七","weekLables":["六","日","一","二","三","四","五"],
 "displayScheduleList":true,"scheduleList":[{"title":"日程标题日程标题11","desc":"日程摘要xxx11","isAllowEdit":false,"calendarColor":"#FF8866", "calendarNo":"xxxx","scheduleNo":"yyyy"},
-{"title":"日程标题日程标题22","desc":"日程摘要xxx22","isAllowEdit":true,"calendarColor":"#4A53E7", "calendarNo":"xxxx22","scheduleNo":"yyyy22"}],)" };
-	jsonStr += viewData;
-	auto str = Util::ToStr(jsonStr.data());
+{"title":"日程标题日程标题22","desc":"日程摘要xxx22","isAllowEdit":true,"calendarColor":"#4A53E7", "calendarNo":"xxxx22","scheduleNo":"yyyy22"}],)";
+	msgData += viewData;
+	msg = Util::ToStr(msgData.data());
+#endif	
 	rapidjson::Document d;
-	d.Parse(str.data());
+	d.Parse(jsonStr.data());
 	auto data = d["data"].GetObj();
 	{
 		auto theme = data["backgroundTheme"].GetString();
@@ -274,8 +219,43 @@ void WsConn::initJson()
 		}
 		ListBody::Get()->SetText(std::move(param));
 	}
-	auto win = MainWin::Get();
-	if (win->hwnd) {
-		win->Refresh();
+	if (dataReady) {
+		MainWin::Get()->Refresh();
 	}
+	else
+	{
+		MainWin::Get()->OnWsDataReady();
+		dataReady = true;
+	}	
+}
+
+void WsConn::connectWs()
+{
+	curl_global_init(CURL_GLOBAL_DEFAULT);
+	multiHandle = curl_multi_init();
+	curl = curl_easy_init();
+	if (!curl) {
+		std::cerr << "Failed to initialize CURL." << std::endl;
+		return;
+	}
+	curl_easy_setopt(curl, CURLOPT_URL, wsUrl.c_str());
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &WsConn::msgCB);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
+
+	struct curl_ws_frame ws_frame = { 0 };
+	ws_frame.flags = CURLWS_TEXT;
+	curl_easy_setopt(curl, CURLOPT_WS_OPTIONS, &ws_frame);
+	curl_multi_add_handle(multiHandle, curl);
+
+	wsThread = std::make_unique<std::jthread>([this](std::stop_token token) {
+			int still_running{1};
+			CURLMcode mc{ CURLM_OK };
+			while (still_running && mc == CURLM_OK && !token.stop_requested())
+			{
+				mc = curl_multi_perform(multiHandle, &still_running);
+				if (still_running) {
+					curl_multi_poll(multiHandle, nullptr, 0, 100, nullptr); // 等待事件
+				}
+			}
+		});
 }

@@ -23,14 +23,15 @@ public:
 	void Close();
 	void ShowList();
 	void HideList();
+	void OnWsDataReady();
 public:
 	HINSTANCE instance;
-	std::unique_ptr<SkCanvas> canvas;
+	std::unique_ptr<SkCanvas> canvas{nullptr};
 	std::vector<SkColor> winPix;
 	HWND hwnd{nullptr};
 	int x{ 100 }, y{ 100 }, w{ 580 }, h{580};
 	bool isMouseDown{ false };
-	float dpi{ 1.0 };
+	float dpi{ -1.0 };
 public:
 	std::vector<MouseEventCB> mouseMoveHandlers;
 	std::vector<MouseEventCB> mouseDragHandlers;

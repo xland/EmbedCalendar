@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <sstream>
 #include <fcntl.h>
 #include "Util.h"
 
@@ -81,5 +82,16 @@ SkColor Util::ToColor(const std::string& colorStr) {
 void Util::RefreshDesktop()
 {
     SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, nullptr, SPIF_UPDATEINIFILE);
+}
+
+HWND Util::ToHwnd(std::string& str)
+{
+    //std::string hwndStr = "002C089C"; 
+    std::stringstream ss;
+    ss << std::hex << str;
+    unsigned long hwndHex;
+    ss >> hwndHex; 
+    HWND hwnd = reinterpret_cast<HWND>(hwndHex);
+    return hwnd;
 }
 

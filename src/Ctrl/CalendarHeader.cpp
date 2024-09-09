@@ -3,6 +3,7 @@
 #include "CalendarHeader.h"
 #include "../Font.h"
 #include "../MainWin.h"
+#include "../WsConn.h"
 #include "../TypeDefine.h"
 #include "../Skin.h"
 #include "TitleBar.h"
@@ -73,6 +74,12 @@ void CalendarHeader::OnDpi()
 
 void CalendarHeader::OnLeftBtnDown(const int& x, const int& y)
 {
+	if (mouseInLeft) {
+		WsConn::Get()->PostMsg(R"({"msgName":"changePrevMonth"})");
+	}
+	if (mouseInRight) {
+		WsConn::Get()->PostMsg(R"({"msgName":"changeNextMonth"})");
+	}
 }
 
 void CalendarHeader::OnMouseMove(const int& x, const int& y)

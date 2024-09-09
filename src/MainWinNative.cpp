@@ -26,7 +26,6 @@ void MainWin::createWindow()
         x, y, w, h, NULL, NULL, instance, static_cast<LPVOID>(this));
     Util::EnableAlpha(hwnd);
     MainWin::Cursor(IDC_ARROW);
-    ShowWindow(hwnd, SW_SHOW);
 }
 
 LRESULT MainWin::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
