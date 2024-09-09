@@ -1,12 +1,14 @@
 #include "ListHeader.h"
+#include "CalendarBody.h"
+#include "SwitchBtn.h"
+#include "../WsConn.h"
 #include "../Font.h"
 #include "../MainWin.h"
 #include "../TypeDefine.h"
 #include "../Skin.h"
-#include "CalendarBody.h"
 #include "../Util.h"
 #include "../Embedder.h"
-#include "SwitchBtn.h"
+
 
 namespace {
 	std::unique_ptr<ListHeader> listHeader;
@@ -65,6 +67,7 @@ void ListHeader::OnLeftBtnDown(const int& x, const int& y)
 {
 	if (!SwitchBtn::Get()->listVisible) return;
 	if (!isMouseIn) return;
+	WsConn::Get()->PostMsg(R"({"msgName":"createSchedule"})");
 }
 
 void ListHeader::OnMouseMove(const int& x, const int& y)

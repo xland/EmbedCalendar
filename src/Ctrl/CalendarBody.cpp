@@ -1,9 +1,11 @@
-﻿#include "CalendarBody.h"
+﻿#include <format>
+#include "CalendarBody.h"
 #include "../Font.h"
 #include "../MainWin.h"
 #include "../TypeDefine.h"
 #include "../Skin.h"
 #include "../Util.h"
+#include "../WsConn.h"
 #include "WeekHeader.h"
 
 namespace {
@@ -145,7 +147,10 @@ void CalendarBody::setItemPos(std::vector<DateItem>& items)
 
 void CalendarBody::OnLeftBtnDown(const int& x, const int& y)
 {
-
+	if (hoverIndex < 0)return;
+	auto str = std::format(R"({{"msgName":"changeDate","data": {{"year":{},"month":{},"date":{}}}}})",
+		items[hoverIndex].year, items[hoverIndex].month, items[hoverIndex].date);
+	WsConn::Get()->PostMsg(std::move(str));
 }
 
 void CalendarBody::OnMouseMove(const int& x, const int& y)

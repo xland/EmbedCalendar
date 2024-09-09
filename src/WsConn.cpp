@@ -187,6 +187,8 @@ void WsConn::OnCustomEvent(const uint32_t& type, const uint32_t& msg)
 		{
 			DateItem item;
 			item.date = std::to_string(data["date"].GetUint());
+			item.year = std::to_string(data["year"].GetUint());
+			item.month = std::to_string(data["month"].GetUint());
 			//auto str = Util::ToWStr(jsonStr.data());
 			item.hasSchdule = data.HasMember("hasSchdule")?data["hasSchdule"].GetBool():false;
 			item.isActive = data["isActive"].GetBool();

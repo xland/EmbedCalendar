@@ -7,6 +7,8 @@ public:
 	DateItem() = default;
 	~DateItem() = default;
 public:
+	std::string year;
+	std::string month;
 	std::string date;
 	std::string lunar;
 	std::string badge;

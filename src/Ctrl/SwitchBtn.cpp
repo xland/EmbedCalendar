@@ -1,9 +1,10 @@
 ﻿#include "SwitchBtn.h"
+#include "CalendarBody.h"
+#include "../WsConn.h"
 #include "../Font.h"
 #include "../MainWin.h"
 #include "../TypeDefine.h"
 #include "../Skin.h"
-#include "CalendarBody.h"
 #include "../Util.h"
 #include "../Embedder.h"
 
@@ -83,12 +84,14 @@ void SwitchBtn::OnLeftBtnDown(const int& x, const int& y)
 		win->HideList();
 		OnDpi();
 		listVisible = false;
+		WsConn::Get()->PostMsg(R"({"msgName":"displayScheduleList","data":false})");
 	}
 	else {
 		win->ShowList();
 		OnDpi();
 		listVisible = true;
 		MainWin::Cursor(IDC_ARROW);
+		WsConn::Get()->PostMsg(R"({"msgName":"displayScheduleList","data":true})");
 	}
 	Util::RefreshDesktop();
 }
