@@ -33,7 +33,8 @@ void MainWin::Init(HINSTANCE instance, std::wstring&& cmd)
     Util::InitDebuger();
     win = std::make_unique<MainWin>(instance);
     Embedder::Init();
-    Font::Init();    
+    Font::Init();
+    Skin::Init();
     TitleBar::Init();
     CalendarHeader::Init();
     WeekHeader::Init();
@@ -114,12 +115,6 @@ void MainWin::HideList()
     SetWindowPos(hwnd, NULL, x, y, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
-void MainWin::OnWsDataReady()
-{
-    onDpiChange();
-    ShowWindow(hwnd, SW_SHOW);
-    SetTimer(hwnd, RefreshDataTimerId, 1000*60*60, NULL);
-}
 
 void MainWin::repaint()
 {
@@ -195,10 +190,33 @@ void MainWin::onDpiChange()
     }
 }
 
-void MainWin::onCustomMsg(const uint64_t& type, const uint64_t& msg)
+void MainWin::onDataReady(rapidjson::Document* d)
 {
-    for (size_t i = 0; i < customEventHandlers.size(); i++)
+    try
     {
-        customEventHandlers[i](type, msg);
+        auto data = d->operator[]("data").GetObj();
+        Skin::Get()->SetData(data);
+        CalendarHeader::Get()->SetData(data);
+        WeekHeader::Get()->SetData(data);
+        CalendarBody::Get()->SetData(data);
+        ListHeader::Get()->SetData(data);
+        ListBody::Get()->SetData(data);
+        SettingMenu::Get()->SetData(data);
+        SwitchBtn::Get()->SetData(data);
+    }
+    catch (const std::exception&)
+    {
+        std::cout << "parse receive data error" << std::endl;
+        delete d;
+    }
+    if (dataReady) {
+        Refresh();
+    }
+    else
+    {
+        dataReady = true;
+        onDpiChange();
+        ShowWindow(hwnd, SW_SHOW);
+        SetTimer(hwnd, RefreshDataTimerId, 1000 * 60 * 60, NULL);
     }
 }

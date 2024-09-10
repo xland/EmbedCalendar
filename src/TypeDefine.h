@@ -3,8 +3,9 @@
 #include <Windows.h>
 #include <functional>
 #include <iostream>
-
 #include "include/core/SkCanvas.h"
+
+
 
 constexpr unsigned int CustomMsgId{ WM_APP + 1 };
 constexpr unsigned int RefreshTimerId{ WM_APP + 2 };

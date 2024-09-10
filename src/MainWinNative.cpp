@@ -134,10 +134,6 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
             Refresh();
             break;
         }
-        case CustomMsgId: {
-            onCustomMsg(wParam, lParam);
-            break;
-        }
         case WM_TIMER: {
             if (wParam == RefreshTimerId) {
                 KillTimer(hWnd, RefreshTimerId);
@@ -151,6 +147,11 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
                 std::cout << "1 hour later" << std::endl;
                 WsConn::Get()->PostMsg(R"({"msgName":"updateRenderData"})");
             }
+            break;
+        }
+        case DataReadyId: {
+            auto d = (rapidjson::Document*)lParam;
+            onDataReady(d);
             break;
         }
     }

@@ -14,14 +14,6 @@ namespace {
 	std::unique_ptr<ListHeader> listHeader;
 }
 
-ListHeader::ListHeader()
-{
-}
-
-ListHeader::~ListHeader()
-{
-}
-
 void ListHeader::Init()
 {
 	listHeader = std::make_unique<ListHeader>();
@@ -84,4 +76,9 @@ void ListHeader::OnMouseMove(const int& x, const int& y)
 		isMouseIn = true;
 		MainWin::Cursor(IDC_HAND);
 	}
+}
+
+void ListHeader::SetData(rapidjson::Value& data)
+{
+	text = data["activeDateDay"].GetString();
 }

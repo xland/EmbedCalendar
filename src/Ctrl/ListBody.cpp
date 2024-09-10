@@ -245,12 +245,10 @@ void ListBody::OnLeftBtnDown(const int& x, const int& y)
 	auto win = MainWin::Get();
 	if (x > listRect.fRight - 48 * win->dpi) {
 		auto msg = std::format(R"({{"msgName":"deleteSchedule","data":{{"scheduleNo":"{}","calendarNo":"{}"}}}})", item.scheduleNo, item.calendarNo);
-		std::cout << "delete" << std::endl;
 		WsConn::Get()->PostMsg(std::move(msg));
 	}
 	else {
 		auto msg = std::format(R"({{"msgName":"updateSchedule","data": {{"scheduleNo":"{}","calendarNo":"{}"}}}})", item.scheduleNo, item.calendarNo);
-		std::cout << "edit" << std::endl;
 		WsConn::Get()->PostMsg(std::move(msg));
 	}
 }
@@ -336,9 +334,20 @@ void ListBody::OnMouseWheel(const int& span)
 	win->Refresh();
 }
 
-void ListBody::SetText(std::vector<ListItem>&& param)
+void ListBody::SetData(rapidjson::Value& data)
 {
-	items = std::move(param);
+	auto arr = data["scheduleList"].GetArray();
+	for (auto& data : arr)
+	{
+		ListItem item;
+		item.title = data["title"].GetString();
+		item.desc = data["desc"].GetString();
+		item.isAllowEdit = data["isAllowEdit"].GetBool();
+		item.color = Util::ToColor(data["calendarColor"].GetString());
+		item.calendarNo = data["calendarNo"].GetString();
+		item.scheduleNo = data["scheduleNo"].GetString();
+		items.push_back(std::move(item));
+	}
 	thumbTop = 0;
 	scrollTop = 0;
 	OnDpi();

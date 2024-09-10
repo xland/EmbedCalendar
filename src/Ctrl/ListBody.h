@@ -2,7 +2,7 @@
 #include <include/core/SkCanvas.h>
 #include <include/core/SkRect.h>
 #include <vector>
-
+#include <rapidjson/document.h>
 #include "../ListItem.h"
 class ListBody
 {
@@ -16,9 +16,8 @@ public:
 	void OnLeftBtnDown(const int& x, const int& y);
 	void OnLeftBtnUp(const int& x, const int& y);
 	void OnMouseMove(const int& x, const int& y);
-	void OnMouseDrag(const int& x, const int& y);
 	void OnMouseWheel(const int& span);
-	void SetText(std::vector<ListItem>&& param);
+	void SetData(rapidjson::Value& data);
 private:
 	void measureList();
 	void paintEmpty(SkCanvas* canvas);

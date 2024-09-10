@@ -6,18 +6,21 @@ namespace {
 	std::unique_ptr<Skin> skin;
 }
 
-Skin::Skin()
-{
-}
-
-Skin::~Skin()
-{
-}
-
-void Skin::Init(const std::string& theme, const float& alpha)
+void Skin::Init()
 {
 	skin = std::make_unique<Skin>();
-	auto alphaVal = static_cast<int>(std::round(alpha*255));
+}
+
+Skin* Skin::Get()
+{
+	return skin.get();
+}
+
+void Skin::SetData(rapidjson::Value& data)
+{
+	auto theme = std::string{ data["backgroundTheme"].GetString() };
+	auto alpha = data["backgroundOpacity"].GetFloat();
+	auto alphaVal = static_cast<int>(std::round(alpha * 255));
 	if (theme == "type1") {
 		skin->bg = SkColorSetARGB(alphaVal, 255, 255, 255);
 		skin->initWhite();
@@ -26,11 +29,6 @@ void Skin::Init(const std::string& theme, const float& alpha)
 		skin->bg = SkColorSetARGB(alphaVal, 0, 0, 0);
 		skin->initBlack();
 	}
-}
-
-Skin* Skin::Get()
-{
-	return skin.get();
 }
 
 void Skin::initBlack()

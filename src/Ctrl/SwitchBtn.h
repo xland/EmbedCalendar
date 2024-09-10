@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <include/core/SkCanvas.h>
 #include <include/core/SkRect.h>
+#include <rapidjson/document.h>
 
 class SwitchBtn
 {
@@ -13,6 +14,7 @@ public:
 	void OnDpi();
 	void OnLeftBtnDown(const int& x, const int& y);
 	void OnMouseMove(const int& x, const int& y);
+	void SetData(rapidjson::Value& data);
 public:
 	bool listVisible{ false };
 	SkRect rect;

@@ -1,14 +1,16 @@
 #pragma once
 #include <include/core/SkColor.h>
 #include <string>
+#include <rapidjson/document.h>
 
 class Skin
 {
 public:
-	Skin();
-	~Skin();
-	static void Init(const std::string& theme,const float& alpha);
+	Skin() = default;
+	~Skin() = default;
+	static void Init();
 	static Skin* Get();
+	void SetData(rapidjson::Value& data);
 public:
 	SkColor bg;
 	SkColor text0;

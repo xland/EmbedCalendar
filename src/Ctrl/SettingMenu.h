@@ -3,6 +3,7 @@
 #include <include/core/SkRRect.h>
 #include <include/core/SkRect.h>
 #include <vector>
+#include <rapidjson/document.h>
 class SettingMenu
 {
 public:
@@ -15,6 +16,7 @@ public:
 	void OnLeftBtnDown(const int& x, const int& y);
 	void OnMouseMove(const int& x, const int& y);
 	void Show();
+	void SetData(rapidjson::Value& data);
 public:
 	std::vector<const char*> iconCode{
 		(const char*)u8"\ue710", (const char*)u8"\ue70a", (const char*)u8"\ue711", (const char*)u8"\ue70d"

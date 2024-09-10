@@ -2,13 +2,14 @@
 #include <include/core/SkCanvas.h>
 #include <include/core/SkRect.h>
 #include <vector>
+#include <rapidjson/document.h>
 
 #include "../DateItem.h"
 class CalendarBody
 {
 public:
-	CalendarBody();
-	~CalendarBody();
+	CalendarBody() = default;
+	~CalendarBody() = default;
 
 	static void Init();
 	static CalendarBody* Get();
@@ -16,11 +17,11 @@ public:
 	void OnDpi();
 	void OnLeftBtnDown(const int& x, const int& y);
 	void OnMouseMove(const int& x, const int& y);
-	void SetText(std::vector<DateItem>&& param);
+	void SetData(rapidjson::Value& data);
 public:
 	float l, t, b, r;
 private:
-	void setItemPos(std::vector<DateItem>& items);
+	void setItemsPos();
 private:
 	std::vector<DateItem> items;
 	float rr,span;

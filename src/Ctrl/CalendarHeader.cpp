@@ -13,14 +13,6 @@ namespace {
 	std::unique_ptr<CalendarHeader> calendarHeader;
 }
 
-CalendarHeader::CalendarHeader()
-{
-}
-
-CalendarHeader::~CalendarHeader()
-{
-}
-
 void CalendarHeader::Init()
 {
 	calendarHeader = std::make_unique<CalendarHeader>();
@@ -39,14 +31,14 @@ CalendarHeader* CalendarHeader::Get()
 void CalendarHeader::OnPaint(SkCanvas* canvas)
 {
 	auto win = MainWin::Get();
-	auto font = Font::GetText();
+	auto fontText = Font::GetText();
 	auto fontIcon = Font::GetIcon();
 	auto skin = Skin::Get();
 	SkPaint paint;
 	paint.setAntiAlias(true);
-	font->setSize(textSize);
+	fontText->setSize(textSize);
 	paint.setColor(skin->text0);
-	canvas->drawString(yearMonthStr.c_str(), textPos.fX, textPos.fY, *font, paint);
+	canvas->drawString(yearMonthStr.c_str(), textPos.fX, textPos.fY, *fontText, paint);
 	if (mouseInLeft) {
 		paint.setColor(skin->hoverBg);
 		canvas->drawCircle(c1Center, r, paint);
@@ -122,9 +114,12 @@ void CalendarHeader::OnMouseMove(const int& x, const int& y)
 	}
 }
 
-void CalendarHeader::SetText(std::string&& text)
+void CalendarHeader::SetData(rapidjson::Value& data)
 {
-	yearMonthStr = text;
+	yearMonthStr = data["activeDateMonth"].GetString();
+	auto lang = data["lang"].GetObj();
+	toolTipLeft = lang["prevMonth"].GetString();
+	toolTipRight = lang["nextMonth"].GetString();
 	measure();
 }
 

@@ -13,14 +13,6 @@ namespace {
 	std::unique_ptr<CalendarBody> calendarBody;
 }
 
-CalendarBody::CalendarBody()
-{
-}
-
-CalendarBody::~CalendarBody()
-{
-}
-
 void CalendarBody::Init()
 {
 	calendarBody = std::make_unique<CalendarBody>();
@@ -105,10 +97,10 @@ void CalendarBody::OnDpi()
 	lunarSize = 11 * win->dpi;
 	badgeSize = 10 * win->dpi;
 
-	setItemPos(items);
+	setItemsPos();
 }
 
-void CalendarBody::setItemPos(std::vector<DateItem>& items)
+void CalendarBody::setItemsPos()
 {
 	auto win = MainWin::Get();
 	auto font = Font::GetText();
@@ -193,9 +185,24 @@ void CalendarBody::OnMouseMove(const int& x, const int& y)
 	}
 }
 
-void CalendarBody::SetText(std::vector<DateItem>&& param)
+void CalendarBody::SetData(rapidjson::Value& data)
 {
-	setItemPos(param);
-	items = std::move(param);
-	
+	auto arr = data["viewData"].GetArray();
+	std::string currtStr = Util::ToStr(L"currt");
+	for (auto& data : arr)
+	{
+		DateItem item;
+		item.date = std::to_string(data["date"].GetUint());
+		item.year = std::to_string(data["year"].GetUint());
+		item.month = std::to_string(data["month"].GetUint());
+		//auto str = Util::ToWStr(jsonStr.data());
+		item.hasSchdule = data.HasMember("hasSchdule") ? data["hasSchdule"].GetBool() : false;
+		item.isActive = data["isActive"].GetBool();
+		item.isToday = data["isToday"].GetBool();
+		item.lunar = data["lunarInfo"].GetString();
+		item.isCurrt = data["type"].GetString() == currtStr;
+		item.badge = data["docStatus"].GetString();
+		items.push_back(std::move(item));
+	}
+	setItemsPos();
 }

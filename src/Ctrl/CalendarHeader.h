@@ -1,25 +1,27 @@
 #pragma once
 #include <include/core/SkCanvas.h>
 #include <include/core/SkRect.h>
+#include <rapidjson/document.h>
 
 class CalendarHeader
 {
 public:
-	CalendarHeader();
-	~CalendarHeader();
+	CalendarHeader() = default;
+	~CalendarHeader() = default;
 	static void Init();
 	static CalendarHeader* Get();
 	void OnPaint(SkCanvas* canvas);
 	void OnDpi();
 	void OnLeftBtnDown(const int& x, const int& y);
 	void OnMouseMove(const int& x, const int& y);
-	void SetText(std::string&& text);
+	void SetData(rapidjson::Value& data);
 public:
 	SkPoint c1Center, c2Center;
 	float r;
 private:
 	void measure();
 private:
+	std::string toolTipLeft, toolTipRight;
 	std::string yearMonthStr;
 	SkPoint textPos;
 	SkPoint icon1Pos, icon2Pos;

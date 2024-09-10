@@ -9,14 +9,6 @@ namespace {
 	std::unique_ptr<WeekHeader> weekHeader;
 }
 
-WeekHeader::WeekHeader()
-{
-}
-
-WeekHeader::~WeekHeader()
-{
-}
-
 void WeekHeader::Init()
 {
 	weekHeader = std::make_unique<WeekHeader>();
@@ -71,8 +63,12 @@ void WeekHeader::OnDpi()
 	yPos = top + 28 / 2 - measureRect.height() / 2 - measureRect.fTop;
 }
 
-void WeekHeader::SetText(std::vector<std::string>&& param)
+void WeekHeader::SetData(rapidjson::Value& data)
 {
-	textArr = std::move(param);
+	auto arr = data["weekLables"].GetArray();
+	for (size_t i = 0; i < arr.Size(); i++)
+	{
+		textArr.push_back(arr[i].GetString());
+	}
 }
 

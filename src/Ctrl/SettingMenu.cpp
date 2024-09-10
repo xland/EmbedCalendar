@@ -130,3 +130,12 @@ void SettingMenu::Show()
 	visible = true;
 	MainWin::Get()->Refresh();
 }
+
+void SettingMenu::SetData(rapidjson::Value& data)
+{
+	auto lang = data["lang"].GetObj();
+	menuText[0] = std::string{ lang["setting"].GetString() };
+	menuText[1] = std::string{ lang["help"].GetString() };
+	menuText[2] = std::string{ lang["advise"].GetString() };
+	menuText[3] = std::string{ lang["signout"].GetString() };
+}

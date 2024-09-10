@@ -103,3 +103,11 @@ void SwitchBtn::OnMouseMove(const int& x, const int& y)
 		win->Refresh();
 	}
 }
+
+void SwitchBtn::SetData(rapidjson::Value& data)
+{
+	listVisible = data["displayScheduleList"].GetBool();
+	if (listVisible) {
+		MainWin::Get()->ShowList();
+	}
+}
