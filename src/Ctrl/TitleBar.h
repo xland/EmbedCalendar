@@ -5,8 +5,8 @@
 class TitleBar
 {
 public:
-	TitleBar();
-	~TitleBar();
+	TitleBar() = default;
+	~TitleBar() = default;
 	static void Init();
 	static TitleBar* Get();
 	bool IsInCaption(const int& x, const int& y);

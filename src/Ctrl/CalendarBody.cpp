@@ -1,12 +1,13 @@
 ﻿#include <format>
 #include "CalendarBody.h"
+#include "WeekHeader.h"
+#include "SettingMenu.h"
 #include "../Font.h"
 #include "../MainWin.h"
 #include "../TypeDefine.h"
 #include "../Skin.h"
 #include "../Util.h"
 #include "../WsConn.h"
-#include "WeekHeader.h"
 
 namespace {
 	std::unique_ptr<CalendarBody> calendarBody;
@@ -156,14 +157,16 @@ void CalendarBody::OnLeftBtnDown(const int& x, const int& y)
 void CalendarBody::OnMouseMove(const int& x, const int& y)
 {
 	if (x<l || x>r || y<t || y>b) {
-
 		if (hoverIndex>=0) {
 			hoverIndex = -1;
 			MainWin::Cursor(IDC_ARROW);
 			auto win = MainWin::Get();
 			win->Refresh();
 		}
-
+		return;
+	}
+	auto settingMenu = SettingMenu::Get();
+	if (settingMenu->visible && settingMenu->bg.contains(x, y)) {
 		return;
 	}
 	int index{-1};

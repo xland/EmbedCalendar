@@ -32,6 +32,7 @@ public:
 	int x{ 100 }, y{ 100 }, w{ 580 }, h{580};
 	bool isMouseDown{ false };
 	float dpi{ -1.0 };
+	bool stopEventFlag{ false };
 public:
 	std::vector<MouseEventCB> mouseMoveHandlers;
 	std::vector<MouseEventCB> mouseDragHandlers;

@@ -151,16 +151,24 @@ void MainWin::onLeftBtnDown(const int& x, const int& y)
 {
     for (size_t i = 0; i < leftBtnDownHandlers.size(); i++)
     {
+        if (stopEventFlag) {
+            break;
+        }
         leftBtnDownHandlers[i](x, y);
     }
+    stopEventFlag = false;
 }
 
 void MainWin::onLeftBtnUp(const int& x, const int& y)
 {
     for (size_t i = 0; i < leftBtnUpHandlers.size(); i++)
     {
+        if (stopEventFlag) {
+            break;
+        }
         leftBtnUpHandlers[i](x, y);
     }
+    stopEventFlag = false;
 }
 
 void MainWin::onMouseMove(const int& x, const int& y)

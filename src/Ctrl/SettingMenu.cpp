@@ -1,5 +1,5 @@
 
-
+#include <stdlib.h>
 #include "SettingMenu.h"
 #include "TitleBar.h"
 #include "../Font.h"
@@ -7,17 +7,11 @@
 #include "../TypeDefine.h"
 #include "../Skin.h"
 #include "../Util.h"
+#include "../WsConn.h"
+#include <ShlObj.h>
 
 namespace {
 	std::unique_ptr<SettingMenu> settingMenu;
-}
-
-SettingMenu::SettingMenu()
-{
-}
-
-SettingMenu::~SettingMenu()
-{
 }
 
 void SettingMenu::Init()
@@ -37,20 +31,36 @@ SettingMenu* SettingMenu::Get()
 
 void SettingMenu::OnPaint(SkCanvas* canvas)
 {
+	if (!visible) return;
+	auto skin = Skin::Get();
 	SkPaint paint;
 	paint.setAntiAlias(true);
-	paint.setColor(Skin::Get()->menuBg);	
-	canvas->drawRRect(bg, paint);
+	paint.setColor(skin->menuBg);
+	SkVector radii[4]{ {radiu, radiu},{radiu, radiu}, //左上角 右上角
+			{radiu, radiu}, {radiu, radiu}  //右下角 左下角
+	};
+	SkRRect rr;
+	rr.setRectRadii(bg, radii);
+	canvas->drawRRect(rr, paint);
 	
+	if (hoverIndex != -1) {
+		auto top{ bg.fTop + hoverIndex * itemHeight + margin };
+		auto hoverBg = SkRect::MakeLTRB(bg.fLeft + margin, top, bg.fRight - margin, top+ itemHeight);
+		SkRRect rr;
+		paint.setColor(skin->menuHover);
+		rr.setRectRadii(hoverBg, radii);
+		canvas->drawRRect(rr, paint);
+	}
+
 	auto fontIcon = Font::GetIcon();
 	fontIcon->setSize(fontSize);
 	auto fontText = Font::GetText();
 	fontText->setSize(fontSize);
-	paint.setColor(Skin::Get()->text1);
+	paint.setColor(skin->text1);
 	for (size_t i = 0; i < 4; i++)
 	{
-		canvas->drawString(iconCode[i], bg.rect().fLeft+leftMargin+textLeftMargin, textStartY + textHeight*i, *fontIcon, paint);
-		canvas->drawString(menuText[i].data(), bg.rect().fLeft + leftMargin*2 + textLeftMargin*2, textStartY + textHeight * i, *fontText, paint);
+		canvas->drawString(iconCode[i], bg.fLeft+ margin +textLeftMargin, textStartY + itemHeight*i, *fontIcon, paint);
+		canvas->drawString(menuText[i].data(), bg.fLeft + margin *2 + textLeftMargin*3, textStartY + itemHeight * i, *fontText, paint);
 	}
 }
 
@@ -58,26 +68,70 @@ void SettingMenu::OnDpi()
 {
 	auto titleBar = TitleBar::Get();
 	auto win = MainWin::Get();
-	textHeight = 32 * win->dpi;
-	leftMargin = 4 * win->dpi;
-	textLeftMargin = 12 * win->dpi;
+	itemHeight = 32 * win->dpi;
+	margin = 4 * win->dpi;
+	textLeftMargin = 7 * win->dpi;
 	fontSize = 14* win->dpi;
-	auto rect = SkRect::MakeLTRB(titleBar->settingRect.fRight - 108 * win->dpi,
+	bg = SkRect::MakeLTRB(titleBar->settingRect.fRight - 108 * win->dpi,
 		titleBar->settingRect.fBottom + 4 * win->dpi,
 		titleBar->settingRect.fRight,
 		titleBar->settingRect.fBottom + 4 * win->dpi + 136 * win->dpi);
-	auto r = 4 * win->dpi;
-	SkVector radii[4]{ {r, r},{r, r}, //左上角 右上角
-			{r, r}, {r, r}  //右下角 左下角
-	};
-	bg.setRectRadii(rect, radii);
-	textStartY = rect.fTop + 26 * win->dpi;
+	radiu = 4 * win->dpi;
+	textStartY = bg.fTop + 26 * win->dpi;
 }
 
 void SettingMenu::OnLeftBtnDown(const int& x, const int& y)
 {
+	if (!visible) return;
+	if (hoverIndex == 0) {
+		WsConn::Get()->PostMsg(R"({"msgName":"commonSet"})");
+	}
+	else if (hoverIndex == 1) {
+		system("start https://docs.hikvision.com/#/file/nodcnpCtQNbetShKAgO3RUcrHnr");
+	}
+	else if (hoverIndex == 2) {
+		system("start https://wj.hikvision.com.cn/wenjuan/#/answer-sheet?id=66dfa62380e065d458e2f400&isHeader=1&headerStyle=light");
+	}
+	else if (hoverIndex == 3) {
+		auto win = MainWin::Get();
+		win->Close();
+		return;
+	}
+	visible = false;
+	MainWin::Get()->Refresh();
+
 }
 
 void SettingMenu::OnMouseMove(const int& x, const int& y)
 {
+	if (!visible) return;
+	auto flag = bg.contains(x, y);
+	if (!flag && hoverIndex==-1) {
+		return;
+	}
+	else if (!flag) {
+		hoverIndex = -1;
+		MainWin::Cursor(IDC_ARROW);
+		MainWin::Get()->Refresh();
+		return;
+	}
+	int index{ -1 };
+	for (size_t i = 0; i < 4; i++)
+	{
+		if(y < bg.fTop + (i + 1)* itemHeight){
+			index = i;
+			break;
+		}
+	}
+	if (index != hoverIndex) {
+		hoverIndex = index;
+		MainWin::Cursor(IDC_HAND);
+		MainWin::Get()->Refresh();
+	}
+}
+
+void SettingMenu::Show()
+{
+	visible = true;
+	MainWin::Get()->Refresh();
 }

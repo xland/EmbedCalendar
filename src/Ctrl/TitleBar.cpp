@@ -2,6 +2,7 @@
 #include <include/core/SkPaint.h>
 
 #include "TitleBar.h"
+#include "SettingMenu.h"
 #include "../Font.h"
 #include "../MainWin.h"
 #include "../TypeDefine.h"
@@ -10,14 +11,6 @@
 
 namespace {
 	std::unique_ptr<TitleBar> titleBar;
-}
-
-TitleBar::TitleBar()
-{
-}
-
-TitleBar::~TitleBar()
-{
 }
 
 void TitleBar::Init()
@@ -98,7 +91,11 @@ void TitleBar::OnLeftBtnDown(const int& x, const int& y)
 	}
 	else if (mouseInSettingBtn) {
 		auto win = MainWin::Get();
-		win->Close();
+		win->stopEventFlag = true;
+		//win->Close();
+		// 
+		// 		
+		SettingMenu::Get()->Show();
 	}
 }
 
