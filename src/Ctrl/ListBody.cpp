@@ -1,14 +1,16 @@
 ﻿#include <include/core/SkRRect.h>
+#include <format>
 
 #include "ListBody.h"
+#include "ListHeader.h"
+#include "SwitchBtn.h"
 #include "../Font.h"
 #include "../MainWin.h"
 #include "../TypeDefine.h"
 #include "../Skin.h"
-#include "ListHeader.h"
-#include "SwitchBtn.h"
 #include "../Util.h"
 #include "../Embedder.h"
+#include "../WsConn.h"
 
 namespace {
 	std::unique_ptr<ListBody> listBody;
@@ -103,7 +105,9 @@ void ListBody::paintList(SkCanvas* canvas)
 	canvas->clipRect(listRect);
 	for (size_t i = 0; i < items.size(); i++)
 	{
+		paintItemBg(canvas, i);
 		paintItem(canvas, i);
+		paintItemBtn(canvas, i);
 	}
 	paintScroller(canvas);
 	canvas->restore();
@@ -112,19 +116,18 @@ void ListBody::paintList(SkCanvas* canvas)
 void ListBody::paintItem(SkCanvas* canvas, const size_t& index)
 {
 	auto win = MainWin::Get();
+	auto skin = Skin::Get();
 	auto& item = items[index];
-	paintItemBg(canvas, index);
-
 	SkPaint paint;
 	auto fontText = Font::GetText();
 	auto x = listRect.fLeft + 9 * win->dpi;
 	fontText->setSize(itemFontSize1);
-	paint.setColor(Skin::Get()->text0);
-	canvas->drawString(item.title.data(), x, item.y + scrollTop+ 17 * win->dpi, *fontText, paint);
+	paint.setColor(skin->text0);
+	canvas->drawString(item.title.data(), x, item.y + scrollTop+ 20 * win->dpi, *fontText, paint);
 
 	fontText->setSize(itemFontSize2);
-	paint.setColor(Skin::Get()->text2);
-	canvas->drawString(item.desc.data(), x, item.y + scrollTop + 40 * win->dpi, *fontText, paint);
+	paint.setColor(skin->text2);
+	canvas->drawString(item.desc.data(), x, item.y + scrollTop + 42 * win->dpi, *fontText, paint);
 }
 
 void ListBody::paintItemBg(SkCanvas* canvas, const size_t& index)
@@ -161,6 +164,24 @@ void ListBody::paintItemBg(SkCanvas* canvas, const size_t& index)
 	canvas->drawRRect(rr, paint);
 }
 
+void ListBody::paintItemBtn(SkCanvas* canvas, const size_t& index)
+{
+	if (index != hoverIndex) return;
+	auto win = MainWin::Get();
+	auto skin = Skin::Get();
+	auto& item = items[index];
+	SkPaint paint;
+	paint.setColor(skin->text1);
+
+	auto fontIcon = Font::GetIcon();
+	fontIcon->setSize(itemFontSize2);
+
+	const char* delCode{ (const char*)u8"\ue712" };
+
+	auto top{ item.y + scrollTop + itemFontSize2*2 };
+	canvas->drawString(delCode, listRect.fRight - 32 * win->dpi, top, *fontIcon, paint);
+}
+
 void ListBody::paintScroller(SkCanvas* canvas)
 {
 
@@ -168,6 +189,19 @@ void ListBody::paintScroller(SkCanvas* canvas)
 
 void ListBody::OnLeftBtnDown(const int& x, const int& y)
 {
+	if (hoverIndex == -1) return;
+	auto win = MainWin::Get();
+	auto& item = items[hoverIndex];
+	if (x > listRect.fRight - 48 * win->dpi) {
+		auto msg = std::format(R"({{"msgName":"deleteSchedule","data":{{"scheduleNo":{},"calendarNo":{}}}}})", item.scheduleNo, item.calendarNo);
+		std::cout << "delete" << std::endl;
+		WsConn::Get()->PostMsg(std::move(msg));
+	}
+	else {
+		auto msg = std::format(R"({{"msgName":"updateSchedule","data": {{"scheduleNo":{},"calendarNo":{}}}}})", item.scheduleNo, item.calendarNo);
+		std::cout << "edit" << std::endl;
+		WsConn::Get()->PostMsg(std::move(msg));
+	}
 }
 
 void ListBody::OnMouseMove(const int& x, const int& y)

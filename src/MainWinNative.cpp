@@ -53,6 +53,10 @@ LRESULT MainWin::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg)
     {
+        case WM_CLOSE: {
+            Close();
+            return 1;
+        }
         case WM_MOVE: {
             x = GET_X_LPARAM(lParam);
             y = GET_Y_LPARAM(lParam);

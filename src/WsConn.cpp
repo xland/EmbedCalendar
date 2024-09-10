@@ -30,7 +30,7 @@ size_t WsConn::msgCB(char* ptr, size_t size, size_t nmemb, void* userdata) {
 	auto self = static_cast<WsConn*>(userdata);
 	auto frame = curl_ws_meta(self->curl);
 	auto result{ size * nmemb };
-	rapidjson::Document* doc = new rapidjson::Document();
+	rapidjson::Document* doc{nullptr};
 	{
 		std::lock_guard<std::mutex> lock(mtx);
 		self->msg.append(ptr, result);
@@ -38,6 +38,7 @@ size_t WsConn::msgCB(char* ptr, size_t size, size_t nmemb, void* userdata) {
 		{
 			return result;
 		}
+		doc = new rapidjson::Document();
 		doc->Parse(self->msg.data());
 		self->msg.clear();
 	}
@@ -267,6 +268,9 @@ void WsConn::connectWs()
 				mc = curl_multi_perform(multiHandle, &still_running);
 				if (still_running) {
 					curl_multi_poll(multiHandle, nullptr, 0, 100, nullptr); // 等待事件
+				}
+				else {
+					PostMessage(MainWin::Get()->hwnd, WM_CLOSE, 0, 0);
 				}
 			}
 		});

@@ -23,6 +23,7 @@ private:
 	void paintList(SkCanvas* canvas);
 	void paintItem(SkCanvas* canvas,const size_t& index);
 	void paintItemBg(SkCanvas* canvas, const size_t& index);
+	void paintItemBtn(SkCanvas* canvas, const size_t& index);
 	void paintScroller(SkCanvas* canvas);
 private:
 	std::vector<ListItem> items;

@@ -126,18 +126,18 @@ void MainWin::repaint()
     auto embedder = Embedder::Get();
     if (embedder->isEmbedded && embedder->isColorWallPaper) {
         canvas->clear(embedder->wallPaperColor);
-        SkPaint paint;
-        paint.setColor(Skin::Get()->bg);
-        canvas->drawPaint(paint);
     }
     else {
-        canvas->clear(Skin::Get()->bg);
-    }  
+        canvas->clear(0x00000000);
+    }
+    SkPaint paint;
+    paint.setColor(Skin::Get()->bg);
+    paint.setAntiAlias(true);
+    auto rr = SkRRect::MakeRectXY(SkRect::MakeXYWH(0, 0, w, h),4*dpi, 4*dpi);
+    canvas->drawRRect(rr, paint);
+    for (size_t i = 0; i < paintHandlers.size(); i++)
     {
-        for (size_t i = 0; i < paintHandlers.size(); i++)
-        {
-            paintHandlers[i](canvas.get());
-        }
+        paintHandlers[i](canvas.get());
     }
     PAINTSTRUCT ps;
     auto dc = BeginPaint(hwnd, &ps);

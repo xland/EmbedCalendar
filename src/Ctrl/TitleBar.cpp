@@ -1,5 +1,6 @@
 #include <functional>
 #include <include/core/SkPaint.h>
+#include <include/core/SkRRect.h>
 
 #include "TitleBar.h"
 #include "SettingMenu.h"
@@ -41,11 +42,15 @@ void TitleBar::OnPaint(SkCanvas* canvas)
 	SkPaint paint;
 	if (mouseInPinBtn) {
 		paint.setColor(Skin::Get()->hoverBg);
-		canvas->drawRect(pinRect, paint);
+		auto win = MainWin::Get();
+		auto rr = SkRRect::MakeRectXY(pinRect, 2 * win->dpi, 2 * win->dpi);
+		canvas->drawRRect(rr, paint);
 	}
 	if (mouseInSettingBtn) {
 		paint.setColor(Skin::Get()->hoverBg);
-		canvas->drawRect(settingRect, paint);
+		auto win = MainWin::Get();
+		auto rr = SkRRect::MakeRectXY(settingRect, 2 * win->dpi, 2 * win->dpi);
+		canvas->drawRRect(rr, paint);
 	}
 	auto font = Font::GetIcon();
 	font->setSize(fontSize);
