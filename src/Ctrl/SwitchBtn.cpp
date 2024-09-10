@@ -34,11 +34,10 @@ void SwitchBtn::OnPaint(SkCanvas* canvas)
 	fontText->setSize(fontSize);
 	fontIcon->setSize(fontSize);
 	SkPaint paint;
-	if (isMouseIn) {
-
-		paint.setColor(Skin::Get()->hoverBg);
-		canvas->drawRect(rect,paint);
-	}
+	//if (isMouseIn) {
+	//	paint.setColor(Skin::Get()->hoverBg);
+	//	canvas->drawRect(rect,paint);
+	//}
 	paint.setColor(0xFF007AFF);
 	if (listVisible) {
 		std::string btnText = Util::ToStr(L"隐藏日程");

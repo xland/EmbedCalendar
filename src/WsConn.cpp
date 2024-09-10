@@ -19,6 +19,7 @@
 #include "Ctrl/ListHeader.h"
 #include "Ctrl/ListBody.h"
 #include "Ctrl/SettingMenu.h"
+#include "Ctrl/SwitchBtn.h"
 
 namespace {
 	std::unique_ptr<WsConn> wsConn;
@@ -229,6 +230,13 @@ void WsConn::OnCustomEvent(const uint64_t& type, const uint64_t& msg)
 		settingMenu->menuText[1] = std::string{lang["help"].GetString() };
 		settingMenu->menuText[2] = std::string{lang["advise"].GetString() };
 		settingMenu->menuText[3] = std::string{lang["signout"].GetString() };
+	}
+	{
+		auto switchBtn =  SwitchBtn::Get();
+		switchBtn->listVisible = data["displayScheduleList"].GetBool();
+		if (switchBtn->listVisible) {
+			MainWin::Get()->ShowList();
+		}
 	}
 	delete (rapidjson::Document*)msg;
 	if (dataReady) {

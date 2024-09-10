@@ -40,7 +40,8 @@ bool TitleBar::IsInCaption(const int& x, const int& y)
 void TitleBar::OnPaint(SkCanvas* canvas)
 {
 	SkPaint paint;
-	if (mouseInPinBtn) {
+	auto embedder = Embedder::Get();
+	if (mouseInPinBtn || embedder->isEmbedded) {
 		paint.setColor(Skin::Get()->hoverBg);
 		auto win = MainWin::Get();
 		auto rr = SkRRect::MakeRectXY(pinRect, 2 * win->dpi, 2 * win->dpi);
@@ -96,10 +97,7 @@ void TitleBar::OnLeftBtnDown(const int& x, const int& y)
 	}
 	else if (mouseInSettingBtn) {
 		auto win = MainWin::Get();
-		win->stopEventFlag = true;
-		//win->Close();
-		// 
-		// 		
+		win->stopEventFlag = true;	
 		SettingMenu::Get()->Show();
 	}
 }

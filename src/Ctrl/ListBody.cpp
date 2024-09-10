@@ -26,6 +26,7 @@ void ListBody::Init()
 	win->mouseDragHandlers.push_back(std::bind(&ListBody::OnMouseDrag, listBody.get(), std::placeholders::_1, std::placeholders::_2));
 	win->mouseWheelHandlers.push_back(std::bind(&ListBody::OnMouseWheel, listBody.get(), std::placeholders::_1));
 	win->leftBtnDownHandlers.push_back(std::bind(&ListBody::OnLeftBtnDown, listBody.get(), std::placeholders::_1, std::placeholders::_2));
+	win->leftBtnUpHandlers.push_back(std::bind(&ListBody::OnLeftBtnUp, listBody.get(), std::placeholders::_1, std::placeholders::_2));
 }
 
 ListBody* ListBody::Get()
@@ -47,17 +48,13 @@ void ListBody::OnPaint(SkCanvas* canvas)
 
 void ListBody::OnDpi()
 {
-	if (items.size() > 0) {
-		measureList();
-	}
-	else
-	{
-		measureEmpty();
-	}
-}
-
-void ListBody::measureEmpty() {
 	auto win = MainWin::Get();
+	listRect.setLTRB(36 * win->dpi, 574 * win->dpi, win->w - 36 * win->dpi + thumbWidth, 790 * win->dpi);
+	itemHeight = 48 * win->dpi;
+	itemFontSize1 = 16 * win->dpi;
+	itemFontSize2 = 14 * win->dpi;
+	thumbWidth = 6 * win->dpi;
+
 	emptyFontSize = 18 * win->dpi;
 	auto font = Font::GetText();
 	SkRect measureRect;
@@ -66,6 +63,10 @@ void ListBody::measureEmpty() {
 	font->measureText(emptyText.data(), emptyText.size(), SkTextEncoding::kUTF8, &measureRect);
 	emptyX = win->w / 2 - measureRect.width() / 2 - measureRect.fLeft;
 	emptyY = 680 * win->dpi;
+
+	if (items.size() > 0) {
+		measureList();
+	}
 }
 
 void ListBody::clipText(ListItem& item)
@@ -78,11 +79,14 @@ void ListBody::clipText(ListItem& item)
 	while (true)
 	{
 		font->measureText(item.title.data(), item.title.size(), SkTextEncoding::kUTF8, &measureRect);
+		auto s = Util::ToWStr(item.title.data());
 		if (measureRect.width() < listRect.width() - thumbWidth - 46*win->dpi) {
-			auto s = Util::ToWStr(item.title.data());
 			break;
 		}
 		Util::RemoveLastChar(item.title);
+		if (item.title.empty()) {
+			break;
+		}
 		flag = true;
 	}
 	if (flag) {
@@ -97,6 +101,9 @@ void ListBody::clipText(ListItem& item)
 			break;
 		}
 		Util::RemoveLastChar(item.desc);
+		if (item.desc.empty()) {
+			break;
+		}
 		flag = true;
 	}
 
@@ -108,24 +115,16 @@ void ListBody::clipText(ListItem& item)
 void ListBody::measureList()
 {
 	auto win = MainWin::Get();
-	listRect.setLTRB(36 * win->dpi, 574 * win->dpi, win->w - 36 * win->dpi+thumbWidth, 790 * win->dpi);
-	itemHeight = 48 * win->dpi;
-	itemFontSize1 = 16 * win->dpi;
-	itemFontSize2 = 14 * win->dpi;
-
 	for (size_t i = 0; i < items.size(); i++)
 	{
 		items[i].y = listRect.fTop + i * 8 * win->dpi + i * itemHeight;
 	}
 	listHeight = items.back().y + itemHeight - listRect.fTop;
-
 	if (listHeight <= listRect.height()) {
 		return;
 	}
 	thumbHeight = listRect.height() / (listHeight / listRect.height());
 	thumbHeight = std::max(thumbHeight, 60.f);
-	thumbWidth = 6 * win->dpi;
-
 	for (size_t i = 0; i < items.size(); i++)
 	{
 		clipText(items[i]);
@@ -256,6 +255,11 @@ void ListBody::OnLeftBtnDown(const int& x, const int& y)
 	}
 }
 
+void ListBody::OnLeftBtnUp(const int& x, const int& y)
+{
+	thumbDragStartY = -1.0;
+}
+
 void ListBody::OnMouseMove(const int& x, const int& y)
 {
 	if (!SwitchBtn::Get()->listVisible) return;
@@ -308,6 +312,7 @@ void ListBody::caculateTop()
 void ListBody::OnMouseDrag(const int& x, const int& y)
 {
 	if (!SwitchBtn::Get()->listVisible) return;
+	if (thumbDragStartY < 0) return;
 	auto distance = y - thumbDragStartY;
 	thumbTop += distance;
 	caculateTop();
@@ -338,8 +343,7 @@ void ListBody::OnMouseWheel(const int& span)
 void ListBody::SetText(std::vector<ListItem>&& param)
 {
 	items = std::move(param);
-	if (items.empty()) return;
 	thumbTop = 0;
 	scrollTop = 0;
-	measureList();
+	OnDpi();
 }

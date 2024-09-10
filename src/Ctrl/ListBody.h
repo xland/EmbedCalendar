@@ -14,12 +14,12 @@ public:
 	void OnPaint(SkCanvas* canvas);
 	void OnDpi();
 	void OnLeftBtnDown(const int& x, const int& y);
+	void OnLeftBtnUp(const int& x, const int& y);
 	void OnMouseMove(const int& x, const int& y);
 	void OnMouseDrag(const int& x, const int& y);
 	void OnMouseWheel(const int& span);
 	void SetText(std::vector<ListItem>&& param);
 private:
-	void measureEmpty();
 	void measureList();
 	void paintEmpty(SkCanvas* canvas);
 	void paintList(SkCanvas* canvas);
@@ -40,7 +40,7 @@ private:
 	int hoverIndex{ -1 };
 	float itemFontSize1,itemFontSize2;
 	float listHeight;
-	float thumbHeight,thumbWidth, thumbDragStartY;
+	float thumbHeight, thumbWidth, thumbDragStartY{-1.0};
 	bool mouseInListRect{ false };
 	bool mouseInThumbRect{ false };
 };
