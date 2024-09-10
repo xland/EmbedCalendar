@@ -127,9 +127,6 @@ bool Embedder::checkMouseMsg(POINT& point) {
     }
     else
     {
-        if (win->isMouseDown) {
-            win->isMouseDown = false;
-        }
         return false;
     }
     HWND hwnd = WindowFromPoint(globalPos);

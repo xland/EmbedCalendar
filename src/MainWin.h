@@ -30,12 +30,10 @@ public:
 	std::vector<SkColor> winPix;
 	HWND hwnd{nullptr};
 	int x{ 100 }, y{ 100 }, w{ 580 }, h{580};
-	bool isMouseDown{ false };
 	float dpi{ -1.0 };
 	bool stopEventFlag{ false };
 public:
 	std::vector<MouseEventCB> mouseMoveHandlers;
-	std::vector<MouseEventCB> mouseDragHandlers;
 	std::vector<WheelEventCB> mouseWheelHandlers;
 	std::vector<MouseEventCB> leftBtnDownHandlers;
 	std::vector<MouseEventCB> leftBtnUpHandlers;
@@ -51,7 +49,6 @@ private:
 	void onLeftBtnDown(const int& x, const int& y);
 	void onLeftBtnUp(const int& x, const int& y);
 	void onMouseMove(const int& x, const int& y);
-	void onMouseDrag(const int& x, const int& y);
 	void onMouseWheel(const int& span);
 	void onDpiChange();
 	void onCustomMsg(const uint64_t& type, const uint64_t& msg);

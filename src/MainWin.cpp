@@ -179,14 +179,6 @@ void MainWin::onMouseMove(const int& x, const int& y)
     }
 }
 
-void MainWin::onMouseDrag(const int& x, const int& y)
-{
-    for (size_t i = 0; i < mouseDragHandlers.size(); i++)
-    {
-        mouseDragHandlers[i](x, y);
-    }
-}
-
 void MainWin::onMouseWheel(const int& span)
 {
     for (size_t i = 0; i < mouseWheelHandlers.size(); i++)

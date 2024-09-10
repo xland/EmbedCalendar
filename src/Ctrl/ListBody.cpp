@@ -23,7 +23,6 @@ void ListBody::Init()
 	win->paintHandlers.push_back(std::bind(&ListBody::OnPaint, listBody.get(), std::placeholders::_1));
 	win->dpiHandlers.push_back(std::bind(&ListBody::OnDpi, listBody.get()));
 	win->mouseMoveHandlers.push_back(std::bind(&ListBody::OnMouseMove, listBody.get(), std::placeholders::_1, std::placeholders::_2));
-	win->mouseDragHandlers.push_back(std::bind(&ListBody::OnMouseDrag, listBody.get(), std::placeholders::_1, std::placeholders::_2));
 	win->mouseWheelHandlers.push_back(std::bind(&ListBody::OnMouseWheel, listBody.get(), std::placeholders::_1));
 	win->leftBtnDownHandlers.push_back(std::bind(&ListBody::OnLeftBtnDown, listBody.get(), std::placeholders::_1, std::placeholders::_2));
 	win->leftBtnUpHandlers.push_back(std::bind(&ListBody::OnLeftBtnUp, listBody.get(), std::placeholders::_1, std::placeholders::_2));
@@ -79,7 +78,7 @@ void ListBody::clipText(ListItem& item)
 	while (true)
 	{
 		font->measureText(item.title.data(), item.title.size(), SkTextEncoding::kUTF8, &measureRect);
-		auto s = Util::ToWStr(item.title.data());
+		//auto s = Util::ToWStr(item.title.data());
 		if (measureRect.width() < listRect.width() - thumbWidth - 46*win->dpi) {
 			break;
 		}
@@ -203,9 +202,10 @@ void ListBody::paintItemBg(SkCanvas* canvas, const size_t& index)
 void ListBody::paintItemBtn(SkCanvas* canvas, const size_t& index)
 {
 	if (index != hoverIndex) return;
+	auto& item = items[index];
+	if (!item.isAllowEdit) return;
 	auto win = MainWin::Get();
 	auto skin = Skin::Get();
-	auto& item = items[index];
 	SkPaint paint;
 	paint.setColor(skin->text1);
 
@@ -233,7 +233,6 @@ void ListBody::paintScroller(SkCanvas* canvas)
 	canvas->drawRect(rect, paint);
 }
 
-
 void ListBody::OnLeftBtnDown(const int& x, const int& y)
 {
 	if (!SwitchBtn::Get()->listVisible) return;
@@ -241,8 +240,9 @@ void ListBody::OnLeftBtnDown(const int& x, const int& y)
 		thumbDragStartY = y;
 	}
 	if (hoverIndex == -1) return;
-	auto win = MainWin::Get();
 	auto& item = items[hoverIndex];
+	if (!item.isAllowEdit) return;
+	auto win = MainWin::Get();
 	if (x > listRect.fRight - 48 * win->dpi) {
 		auto msg = std::format(R"({{"msgName":"deleteSchedule","data":{{"scheduleNo":"{}","calendarNo":"{}"}}}})", item.scheduleNo, item.calendarNo);
 		std::cout << "delete" << std::endl;
@@ -263,7 +263,15 @@ void ListBody::OnLeftBtnUp(const int& x, const int& y)
 void ListBody::OnMouseMove(const int& x, const int& y)
 {
 	if (!SwitchBtn::Get()->listVisible) return;
-	if (items.size() == 0) return;	
+	if (items.size() == 0) return;
+	if (thumbDragStartY >= 0) {
+		auto distance = y - thumbDragStartY;
+		thumbTop += distance;
+		caculateTop();
+		thumbDragStartY = y;
+		auto win = MainWin::Get();
+		win->Refresh();
+	}
 	mouseInListRect = listRect.contains(x, y);
 	if (!mouseInListRect) {
 		if (hoverIndex >= 0) {
@@ -307,18 +315,6 @@ void ListBody::caculateTop()
 	}
 	scrollTop = 0 - (thumbTop / (listRect.height() - thumbHeight)) * (listHeight - listRect.height());
 	
-}
-
-void ListBody::OnMouseDrag(const int& x, const int& y)
-{
-	if (!SwitchBtn::Get()->listVisible) return;
-	if (thumbDragStartY < 0) return;
-	auto distance = y - thumbDragStartY;
-	thumbTop += distance;
-	caculateTop();
-	thumbDragStartY = y;
-	auto win = MainWin::Get();
-	win->Refresh();
 }
 
 void ListBody::OnMouseWheel(const int& span)

@@ -71,7 +71,6 @@ void SwitchBtn::OnLeftBtnDown(const int& x, const int& y)
 	if (!isMouseIn) return;
 	isMouseIn = false;
 	auto win = MainWin::Get();
-	win->isMouseDown = false;
 	if (listVisible) {
 		win->HideList();
 		OnDpi();

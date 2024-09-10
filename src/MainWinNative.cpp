@@ -76,14 +76,12 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
         }
         case WM_LBUTTONDOWN:
         {
-            isMouseDown = true;
             SetCapture(hWnd);
             onLeftBtnDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             break;
         }
         case WM_LBUTTONUP:
         {
-            isMouseDown = false;
             onLeftBtnUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             ReleaseCapture();
             break;
@@ -98,13 +96,7 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
                 tme.dwHoverTime = HOVER_DEFAULT;
                 isTrackMouseEvent = TrackMouseEvent(&tme);
             }
-            if (isMouseDown) {
-                onMouseDrag(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-            }
-            else
-            {
-                onMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-            }
+            onMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             break;
         }
         case WM_MOUSEWHEEL: {

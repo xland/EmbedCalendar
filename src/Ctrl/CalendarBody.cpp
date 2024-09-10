@@ -149,8 +149,6 @@ void CalendarBody::setItemPos(std::vector<DateItem>& items)
 void CalendarBody::OnLeftBtnDown(const int& x, const int& y)
 {
 	if (hoverIndex < 0)return;
-	auto win = MainWin::Get();
-	win->isMouseDown = false;
 	auto str = std::format(R"({{"msgName":"changeDate","data": {{"year":{},"month":{},"date":{}}}}})",
 		items[hoverIndex].year, items[hoverIndex].month, items[hoverIndex].date);
 	WsConn::Get()->PostMsg(std::move(str));
