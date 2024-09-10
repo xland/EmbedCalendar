@@ -43,7 +43,7 @@ void SettingMenu::OnPaint(SkCanvas* canvas)
 		auto top{ bg.fTop + hoverIndex * itemHeight + margin };
 		auto hoverBg = SkRect::MakeLTRB(bg.fLeft + margin, top, bg.fRight - margin, top+ itemHeight);
 		paint.setColor(skin->menuHover);
-		auto rr = SkRRect::MakeRectXY(bg, radiu, radiu);
+		auto rr = SkRRect::MakeRectXY(hoverBg, radiu, radiu);
 		canvas->drawRRect(rr, paint);
 	}
 

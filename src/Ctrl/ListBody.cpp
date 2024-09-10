@@ -338,5 +338,8 @@ void ListBody::OnMouseWheel(const int& span)
 void ListBody::SetText(std::vector<ListItem>&& param)
 {
 	items = std::move(param);
+	if (items.empty()) return;
+	thumbTop = 0;
+	scrollTop = 0;
 	measureList();
 }

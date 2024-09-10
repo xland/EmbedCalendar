@@ -173,9 +173,8 @@ LRESULT CALLBACK Embedder::processMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
         RAWMOUSE rawMouse = raw->data.mouse;
         if (rawMouse.usButtonFlags == RI_MOUSE_WHEEL)
         {
-            auto wheelDelta = (float)(short)rawMouse.usButtonData;
-            auto wParam = wheelDelta > 0 ? SB_LINEUP : SB_LINEDOWN;
-            postMsg(WM_VSCROLL, wParam, 0);
+            auto wheelDelta = (short)rawMouse.usButtonData;
+            postMsg(WM_MOUSEWHEEL, wheelDelta, 0);
             return 0;
         }
         switch (rawMouse.ulButtons)
