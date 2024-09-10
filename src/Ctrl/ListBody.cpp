@@ -16,14 +16,6 @@ namespace {
 	std::unique_ptr<ListBody> listBody;
 }
 
-ListBody::ListBody()
-{
-}
-
-ListBody::~ListBody()
-{
-}
-
 void ListBody::Init()
 {
 	listBody = std::make_unique<ListBody>();
@@ -31,6 +23,8 @@ void ListBody::Init()
 	win->paintHandlers.push_back(std::bind(&ListBody::OnPaint, listBody.get(), std::placeholders::_1));
 	win->dpiHandlers.push_back(std::bind(&ListBody::OnDpi, listBody.get()));
 	win->mouseMoveHandlers.push_back(std::bind(&ListBody::OnMouseMove, listBody.get(), std::placeholders::_1, std::placeholders::_2));
+	win->mouseDragHandlers.push_back(std::bind(&ListBody::OnMouseDrag, listBody.get(), std::placeholders::_1, std::placeholders::_2));
+	win->mouseWheelHandlers.push_back(std::bind(&ListBody::OnMouseWheel, listBody.get(), std::placeholders::_1));
 	win->leftBtnDownHandlers.push_back(std::bind(&ListBody::OnLeftBtnDown, listBody.get(), std::placeholders::_1, std::placeholders::_2));
 }
 
@@ -74,16 +68,67 @@ void ListBody::measureEmpty() {
 	emptyY = 680 * win->dpi;
 }
 
+void ListBody::clipText(ListItem& item)
+{
+	auto win = MainWin::Get();
+	SkRect measureRect;
+	auto font = Font::GetText();
+	font->setSize(itemFontSize1);
+	bool flag{ false };
+	while (true)
+	{
+		font->measureText(item.title.data(), item.title.size(), SkTextEncoding::kUTF8, &measureRect);
+		if (measureRect.width() < listRect.width() - thumbWidth - 46*win->dpi) {
+			auto s = Util::ToWStr(item.title.data());
+			break;
+		}
+		Util::RemoveLastChar(item.title);
+		flag = true;
+	}
+	if (flag) {
+		item.title += "...";
+	}
+	flag = false;
+	font->setSize(itemFontSize2);
+	while (true)
+	{
+		font->measureText(item.desc.data(), item.desc.size(), SkTextEncoding::kUTF8, &measureRect);
+		if (measureRect.width() < listRect.width() - thumbWidth - 12 * win->dpi) {
+			break;
+		}
+		Util::RemoveLastChar(item.desc);
+		flag = true;
+	}
+
+	if (flag) {
+		item.desc += "...";
+	}
+}
+
 void ListBody::measureList()
 {
 	auto win = MainWin::Get();
-	listRect.setLTRB(36 * win->dpi, 574 * win->dpi, win->w - 36 * win->dpi, 790 * win->dpi);
+	listRect.setLTRB(36 * win->dpi, 574 * win->dpi, win->w - 36 * win->dpi+thumbWidth, 790 * win->dpi);
 	itemHeight = 48 * win->dpi;
 	itemFontSize1 = 16 * win->dpi;
 	itemFontSize2 = 14 * win->dpi;
+
 	for (size_t i = 0; i < items.size(); i++)
 	{
 		items[i].y = listRect.fTop + i * 8 * win->dpi + i * itemHeight;
+	}
+	listHeight = items.back().y + itemHeight - listRect.fTop;
+
+	if (listHeight <= listRect.height()) {
+		return;
+	}
+	thumbHeight = listRect.height() / (listHeight / listRect.height());
+	thumbHeight = std::max(thumbHeight, 60.f);
+	thumbWidth = 6 * win->dpi;
+
+	for (size_t i = 0; i < items.size(); i++)
+	{
+		clipText(items[i]);
 	}
 }
 
@@ -109,8 +154,8 @@ void ListBody::paintList(SkCanvas* canvas)
 		paintItem(canvas, i);
 		paintItemBtn(canvas, i);
 	}
-	paintScroller(canvas);
 	canvas->restore();
+	paintScroller(canvas);	
 }
 
 void ListBody::paintItem(SkCanvas* canvas, const size_t& index)
@@ -138,23 +183,15 @@ void ListBody::paintItemBg(SkCanvas* canvas, const size_t& index)
 	auto& item = items[index];
 	if (index == hoverIndex) {
 		SkRect rect;
-		rect.setLTRB(listRect.fLeft, item.y + scrollTop, listRect.fRight, item.y + scrollTop + itemHeight);
-		SkVector radii[4]{
-			{6, 6}, //左上角
-			{6, 6},  //右上角
-			{6, 6},  //右下角
-			{6, 6}  //左下角
-		};
-		SkRRect rr;
-		rr.setRectRadii(rect, radii);
+		rect.setLTRB(listRect.fLeft, item.y + scrollTop, listRect.fRight-thumbWidth, item.y + scrollTop + itemHeight);
+		auto rr = SkRRect::MakeRectXY(rect, 6 * win->dpi, 6 * win->dpi);
 		paint.setColor(0x33FFFFFF);
 		canvas->drawRRect(rr, paint);
 	}
 	paint.setColor(item.color);
 	SkRect rect;
 	rect.setXYWH(listRect.fLeft, item.y + scrollTop, 3 * win->dpi, itemHeight);
-	SkVector radii[4]{
-		{6, 6}, //左上角
+	SkVector radii[4]{ {6, 6}, //左上角
 		{0, 0},  //右上角
 		{0, 0},  //右下角
 		{6, 6}  //左下角
@@ -184,21 +221,36 @@ void ListBody::paintItemBtn(SkCanvas* canvas, const size_t& index)
 
 void ListBody::paintScroller(SkCanvas* canvas)
 {
-
+	if (listHeight <= listRect.height()) {
+		return;
+	}
+	auto win = MainWin::Get();
+	SkPaint paint;
+	paint.setColor(0x08000000);
+	auto rect = SkRect::MakeXYWH(listRect.fRight- thumbWidth, listRect.fTop, thumbWidth, listRect.height());
+	canvas->drawRect(rect, paint);
+	rect = SkRect::MakeXYWH(listRect.fRight- thumbWidth, listRect.fTop + thumbTop, thumbWidth,thumbHeight);
+	paint.setColor(0x20000000);
+	canvas->drawRect(rect, paint);
 }
+
 
 void ListBody::OnLeftBtnDown(const int& x, const int& y)
 {
+	if (!SwitchBtn::Get()->listVisible) return;
+	if (mouseInThumbRect) {
+		thumbDragStartY = y;
+	}
 	if (hoverIndex == -1) return;
 	auto win = MainWin::Get();
 	auto& item = items[hoverIndex];
 	if (x > listRect.fRight - 48 * win->dpi) {
-		auto msg = std::format(R"({{"msgName":"deleteSchedule","data":{{"scheduleNo":{},"calendarNo":{}}}}})", item.scheduleNo, item.calendarNo);
+		auto msg = std::format(R"({{"msgName":"deleteSchedule","data":{{"scheduleNo":"{}","calendarNo":"{}"}}}})", item.scheduleNo, item.calendarNo);
 		std::cout << "delete" << std::endl;
 		WsConn::Get()->PostMsg(std::move(msg));
 	}
 	else {
-		auto msg = std::format(R"({{"msgName":"updateSchedule","data": {{"scheduleNo":{},"calendarNo":{}}}}})", item.scheduleNo, item.calendarNo);
+		auto msg = std::format(R"({{"msgName":"updateSchedule","data": {{"scheduleNo":"{}","calendarNo":"{}"}}}})", item.scheduleNo, item.calendarNo);
 		std::cout << "edit" << std::endl;
 		WsConn::Get()->PostMsg(std::move(msg));
 	}
@@ -207,8 +259,9 @@ void ListBody::OnLeftBtnDown(const int& x, const int& y)
 void ListBody::OnMouseMove(const int& x, const int& y)
 {
 	if (!SwitchBtn::Get()->listVisible) return;
-	if (items.size() == 0) return;
-	if (!listRect.contains(x, y)) {
+	if (items.size() == 0) return;	
+	mouseInListRect = listRect.contains(x, y);
+	if (!mouseInListRect) {
 		if (hoverIndex >= 0) {
 			hoverIndex = -1;
 			MainWin::Cursor(IDC_ARROW);
@@ -217,10 +270,12 @@ void ListBody::OnMouseMove(const int& x, const int& y)
 		}
 		return;
 	}
+	SkRect thumbRect = SkRect::MakeXYWH(listRect.fRight - thumbWidth, thumbTop + listRect.fTop, thumbWidth, thumbHeight);
+	mouseInThumbRect = thumbRect.contains(x, y);	
 	int index{ -1 };
 	for (size_t i = 0; i < items.size(); i++)
 	{
-		if (y>items[i].y+scrollTop && y<items[i].y+itemHeight+scrollTop) {
+		if (y>items[i].y+scrollTop && y<items[i].y+itemHeight+scrollTop && x < listRect.fRight - thumbWidth) {
 			index = i;
 			break;
 		}
@@ -236,6 +291,48 @@ void ListBody::OnMouseMove(const int& x, const int& y)
 	else {
 		MainWin::Cursor(IDC_ARROW);
 	}
+}
+
+void ListBody::caculateTop()
+{
+	if (thumbTop + listRect.fTop + thumbHeight > listRect.fBottom) {
+		thumbTop = listRect.fBottom - thumbHeight - listRect.fTop;
+	}
+	if (thumbTop < 0) {
+		thumbTop = 0;
+	}
+	scrollTop = 0 - (thumbTop / (listRect.height() - thumbHeight)) * (listHeight - listRect.height());
+	
+}
+
+void ListBody::OnMouseDrag(const int& x, const int& y)
+{
+	if (!SwitchBtn::Get()->listVisible) return;
+	auto distance = y - thumbDragStartY;
+	thumbTop += distance;
+	caculateTop();
+	thumbDragStartY = y;
+	auto win = MainWin::Get();
+	win->Refresh();
+}
+
+void ListBody::OnMouseWheel(const int& span)
+{
+	if (!SwitchBtn::Get()->listVisible) return;
+	if (listHeight <= listRect.height()) {
+		return;
+	}
+	if (!mouseInListRect) return;
+	auto win = MainWin::Get();
+	auto distance = 6 * win->dpi;
+	if (span < 0) { //向下滚动
+		thumbTop += distance;
+	}
+	else {
+		thumbTop -= distance;
+	}
+	caculateTop();
+	win->Refresh();
 }
 
 void ListBody::SetText(std::vector<ListItem>&& param)

@@ -187,6 +187,14 @@ void MainWin::onMouseDrag(const int& x, const int& y)
     }
 }
 
+void MainWin::onMouseWheel(const int& span)
+{
+    for (size_t i = 0; i < mouseWheelHandlers.size(); i++)
+    {
+        mouseWheelHandlers[i](span);
+    }
+}
+
 void MainWin::onDpiChange()
 {
     for (size_t i = 0; i < dpiHandlers.size(); i++)

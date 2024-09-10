@@ -7,14 +7,16 @@
 class ListBody
 {
 public:
-	ListBody();
-	~ListBody();
+	ListBody() = default;
+	~ListBody() = default;
 	static void Init();
 	static ListBody* Get();
 	void OnPaint(SkCanvas* canvas);
 	void OnDpi();
 	void OnLeftBtnDown(const int& x, const int& y);
 	void OnMouseMove(const int& x, const int& y);
+	void OnMouseDrag(const int& x, const int& y);
+	void OnMouseWheel(const int& span);
 	void SetText(std::vector<ListItem>&& param);
 private:
 	void measureEmpty();
@@ -25,6 +27,8 @@ private:
 	void paintItemBg(SkCanvas* canvas, const size_t& index);
 	void paintItemBtn(SkCanvas* canvas, const size_t& index);
 	void paintScroller(SkCanvas* canvas);
+	void caculateTop();
+	void clipText(ListItem& item);
 private:
 	std::vector<ListItem> items;
 	float emptyFontSize;
@@ -32,8 +36,12 @@ private:
 	float emptyX, emptyY;
 	SkRect listRect;
 	float itemHeight;
-	float scrollTop{ 0 };
+	float scrollTop{ 0 }, thumbTop{0};
 	int hoverIndex{ -1 };
 	float itemFontSize1,itemFontSize2;
+	float listHeight;
+	float thumbHeight,thumbWidth, thumbDragStartY;
+	bool mouseInListRect{ false };
+	bool mouseInThumbRect{ false };
 };
 

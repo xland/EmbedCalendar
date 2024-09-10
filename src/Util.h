@@ -17,6 +17,7 @@ public:
 	static SkColor ToColor(const std::string& colorStr);
 	static void RefreshDesktop();
 	static HWND ToHwnd(std::string& str);
+	static void RemoveLastChar(std::string& str);
 private:
 
 };

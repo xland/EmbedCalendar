@@ -95,3 +95,20 @@ HWND Util::ToHwnd(std::string& str)
     return hwnd;
 }
 
+bool isMultibyteChar(char c) {
+    return (c & 0xC0) == 0x80;
+}
+
+// 移除UTF-8字符串的最后一个字符
+void Util::RemoveLastChar(std::string& str) {
+    if (str.empty()) {
+        return;
+    }
+    size_t length = str.length();
+    size_t i = length - 1;
+    while (i > 0 && (str[i] & 0xC0) == 0x80) {
+        --i;
+    }
+    str.erase(i);
+}
+

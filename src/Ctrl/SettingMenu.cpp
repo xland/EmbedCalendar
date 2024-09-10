@@ -36,19 +36,14 @@ void SettingMenu::OnPaint(SkCanvas* canvas)
 	SkPaint paint;
 	paint.setAntiAlias(true);
 	paint.setColor(skin->menuBg);
-	SkVector radii[4]{ {radiu, radiu},{radiu, radiu}, //左上角 右上角
-			{radiu, radiu}, {radiu, radiu}  //右下角 左下角
-	};
-	SkRRect rr;
-	rr.setRectRadii(bg, radii);
+	auto rr = SkRRect::MakeRectXY(bg, radiu, radiu);
 	canvas->drawRRect(rr, paint);
 	
 	if (hoverIndex != -1) {
 		auto top{ bg.fTop + hoverIndex * itemHeight + margin };
 		auto hoverBg = SkRect::MakeLTRB(bg.fLeft + margin, top, bg.fRight - margin, top+ itemHeight);
-		SkRRect rr;
 		paint.setColor(skin->menuHover);
-		rr.setRectRadii(hoverBg, radii);
+		auto rr = SkRRect::MakeRectXY(bg, radiu, radiu);
 		canvas->drawRRect(rr, paint);
 	}
 

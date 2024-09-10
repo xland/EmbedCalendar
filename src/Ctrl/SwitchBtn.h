@@ -5,8 +5,8 @@
 class SwitchBtn
 {
 public:
-	SwitchBtn();
-	~SwitchBtn();
+	SwitchBtn() = default;
+	~SwitchBtn() = default;
 	static void Init();
 	static SwitchBtn* Get();
 	void OnPaint(SkCanvas* canvas);

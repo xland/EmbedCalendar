@@ -36,6 +36,7 @@ public:
 public:
 	std::vector<MouseEventCB> mouseMoveHandlers;
 	std::vector<MouseEventCB> mouseDragHandlers;
+	std::vector<WheelEventCB> mouseWheelHandlers;
 	std::vector<MouseEventCB> leftBtnDownHandlers;
 	std::vector<MouseEventCB> leftBtnUpHandlers;
 	std::vector<CustomEventCB> customEventHandlers;
@@ -51,6 +52,7 @@ private:
 	void onLeftBtnUp(const int& x, const int& y);
 	void onMouseMove(const int& x, const int& y);
 	void onMouseDrag(const int& x, const int& y);
+	void onMouseWheel(const int& span);
 	void onDpiChange();
 	void onCustomMsg(const uint64_t& type, const uint64_t& msg);
 	static LRESULT CALLBACK routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

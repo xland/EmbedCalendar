@@ -14,7 +14,7 @@ public:
 	std::string scheduleNo;
 	SkColor color;
 	bool isAllowEdit;
-	float y;
+	float y,w1,w2;
 private:
 
 };

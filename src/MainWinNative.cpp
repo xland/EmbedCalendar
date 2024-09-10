@@ -107,6 +107,11 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
             }
             break;
         }
+        case WM_MOUSEWHEEL: {
+            auto span = GET_WHEEL_DELTA_WPARAM(wParam);
+            onMouseWheel(span);
+            break;
+        }
         case WM_MOUSELEAVE: {
             if (Embedder::Get()->isEmbedded) return 0;
             TRACKMOUSEEVENT tme = {};

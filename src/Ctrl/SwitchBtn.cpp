@@ -12,14 +12,6 @@ namespace {
 	std::unique_ptr<SwitchBtn> switchBtn;
 }
 
-SwitchBtn::SwitchBtn()
-{
-}
-
-SwitchBtn::~SwitchBtn()
-{
-}
-
 void SwitchBtn::Init()
 {
 	switchBtn = std::make_unique<SwitchBtn>();
@@ -80,6 +72,7 @@ void SwitchBtn::OnLeftBtnDown(const int& x, const int& y)
 	if (!isMouseIn) return;
 	isMouseIn = false;
 	auto win = MainWin::Get();
+	win->isMouseDown = false;
 	if (listVisible) {
 		win->HideList();
 		OnDpi();
