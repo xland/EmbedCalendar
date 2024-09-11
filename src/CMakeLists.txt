@@ -19,5 +19,5 @@ target_sources(${PROJECT_NAME} PRIVATE
  "Ctrl/ListBody.h" "Ctrl/ListBody.cpp"
  "Ctrl/SettingMenu.h" "Ctrl/SettingMenu.cpp"  
  "Ctrl/ToolTip.h" "Ctrl/ToolTip.cpp" 
- "Ctrl/BaseCtrl.h" "Ctrl/BaseCtrl.cpp" 
+   
   )

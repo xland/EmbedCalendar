@@ -76,6 +76,7 @@ void WsConn::PostMsg(std::string&& msg)
 	if (res != CURLE_OK || sent == 0) {
 		std::cerr << "Failed to send ws message: " << curl_easy_strerror(res) << std::endl;
 	}
+	std::cout << "send a message" << std::endl;
 }
 
 void WsConn::initWsUrl(std::wstring&& cmdLine)
