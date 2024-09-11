@@ -40,24 +40,46 @@ bool TitleBar::IsInCaption(const int& x, const int& y)
 void TitleBar::OnPaint(SkCanvas* canvas)
 {
 	SkPaint paint;
+	paint.setAntiAlias(true);
 	auto embedder = Embedder::Get();
+	auto skin = Skin::Get();
+	auto win = MainWin::Get();
 	if (mouseInPinBtn || embedder->isEmbedded) {
-		paint.setColor(Skin::Get()->hoverBg);
+		paint.setColor(skin->hoverBg);
 		auto win = MainWin::Get();
 		auto rr = SkRRect::MakeRectXY(pinRect, 2 * win->dpi, 2 * win->dpi);
 		canvas->drawRRect(rr, paint);
 	}
 	if (mouseInSettingBtn) {
-		paint.setColor(Skin::Get()->hoverBg);
-		auto win = MainWin::Get();
+		paint.setColor(skin->hoverBg);
 		auto rr = SkRRect::MakeRectXY(settingRect, 2 * win->dpi, 2 * win->dpi);
 		canvas->drawRRect(rr, paint);
 	}
 	auto font = Font::GetIcon();
 	font->setSize(fontSize);
-	paint.setColor(Skin::Get()->text1);
+	paint.setColor(skin->text1);
 	canvas->drawString(settingIcon, settingPos.fX, settingPos.fY, *font, paint);
 	canvas->drawString(pinIcon, pinPos.fX, pinPos.fY, *font, paint);
+	if (mouseInPinBtn) {
+		if (embedder->isEmbedded) {
+			paint.setColor(skin->toolTipBg);
+			auto rr = SkRRect::MakeRectXY(tipRectUnEmbed, 4 * win->dpi, 4 * win->dpi);
+			canvas->drawRRect(rr, paint);
+			auto fontText = Font::GetText();
+			fontText->setSize(tipSize);
+			paint.setColor(skin->toolTipText);
+			canvas->drawString(tipUnEmbed.c_str(), tipUnEmbedX, tipUnEmbedY, *fontText, paint);
+		}
+		else {
+			paint.setColor(skin->toolTipBg);
+			auto rr = SkRRect::MakeRectXY(tipRectEmbed, 4 * win->dpi, 4 * win->dpi);
+			canvas->drawRRect(rr, paint);
+			auto fontText = Font::GetText();
+			fontText->setSize(tipSize);
+			paint.setColor(skin->toolTipText);
+			canvas->drawString(tipEmbed.c_str(), tipEmbedX, tipEmbedY, *fontText, paint);
+		}
+	}
 }
 
 void TitleBar::OnDpi()
@@ -66,6 +88,7 @@ void TitleBar::OnDpi()
 	fontSize = 18 * win->dpi;
 	auto margin = 12 * win->dpi;
 	auto size = 28 * win->dpi;
+	tipSize = 14* win->dpi;
 	settingRect.setXYWH(win->w - margin - size, margin, size, size);
 	pinRect.setXYWH(settingRect.fLeft-margin-size, margin, size, size);	
 	dragRect.setLTRB(0, 0, pinRect.fLeft - margin, 48 * win->dpi);
@@ -79,6 +102,24 @@ void TitleBar::OnDpi()
 	settingPos.fY = settingRect.centerY() - measureRect.height() / 2 - measureRect.fTop;
 	pinPos.fX = settingPos.fX - (settingRect.fLeft - pinRect.fLeft);
 	pinPos.fY = settingPos.fY;
+
+	auto fontText = Font::GetText();
+	fontText->setSize(tipSize);
+	fontText->measureText(tipEmbed.c_str(), tipEmbed.size(), SkTextEncoding::kUTF8, &measureRect);
+	tipRectEmbed.setXYWH(pinPos.fX - measureRect.width() / 2 - measureRect.fLeft,
+		pinRect.fBottom+3*win->dpi,
+		measureRect.width() + tipSize,
+		measureRect.height() + tipSize);
+	tipEmbedX = tipRectEmbed.fLeft + tipRectEmbed.width() / 2 - measureRect.width() / 2 - measureRect.fLeft;
+	tipEmbedY = tipRectEmbed.fTop + tipRectEmbed.height() / 2 - measureRect.height() / 2 - measureRect.fTop;
+
+	fontText->measureText(tipUnEmbed.c_str(), tipUnEmbed.size(), SkTextEncoding::kUTF8, &measureRect);
+	tipRectUnEmbed.setXYWH(pinPos.fX - measureRect.width() / 2 - measureRect.fLeft,
+		pinRect.fBottom + 3 * win->dpi, measureRect.width() + tipSize,
+		measureRect.height() + tipSize);
+	tipUnEmbedX = tipRectUnEmbed.fLeft + tipRectUnEmbed.width() / 2 - measureRect.width() / 2 - measureRect.fLeft;
+	tipUnEmbedY = tipRectUnEmbed.fTop + tipRectUnEmbed.height() / 2 - measureRect.height() / 2 - measureRect.fTop;
+
 }
 
 void TitleBar::OnLeftBtnDown(const int& x, const int& y)
@@ -131,4 +172,11 @@ void TitleBar::OnMouseMove(const int& x, const int& y)
 		win->Refresh();
 		return;
 	}
+}
+
+void TitleBar::SetData(rapidjson::Value& data)
+{
+	auto lang = data["lang"].GetObj();
+	tipEmbed = lang["embed"].GetString();
+	tipUnEmbed = lang["unEmbed"].GetString();
 }

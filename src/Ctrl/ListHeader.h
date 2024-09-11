@@ -1,6 +1,7 @@
 #pragma once
 #include <include/core/SkCanvas.h>
 #include <include/core/SkRect.h>
+#include <include/core/SkRRect.h>
 #include <rapidjson/document.h>
 
 class ListHeader
@@ -18,8 +19,11 @@ public:
 public:
 	float btnX, btnY, btnSize;
 private:
+	std::string tip;
+	SkRect tipRect;
+	float tipX, tipY;
 	std::string text;
-	float fontSize;
+	float fontSize, tipSize;
 	float textX, textY, iconX;
 	bool isMouseIn{ false };
 };

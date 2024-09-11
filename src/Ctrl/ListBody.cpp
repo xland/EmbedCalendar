@@ -63,9 +63,7 @@ void ListBody::OnDpi()
 	emptyX = win->w / 2 - measureRect.width() / 2 - measureRect.fLeft;
 	emptyY = 680 * win->dpi;
 
-	if (items.size() > 0) {
-		measureList();
-	}
+	
 }
 
 void ListBody::clipText(ListItem& item)
@@ -337,6 +335,7 @@ void ListBody::OnMouseWheel(const int& span)
 void ListBody::SetData(rapidjson::Value& data)
 {
 	auto arr = data["scheduleList"].GetArray();
+	items.clear();
 	for (auto& data : arr)
 	{
 		ListItem item;
@@ -350,5 +349,10 @@ void ListBody::SetData(rapidjson::Value& data)
 	}
 	thumbTop = 0;
 	scrollTop = 0;
-	OnDpi();
+	auto lang = data["lang"].GetObj();
+	tip = lang["deleteSchedule"].GetString();
+
+	if (items.size() > 0) {
+		measureList();
+	}
 }

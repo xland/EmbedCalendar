@@ -57,11 +57,49 @@ void CalendarHeader::OnPaint(SkCanvas* canvas)
 	fontIcon->setSize(iconSize);
 	canvas->drawString(leftIcon, icon1Pos.fX, icon1Pos.fY, *fontIcon, paint);
 	canvas->drawString(rightIcon, icon2Pos.fX, icon2Pos.fY, *fontIcon, paint);
+
+	if(mouseInLeft){
+		paint.setColor(skin->toolTipBg);
+		auto rr = SkRRect::MakeRectXY(tipRectLeft, 4 * win->dpi, 4 * win->dpi);
+		canvas->drawRRect(rr, paint);
+
+		paint.setColor(skin->toolTipText);
+		fontText->setSize(iconSize);
+		canvas->drawString(tipLeft.c_str(), tipLeftX, tipLeftY, *fontText, paint);
+	}
+	if(mouseInRight){
+		paint.setColor(skin->toolTipBg);
+		auto rr = SkRRect::MakeRectXY(tipRectRight, 4 * win->dpi, 4 * win->dpi);
+		canvas->drawRRect(rr, paint);
+
+		paint.setColor(skin->toolTipText);
+		fontText->setSize(iconSize);
+		canvas->drawString(tipRight.c_str(), tipRightX, tipRightY, *fontText, paint);
+	}
 }
 
 void CalendarHeader::OnDpi()
 {
 	measure();
+	auto win = MainWin::Get();
+	auto fontText = Font::GetText();
+	auto titleBar = TitleBar::Get();
+	SkRect measureRect;
+	fontText->setSize(iconSize);
+	fontText->measureText(tipLeft.c_str(), tipLeft.size(), SkTextEncoding::kUTF8, &measureRect);
+
+	tipRectLeft.setXYWH(icon1Pos.fX - measureRect.width() / 2 - measureRect.fLeft,
+		titleBar->dragRect.fBottom - measureRect.height() - iconSize, measureRect.width() + iconSize,
+		measureRect.height() + iconSize);
+	tipLeftX = tipRectLeft.fLeft + tipRectLeft.width() / 2 - measureRect.width() / 2 - measureRect.fLeft;
+	tipLeftY = tipRectLeft.fTop + tipRectLeft.height() / 2 - measureRect.height() / 2 - measureRect.fTop;
+
+	fontText->measureText(tipRight.c_str(), tipRight.size(), SkTextEncoding::kUTF8, &measureRect);
+	tipRectRight.setXYWH(icon2Pos.fX - measureRect.width() / 2 - measureRect.fLeft,
+		titleBar->dragRect.fBottom - measureRect.height() - iconSize,
+		measureRect.width() + iconSize, measureRect.height() + iconSize);
+	tipRightX = tipRectRight.fLeft + tipRectRight.width() / 2 - measureRect.width() / 2 - measureRect.fLeft;
+	tipRightY = tipRectRight.fTop + tipRectRight.height() / 2 - measureRect.height() / 2 - measureRect.fTop;
 }
 
 void CalendarHeader::OnLeftBtnDown(const int& x, const int& y)
@@ -118,25 +156,26 @@ void CalendarHeader::SetData(rapidjson::Value& data)
 {
 	yearMonthStr = data["activeDateMonth"].GetString();
 	auto lang = data["lang"].GetObj();
-	toolTipLeft = lang["prevMonth"].GetString();
-	toolTipRight = lang["nextMonth"].GetString();
+	tipLeft = lang["prevMonth"].GetString();
+	tipRight = lang["nextMonth"].GetString();
 	measure();
 }
 
 void CalendarHeader::measure()
 {
 	auto win = MainWin::Get();
-	auto font = Font::GetText();
+	auto fontText = Font::GetText();
 	auto fontIcon = Font::GetIcon();
+	auto titleBar = TitleBar::Get();
 	textSize = 28 * win->dpi;
 	iconSize = 14 * win->dpi;
 	r = 16 * win->dpi;
 
-	font->setSize(textSize);
+	fontText->setSize(textSize);
 	SkRect measureRect;
-	font->measureText(yearMonthStr.c_str(), yearMonthStr.size(), SkTextEncoding::kUTF8, &measureRect);
+	fontText->measureText(yearMonthStr.c_str(), yearMonthStr.size(), SkTextEncoding::kUTF8, &measureRect);
 	textPos.fX = win->w / 2 - measureRect.width() / 2 - measureRect.fLeft;
-	c1Center.fY = TitleBar::Get()->dragRect.fBottom + 6 * win->dpi + 32 * win->dpi / 2 ;
+	c1Center.fY = titleBar->dragRect.fBottom + 6 * win->dpi + 32 * win->dpi / 2 ;
 	c2Center.fY = c1Center.fY;
 	textPos.fY = c1Center.fY - measureRect.height() / 2 - measureRect.fTop;
 	

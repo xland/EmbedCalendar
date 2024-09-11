@@ -40,14 +40,12 @@ void SwitchBtn::OnPaint(SkCanvas* canvas)
 	//}
 	paint.setColor(0xFF007AFF);
 	if (listVisible) {
-		std::string btnText = Util::ToStr(L"隐藏日程");
-		canvas->drawString(btnText.data(), textX, textY, *fontText, paint);
+		canvas->drawString(textShow.data(), textX, textY, *fontText, paint);
 		const char* iconCode{ (const char*)u8"\ue708" };
 		canvas->drawString(iconCode, iconX, textY, *fontIcon, paint);
 	}
 	else {
-		std::string btnText = Util::ToStr(L"显示日程");
-		canvas->drawString(btnText.data(), textX, textY, *fontText, paint);
+		canvas->drawString(textHide.data(), textX, textY, *fontText, paint);
 		const char* iconCode{ (const char*)u8"\ue70f" };
 		canvas->drawString(iconCode, iconX, textY, *fontIcon, paint);
 	}
@@ -107,6 +105,9 @@ void SwitchBtn::OnMouseMove(const int& x, const int& y)
 void SwitchBtn::SetData(rapidjson::Value& data)
 {
 	listVisible = data["displayScheduleList"].GetBool();
+	auto lang = data["lang"].GetObj();
+	textShow = lang["displaySchedule"].GetString();
+	textHide = lang["hideSchedule"].GetString();
 	if (listVisible) {
 		MainWin::Get()->ShowList();
 	}

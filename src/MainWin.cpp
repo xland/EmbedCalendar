@@ -196,6 +196,7 @@ void MainWin::onDataReady(rapidjson::Document* d)
     {
         auto data = d->operator[]("data").GetObj();
         Skin::Get()->SetData(data);
+        TitleBar::Get()->SetData(data);
         CalendarHeader::Get()->SetData(data);
         WeekHeader::Get()->SetData(data);
         CalendarBody::Get()->SetData(data);

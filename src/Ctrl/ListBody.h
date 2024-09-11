@@ -29,6 +29,10 @@ private:
 	void caculateTop();
 	void clipText(ListItem& item);
 private:
+	std::string tip;
+	SkRect tipRect;
+	float tipX, tipY;
+
 	std::vector<ListItem> items;
 	float emptyFontSize;
 	std::string emptyText;

@@ -1,6 +1,7 @@
 #pragma once
 #include <include/core/SkCanvas.h>
 #include <include/core/SkRect.h>
+#include <rapidjson/document.h>
 
 class TitleBar
 {
@@ -14,14 +15,18 @@ public:
 	void OnDpi();
 	void OnLeftBtnDown(const int& x, const int& y);
 	void OnMouseMove(const int& x, const int& y);
+	void SetData(rapidjson::Value& data);
 public:
 	SkRect dragRect;
 	SkRect settingRect;
 	SkRect pinRect;
 private:
-	bool mouseInSettingBtn{false};
-	bool mouseInPinBtn{ false };
-	float fontSize;
+	std::string tipEmbed, tipUnEmbed;
+	SkRect tipRectEmbed, tipRectUnEmbed;
+	float tipEmbedX, tipEmbedY, tipUnEmbedX, tipUnEmbedY;
+	bool mouseInSettingBtn{false},mouseInPinBtn{ false };
+	float fontSize,tipSize;
+	
 	const char* settingIcon{ (const char*)u8"\ue6e8" };
 	const char* pinIcon{ (const char*)u8"\ue70c" };
 	SkPoint pinPos;

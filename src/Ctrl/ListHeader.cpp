@@ -37,10 +37,23 @@ void ListHeader::OnPaint(SkCanvas* canvas)
 	fontText->setSize(fontSize);
 	fontIcon->setSize(fontSize);
 	SkPaint paint;
+	paint.setAntiAlias(true);
 	paint.setColor(0xFF007AFF);
 	canvas->drawString(text.data(), textX, textY, *fontText, paint);
 	const char* iconCode{ (const char*)u8"\ue70b" };
 	canvas->drawString(iconCode, iconX, textY, *fontIcon, paint);
+
+	if (isMouseIn) {
+		auto skin = Skin::Get();
+		auto win = MainWin::Get();
+		paint.setColor(skin->toolTipBg);
+		auto rr = SkRRect::MakeRectXY(tipRect, 4 * win->dpi, 4 * win->dpi);
+		canvas->drawRRect(rr, paint);
+		auto fontText = Font::GetText();
+		fontText->setSize(tipSize);
+		paint.setColor(skin->toolTipText);
+		canvas->drawString(tip.c_str(), tipX, tipY, *fontText, paint);
+	}
 }
 
 void ListHeader::OnDpi()
@@ -53,6 +66,16 @@ void ListHeader::OnDpi()
 	btnSize = 40 * win->dpi;
 	btnX = iconX - 10 * win->dpi;
 	btnY = textY - 30 *win->dpi;
+	tipSize = 14 * win->dpi;
+
+	auto fontText = Font::GetText();
+	fontText->setSize(tipSize);
+	SkRect measureRect;
+	fontText->measureText(tip.c_str(), tip.size(), SkTextEncoding::kUTF8, &measureRect);
+	tipRect.setXYWH(iconX - measureRect.width() / 2 - measureRect.fLeft, btnY+btnSize,
+		measureRect.width() + tipSize, measureRect.height() + tipSize);
+	tipX = tipRect.fLeft + tipRect.width() / 2 - measureRect.width() / 2 - measureRect.fLeft;
+	tipY = tipRect.fTop + tipRect.height() / 2 - measureRect.height() / 2 - measureRect.fTop;
 }
 
 void ListHeader::OnLeftBtnDown(const int& x, const int& y)
@@ -69,11 +92,13 @@ void ListHeader::OnMouseMove(const int& x, const int& y)
 	auto win = MainWin::Get();
 	if (!flag && isMouseIn) {
 		isMouseIn = false;
+		win->Refresh();
 		MainWin::Cursor(IDC_ARROW);
 		return;
 	}
 	if (flag && !isMouseIn) {
 		isMouseIn = true;
+		win->Refresh();
 		MainWin::Cursor(IDC_HAND);
 	}
 }
@@ -81,4 +106,6 @@ void ListHeader::OnMouseMove(const int& x, const int& y)
 void ListHeader::SetData(rapidjson::Value& data)
 {
 	text = data["activeDateDay"].GetString();
+	auto lang = data["lang"].GetObj();
+	tip = lang["createSchedule"].GetString();
 }

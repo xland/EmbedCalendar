@@ -66,6 +66,7 @@ void WeekHeader::OnDpi()
 void WeekHeader::SetData(rapidjson::Value& data)
 {
 	auto arr = data["weekLables"].GetArray();
+	textArr.clear();
 	for (size_t i = 0; i < arr.Size(); i++)
 	{
 		textArr.push_back(arr[i].GetString());

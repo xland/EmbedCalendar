@@ -19,6 +19,7 @@ public:
 	bool listVisible{ false };
 	SkRect rect;
 private:
+	std::string textShow, textHide;
 	float fontSize;
 	float textX, textY, iconX;
 	bool isMouseIn{ false };

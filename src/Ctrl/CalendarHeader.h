@@ -1,6 +1,7 @@
 #pragma once
 #include <include/core/SkCanvas.h>
 #include <include/core/SkRect.h>
+#include <include/core/SkRRect.h>
 #include <rapidjson/document.h>
 
 class CalendarHeader
@@ -21,7 +22,9 @@ public:
 private:
 	void measure();
 private:
-	std::string toolTipLeft, toolTipRight;
+	std::string tipLeft, tipRight;
+	SkRect tipRectLeft, tipRectRight;
+	float tipLeftX,tipLeftY, tipRightX, tipRightY;
 	std::string yearMonthStr;
 	SkPoint textPos;
 	SkPoint icon1Pos, icon2Pos;
