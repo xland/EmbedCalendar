@@ -53,6 +53,7 @@ void ListBody::OnDpi()
 	itemFontSize1 = 16 * win->dpi;
 	itemFontSize2 = 14 * win->dpi;
 	thumbWidth = 6 * win->dpi;
+	itemBtnLeft = listRect.fRight - 48 * win->dpi;
 
 	emptyFontSize = 18 * win->dpi;
 	auto font = Font::GetText();
@@ -63,7 +64,17 @@ void ListBody::OnDpi()
 	emptyX = win->w / 2 - measureRect.width() / 2 - measureRect.fLeft;
 	emptyY = 680 * win->dpi;
 
-	
+	if (items.size() > 0) {
+		measureList();
+	}
+
+	auto fontText = Font::GetText();
+	fontText->setSize(itemFontSize2);
+	fontText->measureText(tip.c_str(), tip.size(), SkTextEncoding::kUTF8, &measureRect);
+	tipRect.setXYWH(listRect.fRight - 66*win->dpi,0,
+		measureRect.width() + itemFontSize2, measureRect.height() + itemFontSize2);
+	tipX = tipRect.fLeft + tipRect.width() / 2 - measureRect.width() / 2 - measureRect.fLeft;
+	tipY = tipRect.fTop + tipRect.height() / 2 - measureRect.height() / 2 - measureRect.fTop;
 }
 
 void ListBody::clipText(ListItem& item)
@@ -151,6 +162,24 @@ void ListBody::paintList(SkCanvas* canvas)
 		paintItemBtn(canvas, i);
 	}
 	canvas->restore();
+
+
+	auto win = MainWin::Get();
+	auto skin = Skin::Get();
+	if (mouseInBtnRect && hoverIndex >= 0) {
+		SkPaint paint;
+		paint.setAntiAlias(true);
+		auto top{ items[hoverIndex].y - 20*win->dpi + scrollTop};
+		paint.setColor(skin->toolTipBg);
+		tipRect.offsetTo(tipRect.fLeft, top);
+		auto rr = SkRRect::MakeRectXY(tipRect, 4 * win->dpi, 4 * win->dpi);
+		canvas->drawRRect(rr, paint);
+		auto fontText = Font::GetText();
+		fontText->setSize(itemFontSize2);
+		paint.setColor(skin->toolTipText);
+		canvas->drawString(tip.c_str(), tipX, tipY + top, *fontText, paint);
+	}
+
 	paintScroller(canvas);	
 }
 
@@ -206,12 +235,9 @@ void ListBody::paintItemBtn(SkCanvas* canvas, const size_t& index)
 	auto skin = Skin::Get();
 	SkPaint paint;
 	paint.setColor(skin->text1);
-
 	auto fontIcon = Font::GetIcon();
 	fontIcon->setSize(itemFontSize2);
-
 	const char* delCode{ (const char*)u8"\ue712" };
-
 	auto top{ item.y + scrollTop + itemFontSize2*2 };
 	canvas->drawString(delCode, listRect.fRight - 32 * win->dpi, top, *fontIcon, paint);
 }
@@ -241,7 +267,7 @@ void ListBody::OnLeftBtnDown(const int& x, const int& y)
 	auto& item = items[hoverIndex];
 	if (!item.isAllowEdit) return;
 	auto win = MainWin::Get();
-	if (x > listRect.fRight - 48 * win->dpi) {
+	if (x > itemBtnLeft) {
 		auto msg = std::format(R"({{"msgName":"deleteSchedule","data":{{"scheduleNo":"{}","calendarNo":"{}"}}}})", item.scheduleNo, item.calendarNo);
 		WsConn::Get()->PostMsg(std::move(msg));
 	}
@@ -260,20 +286,20 @@ void ListBody::OnMouseMove(const int& x, const int& y)
 {
 	if (!SwitchBtn::Get()->listVisible) return;
 	if (items.size() == 0) return;
+	auto win = MainWin::Get();
 	if (thumbDragStartY >= 0) {
 		auto distance = y - thumbDragStartY;
 		thumbTop += distance;
 		caculateTop();
 		thumbDragStartY = y;
-		auto win = MainWin::Get();
 		win->Refresh();
 	}
 	mouseInListRect = listRect.contains(x, y);
 	if (!mouseInListRect) {
 		if (hoverIndex >= 0) {
 			hoverIndex = -1;
+			mouseInBtnRect = false;
 			MainWin::Cursor(IDC_ARROW);
-			auto win = MainWin::Get();
 			win->Refresh();
 		}
 		return;
@@ -281,6 +307,7 @@ void ListBody::OnMouseMove(const int& x, const int& y)
 	SkRect thumbRect = SkRect::MakeXYWH(listRect.fRight - thumbWidth, thumbTop + listRect.fTop, thumbWidth, thumbHeight);
 	mouseInThumbRect = thumbRect.contains(x, y);	
 	int index{ -1 };
+	bool inBtn{ x > itemBtnLeft };
 	for (size_t i = 0; i < items.size(); i++)
 	{
 		if (y>items[i].y+scrollTop && y<items[i].y+itemHeight+scrollTop && x < listRect.fRight - thumbWidth) {
@@ -288,9 +315,12 @@ void ListBody::OnMouseMove(const int& x, const int& y)
 			break;
 		}
 	}
+	if (index >= 0 && inBtn != mouseInBtnRect) {
+		mouseInBtnRect = inBtn;
+		win->Refresh();
+	}
 	if (index != hoverIndex) {
 		hoverIndex = index;
-		auto win = MainWin::Get();
 		win->Refresh();
 	}
 	if (hoverIndex >= 0) {
@@ -351,8 +381,12 @@ void ListBody::SetData(rapidjson::Value& data)
 	scrollTop = 0;
 	auto lang = data["lang"].GetObj();
 	tip = lang["deleteSchedule"].GetString();
-
-	if (items.size() > 0) {
-		measureList();
+	if (listRect.isEmpty()) {
+		OnDpi();
+	}
+	else {
+		if (items.size() > 0) {
+			measureList();
+		}
 	}
 }

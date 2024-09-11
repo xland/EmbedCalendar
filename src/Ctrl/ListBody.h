@@ -35,6 +35,7 @@ private:
 
 	std::vector<ListItem> items;
 	float emptyFontSize;
+	float itemBtnLeft;
 	std::string emptyText;
 	float emptyX, emptyY;
 	SkRect listRect;
@@ -46,5 +47,6 @@ private:
 	float thumbHeight, thumbWidth, thumbDragStartY{-1.0};
 	bool mouseInListRect{ false };
 	bool mouseInThumbRect{ false };
+	bool mouseInBtnRect{ false };
 };
 
