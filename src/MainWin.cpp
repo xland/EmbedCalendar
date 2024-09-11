@@ -192,9 +192,15 @@ void MainWin::onDpiChange()
 
 void MainWin::onDataReady(rapidjson::Document* d)
 {
+    bool hasEmbed = { false };
+    int x1{ 0 }, y1{ 0 };
     try
     {
         auto data = d->operator[]("data").GetObj();
+        hasEmbed = data["hasEmbed"].GetBool();
+        auto pos = data["embedPosition"].GetObj();
+        x1 = pos["x"].GetInt();
+        y1 = pos["y"].GetInt();
         Skin::Get()->SetData(data);
         TitleBar::Get()->SetData(data);
         CalendarHeader::Get()->SetData(data);
@@ -219,5 +225,18 @@ void MainWin::onDataReady(rapidjson::Document* d)
         onDpiChange();
         ShowWindow(hwnd, SW_SHOW);
         SetTimer(hwnd, RefreshDataTimerId, 1000 * 60 * 60, NULL);
+        if (hasEmbed) {
+
+            auto sx = GetSystemMetrics(SM_XVIRTUALSCREEN);
+            auto sy = GetSystemMetrics(SM_YVIRTUALSCREEN);
+            auto sw = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+            auto sh = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+
+            SetWindowPos(hwnd, NULL, x1, y1, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
+
+
+
+            Embedder::Get()->Embed();
+        }
     }
 }

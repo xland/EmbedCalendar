@@ -138,8 +138,11 @@ void TitleBar::OnLeftBtnDown(const int& x, const int& y)
 	}
 	else if (mouseInSettingBtn) {
 		auto win = MainWin::Get();
-		win->stopEventFlag = true;	
-		SettingMenu::Get()->Show();
+		auto settingMenu = SettingMenu::Get();
+		if (!settingMenu->visible) {
+			win->stopEventFlag = true;
+			SettingMenu::Get()->Show();
+		}
 	}
 }
 

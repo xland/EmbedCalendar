@@ -1,9 +1,11 @@
-﻿
+﻿#include <format>
+#include <string>
 
 #include "Embedder.h"
 #include "MainWin.h"
 #include "TypeDefine.h"
 #include "Util.h"
+#include "WsConn.h"
 
 namespace {
 	std::unique_ptr<Embedder> embedder;
@@ -42,6 +44,8 @@ void Embedder::Embed()
     SetParent(win->hwnd, workerW);
     roteInput();
     SetTimer(win->hwnd, CheckWallPaperTimerId, 2000, NULL);
+    auto msg = std::format(R"({{"hasEmbed":true,"x":{},"y":{}}})",std::to_string(win->x), std::to_string(win->y));
+    WsConn::Get()->PostMsg(std::move(msg));
     isEmbedded = true;
 }
 
@@ -53,6 +57,7 @@ void Embedder::UnEmbed()
     SetParent(win->hwnd, nullptr);
     Util::DisableAlpha(workerW);
     Util::RefreshDesktop();
+    WsConn::Get()->PostMsg(R"({"hasEmbed":false})");
     isEmbedded = false;
 }
 
