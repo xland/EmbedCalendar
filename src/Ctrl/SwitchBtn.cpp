@@ -92,13 +92,11 @@ void SwitchBtn::OnMouseMove(const int& x, const int& y)
 	if (!flag && isMouseIn) {
 		isMouseIn = false;
 		MainWin::Cursor(IDC_ARROW);
-		win->Refresh();
 		return;
 	}
 	if (flag && !isMouseIn) {
 		isMouseIn = true;
 		MainWin::Cursor(IDC_HAND);
-		win->Refresh();
 	}
 }
 
