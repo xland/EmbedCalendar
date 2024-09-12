@@ -166,7 +166,7 @@ void ListBody::paintList(SkCanvas* canvas)
 
 	auto win = MainWin::Get();
 	auto skin = Skin::Get();
-	if (mouseInBtnRect && hoverIndex >= 0) {
+	if (mouseInBtnRect && hoverIndex >= 0 && items[hoverIndex].isAllowEdit) {
 		SkPaint paint;
 		paint.setAntiAlias(true);
 		auto top{ items[hoverIndex].y - 20*win->dpi + scrollTop};
