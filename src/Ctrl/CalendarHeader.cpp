@@ -84,10 +84,34 @@ void CalendarHeader::OnDpi()
 	auto win = MainWin::Get();
 	auto fontText = Font::GetText();
 	auto titleBar = TitleBar::Get();
+
+
+
+
+
 	SkRect measureRect;
+	iconSize = 14 * win->dpi;
+	r = 16 * win->dpi;
+	c1Center.fY = titleBar->dragRect.fBottom + 6 * win->dpi + 32 * win->dpi / 2;
+	c2Center.fY = c1Center.fY;
+
+	c1Center.fX = win->w / 2 - 128 * win->dpi - r;
+	c2Center.fX = win->w / 2 + 128 * win->dpi + r;
+
+	auto fontIcon = Font::GetIcon();
+	fontIcon->setSize(iconSize);
+	int length = std::mbstowcs(nullptr, leftIcon, 0);
+	fontIcon->measureText(leftIcon, length, SkTextEncoding::kUTF8, &measureRect);
+	icon1Pos.fX = c1Center.fX - r + r - measureRect.width() / 2 - measureRect.fLeft;
+	icon1Pos.fY = c2Center.fY - r + r - measureRect.height() / 2 - measureRect.fTop;
+
+	icon2Pos.fY = icon1Pos.fY;
+	icon2Pos.fX = c2Center.fX - (c1Center.fX - icon1Pos.fX);
+
+
+
 	fontText->setSize(iconSize);
 	fontText->measureText(tipLeft.c_str(), tipLeft.size(), SkTextEncoding::kUTF8, &measureRect);
-
 	tipRectLeft.setXYWH(icon1Pos.fX - measureRect.width() / 2 - measureRect.fLeft,
 		titleBar->dragRect.fBottom - measureRect.height() - iconSize, measureRect.width() + iconSize,
 		measureRect.height() + iconSize);
@@ -165,30 +189,12 @@ void CalendarHeader::measure()
 {
 	auto win = MainWin::Get();
 	auto fontText = Font::GetText();
-	auto fontIcon = Font::GetIcon();
 	auto titleBar = TitleBar::Get();
-	textSize = 28 * win->dpi;
-	iconSize = 14 * win->dpi;
-	r = 16 * win->dpi;
 
+	textSize = 28 * win->dpi;
 	fontText->setSize(textSize);
 	SkRect measureRect;
 	fontText->measureText(yearMonthStr.c_str(), yearMonthStr.size(), SkTextEncoding::kUTF8, &measureRect);
-	textPos.fX = win->w / 2 - measureRect.width() / 2 - measureRect.fLeft;
-	c1Center.fY = titleBar->dragRect.fBottom + 6 * win->dpi + 32 * win->dpi / 2 ;
-	c2Center.fY = c1Center.fY;
-	textPos.fY = c1Center.fY - measureRect.height() / 2 - measureRect.fTop;
-	
-	c1Center.fX = textPos.fX - 28 * win->dpi - r;
-	c2Center.fX = textPos.fX + measureRect.width() + 28 * win->dpi + r;
-
-	fontIcon->setSize(iconSize);
-	int length = std::mbstowcs(nullptr, leftIcon, 0);
-	fontIcon->measureText(leftIcon, length, SkTextEncoding::kUTF8, &measureRect);
-
-	icon1Pos.fX = c1Center.fX - r + r - measureRect.width() / 2 - measureRect.fLeft;
-	icon1Pos.fY = c2Center.fY - r + r - measureRect.height() / 2 - measureRect.fTop;
-
-	icon2Pos.fY = icon1Pos.fY;
-	icon2Pos.fX = c2Center.fX - (c1Center.fX - icon1Pos.fX);
+	textPos.fX = win->w / 2 - measureRect.width() / 2 - measureRect.fLeft;	
+	textPos.fY = titleBar->dragRect.fBottom + 6 * win->dpi + 32 * win->dpi / 2 - measureRect.height() / 2 - measureRect.fTop;
 }
