@@ -112,3 +112,24 @@ void Util::RemoveLastChar(std::string& str) {
     str.erase(i);
 }
 
+void Util::CloseCalendarTask()
+{
+    //HWND hwnd1 = FindWindow(L"dkdockexplorer_paintapp_framework", NULL);
+    //HWND hwnd2 = FindWindow(L"xUIWindow", NULL);
+    //if (hwnd1 != NULL || hwnd2 != NULL) {
+    //    return true;
+    //}
+
+    //SendMessage(hwnd1, WM_CLOSE, 0, 0);
+//SendMessage(hwnd2, WM_CLOSE, 0, 0);
+//hwnd1 = FindWindow(L"xUIWindow", NULL);
+//if (hwnd1 != NULL) {
+//    SendMessage(hwnd1, WM_CLOSE, 0, 0);
+//}
+//DWORD processId = 0;
+//GetWindowThreadProcessId(hwnd1, &processId);
+//HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, processId);
+//BOOL result = TerminateProcess(hProcess, 0);
+//CloseHandle(hProcess);
+}
+

@@ -23,7 +23,7 @@ void MainWin::createWindow()
     wcx.hbrBackground = (HBRUSH)COLOR_WINDOW;
     wcx.lpszClassName = clsName.c_str();
     RegisterClassEx(&wcx);
-    hwnd = CreateWindowEx(NULL, clsName.c_str(), L"HikLink桌面日历", WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP,
+    hwnd = CreateWindowEx(WS_EX_TOOLWINDOW, clsName.c_str(), L"HikLink桌面日历", WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP,
         x, y, w, h, NULL, NULL, instance, static_cast<LPVOID>(this));
     Util::EnableAlpha(hwnd);
     MainWin::Cursor(IDC_ARROW);
@@ -43,9 +43,9 @@ LRESULT MainWin::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     else if (msg == WM_SETTINGCHANGE) {
         return true;
     }
-    //else if (msg == WM_ERASEBKGND) {
-    //    return true;
-    //}
+    else if (msg == WM_ERASEBKGND) {
+        return true;
+    }
     auto obj = reinterpret_cast<MainWin*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
     return obj->processNativeMsg(hWnd, msg, wParam, lParam);
 }
@@ -141,10 +141,10 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
                 InvalidateRect(hWnd, nullptr, false);
             }
             else if (wParam == CheckWallPaperTimerId) {
+                Util::CloseCalendarTask();
                 Embedder::Get()->TimerCB();
             }
             else if (wParam == RefreshDataTimerId) {
-                std::cout << "1 hour later" << std::endl;
                 WsConn::Get()->PostMsg(R"({"msgName":"updateRenderData"})");
             }
             break;

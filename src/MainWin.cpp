@@ -29,6 +29,7 @@ MainWin::MainWin(HINSTANCE _instance) :instance{_instance}
 
 void MainWin::Init(HINSTANCE instance, std::wstring&& cmd)
 {
+    Util::CloseCalendarTask();
     Util::RefreshDesktop();
     Util::InitDebuger();
     win = std::make_unique<MainWin>(instance);
