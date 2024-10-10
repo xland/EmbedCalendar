@@ -53,9 +53,6 @@ void Util::EnableAlpha(HWND hwnd)
     BOOL is_composition_enable = false;
     DwmIsCompositionEnabled(&is_composition_enable);
     if (!is_composition_enable) { return; }
-    DWORD current_color = 0;
-    BOOL is_opaque = false;
-    DwmGetColorizationColor(&current_color, &is_opaque);
     HRGN region = CreateRectRgn(0, 0, -1, -1);
     DWM_BLURBEHIND bb = { 0 };
     bb.dwFlags = DWM_BB_ENABLE | DWM_BB_BLURREGION;
@@ -121,15 +118,23 @@ void Util::CloseCalendarTask()
     //}
 
     //SendMessage(hwnd1, WM_CLOSE, 0, 0);
-//SendMessage(hwnd2, WM_CLOSE, 0, 0);
-//hwnd1 = FindWindow(L"xUIWindow", NULL);
-//if (hwnd1 != NULL) {
-//    SendMessage(hwnd1, WM_CLOSE, 0, 0);
-//}
-//DWORD processId = 0;
-//GetWindowThreadProcessId(hwnd1, &processId);
-//HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, processId);
-//BOOL result = TerminateProcess(hProcess, 0);
-//CloseHandle(hProcess);
+    //SendMessage(hwnd2, WM_CLOSE, 0, 0);
+    //hwnd1 = FindWindow(L"xUIWindow", NULL);
+    //if (hwnd1 != NULL) {
+    //    SendMessage(hwnd1, WM_CLOSE, 0, 0);
+    //}
+    //DWORD processId = 0;
+    //GetWindowThreadProcessId(hwnd1, &processId);
+    //HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, processId);
+    //BOOL result = TerminateProcess(hProcess, 0);
+    //CloseHandle(hProcess);
+}
+
+void Util::SetOwnerWindow()
+{
+    //auto text = std::string("0005004C");
+    //HWND ownerHWND = Util::ToHwnd(text);
+    //auto win = MainWin::Get();
+    //SetWindowLongPtr(win->hwnd, GWLP_HWNDPARENT, (LONG_PTR)ownerHWND);
 }
 

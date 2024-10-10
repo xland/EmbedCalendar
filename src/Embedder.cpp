@@ -63,6 +63,8 @@ void Embedder::UnEmbed()
 
 void Embedder::TimerCB()
 {
+    //Util::DisableAlpha(workerW);
+
     bool flag = isColorWallPaper;
     checkIsColorWallPaper();
     if (!flag && isColorWallPaper) {

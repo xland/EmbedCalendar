@@ -40,12 +40,6 @@ LRESULT MainWin::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     else if (msg == WM_SETCURSOR) {
         return true;
     }
-    else if (msg == WM_SETTINGCHANGE) {
-        return true;
-    }
-    else if (msg == WM_ERASEBKGND) {
-        return true;
-    }
     auto obj = reinterpret_cast<MainWin*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
     return obj->processNativeMsg(hWnd, msg, wParam, lParam);
 }
@@ -141,7 +135,6 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
                 InvalidateRect(hWnd, nullptr, false);
             }
             else if (wParam == CheckWallPaperTimerId) {
-                Util::CloseCalendarTask();
                 Embedder::Get()->TimerCB();
             }
             else if (wParam == RefreshDataTimerId) {
