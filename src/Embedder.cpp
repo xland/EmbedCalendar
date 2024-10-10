@@ -93,7 +93,6 @@ void Embedder::findWorkerW()
 {
     if (workerW) return;
     HWND progman = FindWindow(L"Progman", NULL);
-    //SendMessageTimeout(progman, 0x052C, 0, 0, SMTO_NORMAL, 1000, NULL);
     SendMessage(progman, 0x052C, 0xD, 0);
     SendMessage(progman, 0x052C, 0xD, 1);
     EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL {
