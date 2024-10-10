@@ -32,16 +32,8 @@ Embedder* Embedder::Get()
 
 void Embedder::Embed()
 {
-    findWorkerW();
-    checkIsColorWallPaper();
-    if (isColorWallPaper) {
-        getWallPaperColor();
-    }
-    else {
-        Util::EnableAlpha(workerW);
-    }
+    initHwnd();
     auto win = MainWin::Get();
-    SetParent(win->hwnd, workerW);
     roteInput();
     SetTimer(win->hwnd, CheckWallPaperTimerId, 2000, NULL);
     auto msg = std::format(R"({{"msgName":"embedWin","data":{{"hasEmbed":true,"x":{},"y":{}}}}})",std::to_string(win->x), std::to_string(win->y));
@@ -55,7 +47,6 @@ void Embedder::UnEmbed()
     KillTimer(win->hwnd, CheckWallPaperTimerId);
     SetWindowLongPtr(win->hwnd, GWLP_WNDPROC, (LONG_PTR)oldProc);
     SetParent(win->hwnd, nullptr);
-    Util::DisableAlpha(workerW);
     Util::RefreshDesktop();
     WsConn::Get()->PostMsg(R"({"msgName":"embedWin","data":{"hasEmbed":false}})");
     isEmbedded = false;
@@ -63,65 +54,41 @@ void Embedder::UnEmbed()
 
 void Embedder::TimerCB()
 {
-    //Util::DisableAlpha(workerW);
+    auto win = MainWin::Get();
+    POINT pt = { win->x, win->y };
+    ScreenToClient(hwndDefView, &pt);
 
-    bool flag = isColorWallPaper;
-    checkIsColorWallPaper();
-    if (!flag && isColorWallPaper) {
-        Util::DisableAlpha(workerW);
-        MainWin::Get()->Refresh();
-        Util::RefreshDesktop();
-        return;
-    }
-    if (flag && !isColorWallPaper) {
-        Util::EnableAlpha(workerW);
-        MainWin::Get()->Refresh();
-        Util::RefreshDesktop();
-        return;
-    }
-    if (isColorWallPaper) {
-        auto color = wallPaperColor;
-        getWallPaperColor();
-        if (color != wallPaperColor) {
-            MainWin::Get()->Refresh();
-            return;
-        }
-    }
+    BITMAPINFO bmpInfo = { sizeof(BITMAPINFOHEADER), (long)win->w, 0 - (long)win->h, 1, 32, BI_RGB, (DWORD)win->w * win->h, 0, 0, 0, 0 };
+    HDC hdcWindow = GetDC(hwndSysListView);
+    HDC hdcMemDC = CreateCompatibleDC(hdcWindow);
+    HBITMAP hBitmap = CreateCompatibleBitmap(hdcWindow, win->w, win->h);
+    DeleteObject(SelectObject(hdcMemDC, hBitmap));
+    BitBlt(hdcMemDC, 0, 0, win->w, win->h, hdcWindow, pt.x,pt.y, SRCCOPY);
+    GetDIBits(hdcMemDC, hBitmap, 0, win->h, &win->winPix.front(), &bmpInfo, DIB_RGB_COLORS);
+    DeleteObject(hBitmap);
+    DeleteDC(hdcMemDC);
+    ReleaseDC(NULL, hdcWindow);
+    sk_sp<SkSurface> surface = SkSurfaces::WrapPixels(info, &winPix.front(), win->w * sizeof(SkColor));
+    auto img = surface->makeImageSnapshot();
+
+
+    
+    HDC hdc = GetDCEx(hwndDefView, NULL, 0x403);
+    SetDIBitsToDevice(hdc, pt.x, pt.y, win->w, win->h, 0, 0, 0, win->h, &win->winPix.front(), &bmpInfo, DIB_RGB_COLORS);
+    ReleaseDC(hwndDefView, hdc);
 }
 
-void Embedder::findWorkerW()
+void Embedder::initHwnd()
 {
-    if (workerW) return;
-    HWND progman = FindWindow(L"Progman", NULL);
-    SendMessage(progman, 0x052C, 0xD, 0);
-    SendMessage(progman, 0x052C, 0xD, 1);
     EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL {
-        HWND defView = FindWindowEx(hwnd, NULL, L"SHELLDLL_DefView", NULL);
-        if (defView != NULL) {
-            auto self = (Embedder*)lParam;
-            self->workerW = FindWindowEx(NULL, hwnd, L"WorkerW", NULL);
+        auto self = (Embedder*)lParam;
+        self->hwndDefView = FindWindowEx(hwnd, NULL, L"SHELLDLL_DefView", NULL);
+        if (self->hwndDefView != NULL) {
+            return FALSE;
         }
         return TRUE;
         }, (LPARAM)this);
-}
-
-void Embedder::checkIsColorWallPaper()
-{
-    std::wstring wallpaperPath(MAX_PATH, L'\0');
-    SystemParametersInfoW(SPI_GETDESKWALLPAPER, MAX_PATH, &wallpaperPath.front(), 0);
-    wallpaperPath.resize(wcslen(wallpaperPath.c_str()));
-    isColorWallPaper = wallpaperPath.empty();
-}
-
-void Embedder::getWallPaperColor()
-{
-    HDC hdc = GetDC(workerW);
-    COLORREF color = GetPixel(hdc, 6, 6);
-    auto r = (unsigned)GetRValue(color);
-    auto g = (unsigned)GetGValue(color);
-    auto b = (unsigned)GetBValue(color);
-    ReleaseDC(workerW, hdc);
-    wallPaperColor = SkColorSetARGB(255, r, g, b);
+    hwndSysListView = FindWindowEx(hwndDefView, NULL, L"SysListView32", NULL);
 }
 
 bool Embedder::checkMouseMsg(POINT& point) {

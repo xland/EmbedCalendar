@@ -17,9 +17,7 @@ public:
 	bool isColorWallPaper{false};
 	SkColor wallPaperColor;
 private:
-	void findWorkerW();
-	void checkIsColorWallPaper();
-	void getWallPaperColor();
+	void initHwnd();
 	void roteInput();
 	static void postMsg(UINT msg, WPARAM wParam, LPARAM lParam);
 	static void postMsg(UINT msg, WPARAM wParam, const POINT& point);
@@ -27,6 +25,7 @@ private:
 	static RAWINPUT* getRawInput(HRAWINPUT lParam);
 	static LRESULT CALLBACK processMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 private:
-	HWND workerW{nullptr};
+	HWND hwndDefView{ nullptr };
+	HWND hwndSysListView{ nullptr };
 };
 

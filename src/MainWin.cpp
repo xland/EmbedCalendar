@@ -119,13 +119,7 @@ void MainWin::HideList()
 
 void MainWin::repaint()
 {
-    auto embedder = Embedder::Get();
-    if (embedder->isEmbedded && embedder->isColorWallPaper) {
-        canvas->clear(embedder->wallPaperColor);
-    }
-    else {
-        canvas->clear(0x00000000);
-    }
+    canvas->clear(0x00000000);
     SkPaint paint;
     paint.setColor(Skin::Get()->bg);
     paint.setAntiAlias(true);
