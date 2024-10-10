@@ -67,7 +67,7 @@ void Util::DisableAlpha(HWND hwnd)
     DWM_BLURBEHIND bb = { 0 };
     bb.dwFlags = DWM_BB_ENABLE;
     bb.fEnable = FALSE;
-    HRESULT hr = DwmEnableBlurBehindWindow(hwnd, &bb);
+    DwmEnableBlurBehindWindow(hwnd, &bb);
 }
 
 SkColor Util::ToColor(const std::string& colorStr) {
