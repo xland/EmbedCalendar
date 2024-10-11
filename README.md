@@ -10,3 +10,8 @@
 Photo2 = 窗口像素+Photo1
 把Photo2绘制到SHELLDLL_DefView窗口上
 定时重绘
+
+
+可以给SHELLDLL_DefView绘图
+但绘制的内容会盖住SysListView32的图标
+此时再给SysListView32拍照的话，拍到的是窗口像素，而不是图标图像

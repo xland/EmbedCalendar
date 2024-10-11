@@ -3,7 +3,6 @@
 #include <windowsx.h>
 #include "MainWin.h"
 #include "Util.h"
-#include "Embedder.h"
 #include "WsConn.h"
 #include "Ctrl/SwitchBtn.h"
 #include "Ctrl/TitleBar.h"
@@ -25,6 +24,17 @@ void MainWin::createWindow()
     RegisterClassEx(&wcx);
     hwnd = CreateWindowEx(WS_EX_TOOLWINDOW, clsName.c_str(), L"HikLink桌面日历", WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP,
         x, y, w, h, NULL, NULL, instance, static_cast<LPVOID>(this));
+    
+    static HWND hwndDefView{nullptr};
+    EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL {
+        hwndDefView = FindWindowEx(hwnd, NULL, L"SHELLDLL_DefView", NULL);
+        if (hwndDefView) {
+            return FALSE;
+        }
+        return TRUE;
+        },NULL);
+    SetWindowLongPtr(hwnd, GWLP_HWNDPARENT, (LONG_PTR)hwndDefView);
+
     Util::EnableAlpha(hwnd);
     MainWin::Cursor(IDC_ARROW);
 }
@@ -99,7 +109,6 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
             break;
         }
         case WM_MOUSELEAVE: {
-            if (Embedder::Get()->isEmbedded) return 0;
             TRACKMOUSEEVENT tme = {};
             tme.cbSize = sizeof(TRACKMOUSEEVENT);
             tme.dwFlags = TME_CANCEL | TME_HOVER | TME_LEAVE;
@@ -133,9 +142,6 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
                 KillTimer(hWnd, RefreshTimerId);
                 refreshFlag = false;
                 InvalidateRect(hWnd, nullptr, false);
-            }
-            else if (wParam == CheckWallPaperTimerId) {
-                Embedder::Get()->TimerCB();
             }
             else if (wParam == RefreshDataTimerId) {
                 WsConn::Get()->PostMsg(R"({"msgName":"updateRenderData"})");

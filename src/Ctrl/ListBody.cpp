@@ -9,7 +9,6 @@
 #include "../TypeDefine.h"
 #include "../Skin.h"
 #include "../Util.h"
-#include "../Embedder.h"
 #include "../WsConn.h"
 
 namespace {

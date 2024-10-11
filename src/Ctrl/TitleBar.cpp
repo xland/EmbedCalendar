@@ -7,7 +7,6 @@
 #include "../Font.h"
 #include "../MainWin.h"
 #include "../TypeDefine.h"
-#include "../Embedder.h"
 #include "../Skin.h"
 
 namespace {
@@ -41,10 +40,9 @@ void TitleBar::OnPaint(SkCanvas* canvas)
 {
 	SkPaint paint;
 	paint.setAntiAlias(true);
-	auto embedder = Embedder::Get();
 	auto skin = Skin::Get();
 	auto win = MainWin::Get();
-	if (mouseInPinBtn || embedder->isEmbedded) {
+	if (mouseInPinBtn) {
 		paint.setColor(skin->hoverBg);
 		auto win = MainWin::Get();
 		auto rr = SkRRect::MakeRectXY(pinRect, 2 * win->dpi, 2 * win->dpi);
@@ -61,24 +59,13 @@ void TitleBar::OnPaint(SkCanvas* canvas)
 	canvas->drawString(settingIcon, settingPos.fX, settingPos.fY, *font, paint);
 	canvas->drawString(pinIcon, pinPos.fX, pinPos.fY, *font, paint);
 	if (mouseInPinBtn) {
-		if (embedder->isEmbedded) {
-			paint.setColor(skin->toolTipBg);
-			auto rr = SkRRect::MakeRectXY(tipRectUnEmbed, 4 * win->dpi, 4 * win->dpi);
-			canvas->drawRRect(rr, paint);
-			auto fontText = Font::GetText();
-			fontText->setSize(tipSize);
-			paint.setColor(skin->toolTipText);
-			canvas->drawString(tipUnEmbed.c_str(), tipUnEmbedX, tipUnEmbedY, *fontText, paint);
-		}
-		else {
-			paint.setColor(skin->toolTipBg);
-			auto rr = SkRRect::MakeRectXY(tipRectEmbed, 4 * win->dpi, 4 * win->dpi);
-			canvas->drawRRect(rr, paint);
-			auto fontText = Font::GetText();
-			fontText->setSize(tipSize);
-			paint.setColor(skin->toolTipText);
-			canvas->drawString(tipEmbed.c_str(), tipEmbedX, tipEmbedY, *fontText, paint);
-		}
+		paint.setColor(skin->toolTipBg);
+		auto rr = SkRRect::MakeRectXY(tipRectUnEmbed, 4 * win->dpi, 4 * win->dpi);
+		canvas->drawRRect(rr, paint);
+		auto fontText = Font::GetText();
+		fontText->setSize(tipSize);
+		paint.setColor(skin->toolTipText);
+		canvas->drawString(tipUnEmbed.c_str(), tipUnEmbedX, tipUnEmbedY, *fontText, paint);
 	}
 }
 
@@ -126,13 +113,6 @@ void TitleBar::OnLeftBtnDown(const int& x, const int& y)
 {
 	if (mouseInPinBtn) {
 		mouseInPinBtn = false;
-		auto embedder = Embedder::Get();
-		if (embedder->isEmbedded) {
-			embedder->UnEmbed();
-		}
-		else {
-			embedder->Embed();
-		}
 		auto win = MainWin::Get();
 		SendMessage(win->hwnd, WM_LBUTTONUP, MK_LBUTTON, MAKELPARAM(x, y));
 	}

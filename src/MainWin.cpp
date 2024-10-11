@@ -4,7 +4,6 @@
 #include "WsConn.h"
 #include "Skin.h"
 #include "Font.h"
-#include "Embedder.h"
 #include "Util.h"
 #include "Ctrl/TitleBar.h"
 #include "Ctrl/CalendarHeader.h"
@@ -33,7 +32,6 @@ void MainWin::Init(HINSTANCE instance, std::wstring&& cmd)
     Util::RefreshDesktop();
     Util::InitDebuger();
     win = std::make_unique<MainWin>(instance);
-    Embedder::Init();
     Font::Init();
     Skin::Init();
     TitleBar::Init();
@@ -231,7 +229,6 @@ void MainWin::onDataReady(rapidjson::Document* d)
             if (x1 > sx && y1 > sy && x1 < sx + sw && y1 < sy + sh) {
                 SetWindowPos(hwnd, NULL, x1, y1, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
             }
-            Embedder::Get()->Embed();
         }
     }
 }

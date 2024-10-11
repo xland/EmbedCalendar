@@ -8,7 +8,6 @@ target_sources(${PROJECT_NAME} PRIVATE
 "Skin.h" "Skin.cpp"
 "Font.h" "Font.cpp"
 "Util.h" "Util.cpp"
-"Embedder.h" "Embedder.cpp"
 
  "Ctrl/TitleBar.h" "Ctrl/TitleBar.cpp" 
  "Ctrl/CalendarHeader.h" "Ctrl/CalendarHeader.cpp" 

@@ -7,7 +7,6 @@
 #include "../TypeDefine.h"
 #include "../Skin.h"
 #include "../Util.h"
-#include "../Embedder.h"
 
 
 namespace {
