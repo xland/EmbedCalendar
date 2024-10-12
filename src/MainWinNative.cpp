@@ -18,25 +18,27 @@ void MainWin::createWindow()
     wcx.cbWndExtra = sizeof(MainWin*);
     wcx.hInstance = instance;
     wcx.hIcon = LoadIcon(instance, IDI_APPLICATION);
-    wcx.hCursor = LoadCursor(instance, IDC_CROSS);
+    wcx.hCursor = LoadCursor(instance, IDC_CROSS); 
     wcx.hbrBackground = (HBRUSH)COLOR_WINDOW;
     wcx.lpszClassName = clsName.c_str();
     RegisterClassEx(&wcx);
     hwnd = CreateWindowEx(WS_EX_TOOLWINDOW, clsName.c_str(), L"HikLink桌面日历", WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP,
         x, y, w, h, NULL, NULL, instance, static_cast<LPVOID>(this));
-    
-    static HWND hwndDefView{nullptr};
-    EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL {
+    Util::EnableAlpha(hwnd);
+    MainWin::Cursor(IDC_ARROW);
+
+
+    //HWND hWndDesktop = GetDesktopWindow();
+    static HWND hwndDefView;
+        EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL {
         hwndDefView = FindWindowEx(hwnd, NULL, L"SHELLDLL_DefView", NULL);
-        if (hwndDefView) {
+        if (hwndDefView != NULL) {
             return FALSE;
         }
         return TRUE;
         },NULL);
     SetWindowLongPtr(hwnd, GWLP_HWNDPARENT, (LONG_PTR)hwndDefView);
-
-    Util::EnableAlpha(hwnd);
-    MainWin::Cursor(IDC_ARROW);
+    SetWindowPos(hwnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 }
 
 LRESULT MainWin::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -60,6 +62,28 @@ LRESULT MainWin::processNativeMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
         case WM_CLOSE: {
             Close();
             return 1;
+        }
+        case WM_WINDOWPOSCHANGING:
+        {
+            WINDOWPOS* pPos = reinterpret_cast<WINDOWPOS*>(lParam);
+            // 确保不改变 Z 序
+            pPos->flags |= SWP_NOZORDER;
+            break;
+        }
+        case WM_SETFOCUS:{
+            SetWindowPos(hwnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+            return 0;
+        }
+        case WM_ACTIVATE:
+        {
+            SetWindowPos(hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE); //| SWP_NOACTIVATE
+            return 0;
+        }
+        case WM_SIZE:{
+            if (wParam == SIZE_MINIMIZED) {
+                MessageBox(hwnd, L"Window Minimized", L"Notification", MB_OK);
+            }
+            return 0;
         }
         case WM_MOVE: {
             x = GET_X_LPARAM(lParam);
