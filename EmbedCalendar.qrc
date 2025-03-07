@@ -1,4 +1,5 @@
 <RCC>
-    <qresource prefix="EmbedCalendar">
+    <qresource prefix="/">
+        <file>Res/iconfont.ttf</file>
     </qresource>
 </RCC>

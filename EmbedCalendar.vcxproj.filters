@@ -26,10 +26,10 @@
     <QtRcc Include="EmbedCalendar.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
-    <QtMoc Include="EmbedCalendar.h">
+    <QtMoc Include="MainWindow.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <ClCompile Include="EmbedCalendar.cpp">
+    <ClCompile Include="MainWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -37,5 +37,63 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TitleBarBtn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="YearBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="YearBarBtn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WeekBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="YearBarBtnBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="YearBarBtnToday.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Skin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="TitleBarBtn.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="TitleBar.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="YearBar.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="YearBarBtn.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="WeekBar.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="YearBarBtnToday.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="YearBarBtnBase.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Skin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

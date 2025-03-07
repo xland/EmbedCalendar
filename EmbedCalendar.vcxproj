@@ -92,10 +92,34 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Skin.cpp" />
+    <ClCompile Include="TitleBar.cpp" />
+    <ClCompile Include="TitleBarBtn.cpp" />
+    <ClCompile Include="Util.cpp" />
+    <ClCompile Include="WeekBar.cpp" />
+    <ClCompile Include="YearBar.cpp" />
+    <ClCompile Include="YearBarBtn.cpp" />
+    <ClCompile Include="YearBarBtnBase.cpp" />
+    <ClCompile Include="YearBarBtnToday.cpp" />
     <QtRcc Include="EmbedCalendar.qrc" />
-    <QtMoc Include="EmbedCalendar.h" />
-    <ClCompile Include="EmbedCalendar.cpp" />
+    <QtMoc Include="MainWindow.h" />
+    <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="TitleBarBtn.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="TitleBar.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Skin.h" />
+    <ClInclude Include="Util.h" />
+    <QtMoc Include="YearBarBtnBase.h" />
+    <QtMoc Include="YearBarBtnToday.h" />
+    <QtMoc Include="WeekBar.h" />
+    <QtMoc Include="YearBarBtn.h" />
+    <QtMoc Include="YearBar.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
