@@ -97,6 +97,7 @@
     <ClCompile Include="ListBarBtn.cpp" />
     <ClCompile Include="ListContent.cpp" />
     <ClCompile Include="ListItem.cpp" />
+    <ClCompile Include="ListItemBtn.cpp" />
     <ClCompile Include="Skin.cpp" />
     <ClCompile Include="SwitchBar.cpp" />
     <ClCompile Include="TitleBar.cpp" />
@@ -119,6 +120,7 @@
     <QtMoc Include="TitleBar.h" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="ListItemBtn.h" />
     <QtMoc Include="ListItem.h" />
     <QtMoc Include="ListContent.h" />
     <QtMoc Include="ListBarBtn.h" />

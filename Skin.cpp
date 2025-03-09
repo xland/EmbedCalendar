@@ -61,4 +61,7 @@ void Skin::initWhite()
 	dayWorking = QColor(0, 122, 255);
 
 	switchText = QColor(0, 122, 255);
+
+	listItemText1 = QColor(31, 35, 41);
+	listItemText2 = QColor(102, 102, 102);
 }

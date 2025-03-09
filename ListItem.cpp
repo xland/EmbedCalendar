@@ -1,6 +1,6 @@
-#include <QPainter>
+﻿#include <QPainter>
 #include <QPainterPath>
-
+#include "Skin.h"
 #include "ListItem.h"
 
 ListItem::ListItem(QWidget *parent) : QWidget(parent)
@@ -18,7 +18,7 @@ void ListItem::paintEvent(QPaintEvent* event)
     painter.setRenderHint(QPainter::Antialiasing); // 抗锯齿，使边缘更平滑
 
     // 定义矩形区域
-    QRectF rect(0, 0, 8, 44); // x, y, width, height
+    QRectF rect(0, 0, 3, 44); // x, y, width, height
     qreal radius = 3.0; // 圆角半径
 
     // 创建 QPainterPath 用于自定义形状
@@ -37,4 +37,19 @@ void ListItem::paintEvent(QPaintEvent* event)
     painter.setPen(Qt::NoPen); // 边框颜色和宽度
     painter.setBrush(Qt::darkBlue); // 填充颜色
     painter.drawPath(path); // 绘制路径
+
+    painter.setRenderHint(QPainter::TextAntialiasing, true);
+    QFont font("Microsoft YaHei", 10);
+    font.setStyleStrategy(QFont::PreferAntialias);
+    font.setHintingPreference(QFont::PreferNoHinting);
+    painter.setFont(font);
+    painter.setBrush(Qt::NoBrush);
+    auto skin = Skin::get();
+    painter.setPen(skin->listItemText1);
+    painter.drawText(QPoint(8, 16), QString::fromLocal8Bit("这是日程的标题，这是日程的标题"));
+
+    font.setPointSize(9);
+    painter.setFont(font);
+    painter.setPen(skin->listItemText2);
+    painter.drawText(QPoint(8, 38), QString::fromLocal8Bit("12：12 这是日程的简介，这是日程的标题"));
 }

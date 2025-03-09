@@ -5,23 +5,9 @@ ListContent::ListContent(QWidget *parent) : QScrollArea(parent)
 {
     setFrameShape(QFrame::NoFrame);
     setGeometry(20, 474, parent->width() - 40, 730 - 474 - 56);
-
-    QWidget* contentWidget = new QWidget(this);
-    contentWidget->setFixedWidth(parent->width() - 46);
-    contentWidget->setStyleSheet(R"(background: transparent;)");
-    QVBoxLayout* layout = new QVBoxLayout(contentWidget);
-    for (int i = 0; i < 20; ++i) {
-        auto item = new ListItem(this);
-        layout->addWidget(item);
-    }
-    layout->addStretch();
-    setWidget(contentWidget);
-
-    setStyleSheet(R"(
-QScrollArea {
-    border: none;
-    background: transparent;
-}
+    setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setStyleSheet(R"(QScrollArea{border: none; background: transparent;}
 QScrollBar:vertical {
     border: none;
     background: transparent; /* 滚动条背景颜色 */
@@ -44,7 +30,17 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
     background: none;     /* 滑块上下区域的背景 */
 })");
 
-
+    QWidget* contentWidget = new QWidget(this);
+    contentWidget->setStyleSheet(R"(background: transparent;margin:0px;padding:0px;)");
+    QVBoxLayout* layout = new QVBoxLayout(contentWidget);
+    layout->setMargin(0);
+    layout->setSpacing(8);
+    for (int i = 0; i < 13; ++i) {
+        auto item = new ListItem(this);
+        layout->addWidget(item);
+    }
+    layout->addStretch();
+    setWidget(contentWidget);
 }
 
 ListContent::~ListContent()

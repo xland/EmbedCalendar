@@ -32,6 +32,9 @@ public:
 
 	QColor switchText;
 
+	QColor listItemText1;
+	QColor listItemText2;
+
 private:
 	void initBlack();
 	void initWhite();
