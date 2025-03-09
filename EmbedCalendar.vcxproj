@@ -93,6 +93,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DayBtn.cpp" />
+    <ClCompile Include="ListBar.cpp" />
+    <ClCompile Include="ListBarBtn.cpp" />
     <ClCompile Include="Skin.cpp" />
     <ClCompile Include="SwitchBar.cpp" />
     <ClCompile Include="TitleBar.cpp" />
@@ -115,6 +117,8 @@
     <QtMoc Include="TitleBar.h" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="ListBarBtn.h" />
+    <QtMoc Include="ListBar.h" />
     <QtMoc Include="SwitchBar.h" />
     <QtMoc Include="DayBtn.h" />
     <ClInclude Include="Skin.h" />

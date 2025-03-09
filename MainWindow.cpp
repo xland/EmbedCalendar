@@ -12,6 +12,7 @@
 #include "WeekBar.h"
 #include "DayBtn.h"
 #include "SwitchBar.h"
+#include "ListBar.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -27,7 +28,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     {
         auto dayBtn = new DayBtn(i,this);
     }
+    auto listBar = new ListBar(this);
     auto switchBar = new SwitchBar(this);
+
 
     //auto workerW = getWorkerW();
     //auto hwnd = (HWND)winId();

@@ -70,6 +70,12 @@
     <ClCompile Include="SwitchBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ListBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ListBarBtn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="TitleBarBtn.h">
@@ -97,6 +103,12 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="SwitchBar.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="ListBar.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="ListBarBtn.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

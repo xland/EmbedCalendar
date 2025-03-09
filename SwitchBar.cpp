@@ -6,7 +6,7 @@
 
 SwitchBar::SwitchBar(QWidget *parent) : QWidget(parent)
 {
-	setGeometry(0, parent->height()-60, parent->width(), 60);
+	setGeometry(260, parent->height()-60, 104, 60);
 	setCursor(Qt::CursorShape::PointingHandCursor);
 }
 
@@ -34,11 +34,11 @@ void SwitchBar::paintEvent(QPaintEvent* event)
 		text = QString::fromLocal8Bit("显示日程");
 		code = QChar(0xe70f);
 	}
-	painter.drawText(QPoint(268,36), text);
+	painter.drawText(QPoint(8,36), text);
 	auto fontIcon = Util::getIconFont();
 	fontIcon->setPixelSize(16);
 	painter.setFont(*fontIcon);
-	painter.drawText(QPoint(336, 36), code);
+	painter.drawText(QPoint(76, 36), code);
 }
 
 void SwitchBar::mousePressEvent(QMouseEvent* event)
@@ -53,6 +53,6 @@ void SwitchBar::mousePressEvent(QMouseEvent* event)
 		else {
 			win->setFixedHeight(730);
 		}
-		setGeometry(0, win->height() - 60, win->width(), 60);
+		setGeometry(260, win->height() - 60, 104, 60);
 	}
 }
