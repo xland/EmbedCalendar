@@ -6,7 +6,7 @@ class ListBarBtn : public QWidget
 {
 	Q_OBJECT
 public:
-	ListBarBtn(const uint& code, QWidget *parent = nullptr);
+	ListBarBtn(QWidget *parent = nullptr);
 	~ListBarBtn();
 protected:
 	void paintEvent(QPaintEvent* event) override;

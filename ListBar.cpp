@@ -3,11 +3,12 @@
 #include "Skin.h"
 #include "Util.h"
 #include "ListBar.h"
+#include "ListBarBtn.h"
 
 ListBar::ListBar(QWidget *parent) : QWidget(parent)
 {
 	setGeometry(20, 436, parent->width()-40, 26);
-	setCursor(Qt::CursorShape::PointingHandCursor);
+	new ListBarBtn(this);
 }
 
 ListBar::~ListBar()

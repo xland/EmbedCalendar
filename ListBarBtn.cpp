@@ -5,9 +5,9 @@
 #include "Util.h"
 #include "ListBarBtn.h"
 
-ListBarBtn::ListBarBtn(const uint& code, QWidget* parent) : QWidget(parent)
+ListBarBtn::ListBarBtn(QWidget* parent) : QWidget(parent)
 {
-    setFixedSize(28, 28);
+    setGeometry(parent->width()-26,0, 26, 26);
     setMouseTracking(true);
     setCursor(Qt::CursorShape::PointingHandCursor);
 }
@@ -22,17 +22,12 @@ void ListBarBtn::paintEvent(QPaintEvent* event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     auto skin = Skin::get();
-    if (isHover) {
-        painter.setBrush(skin->titleBtnHover);
-        painter.setPen(Qt::NoPen);
-        painter.drawRoundedRect(rect(), 2, 2);
-    }
     painter.setRenderHint(QPainter::TextAntialiasing, true);
     auto font = Util::getIconFont();
-    font->setPixelSize(18);
+    font->setPixelSize(20);
     painter.setFont(*font);
-    painter.setPen(skin->titleBtn);
-    painter.drawText(rect(), Qt::AlignCenter, QChar(code));
+    painter.setPen(skin->switchText);
+    painter.drawText(rect(), Qt::AlignCenter, QChar(0xe70b));
 }
 
 

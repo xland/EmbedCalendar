@@ -76,6 +76,12 @@
     <ClCompile Include="ListBarBtn.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ListContent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ListItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="TitleBarBtn.h">
@@ -109,6 +115,12 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="ListBarBtn.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="ListContent.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="ListItem.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
