@@ -21,13 +21,17 @@ public:
 	QColor yearBtnTodayHover;
 	QColor yearBtnTodayBorder;
 
-	QColor weekText;
-	QColor toolTipBg;
-	QColor toolTipText;
-	QColor menuBg;
-	QColor menuText;
-	QColor menuHover;
-	QColor hoverBg;
+	QColor week;
+	QColor day;
+	QColor dayHover;
+	QColor lunar;
+	QColor dayNotCurMonth;
+	QColor lunarNotCurMonth;
+	QColor dot;
+	QColor dayWorking;
+
+	QColor switchText;
+
 private:
 	void initBlack();
 	void initWhite();

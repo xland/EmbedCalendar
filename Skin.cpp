@@ -50,4 +50,15 @@ void Skin::initWhite()
 	yearBtnTodayHover = QColor(240, 44, 56, 51);
 	yearBtnTodayBorder = QColor(240, 44, 56, 255);
 	yearBtnToday = QColor(240, 44, 56, 255);
+
+	week = QColor(76, 79, 84);
+	day = QColor(31, 35, 41);
+	lunar = QColor(76, 79, 84);
+	dayNotCurMonth = QColor(102, 102, 102);
+	lunarNotCurMonth = QColor(102, 102, 102);
+	dot = QColor(102, 102, 102);
+	dayHover = QColor(255, 255, 255, 128);
+	dayWorking = QColor(0, 122, 255);
+
+	switchText = QColor(0, 122, 255);
 }

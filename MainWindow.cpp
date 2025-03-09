@@ -10,6 +10,8 @@
 #include "TitleBar.h"
 #include "YearBar.h"
 #include "WeekBar.h"
+#include "DayBtn.h"
+#include "SwitchBar.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -21,6 +23,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     auto titleBar = new TitleBar(this);
     auto yearBar = new YearBar(this);
     auto weekBar = new WeekBar(this);
+    for (int i=0;i<42;i++)
+    {
+        auto dayBtn = new DayBtn(i,this);
+    }
+    auto switchBar = new SwitchBar(this);
 
     //auto workerW = getWorkerW();
     //auto hwnd = (HWND)winId();

@@ -24,7 +24,7 @@ void YearBar::paintEvent(QPaintEvent* event)
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing, true);
 	painter.setRenderHint(QPainter::TextAntialiasing, true);
-	QFont font("Microsoft YaHei", 12);
+	QFont font("Microsoft YaHei", 16);
 	font.setStyleStrategy(QFont::PreferAntialias);
 	font.setHintingPreference(QFont::PreferNoHinting);
 	painter.setFont(font);
