@@ -1,5 +1,6 @@
 ﻿#include <QPainter>
 #include <QPainterPath>
+#include "Util.h"
 #include "Skin.h"
 #include "ListItem.h"
 
@@ -39,17 +40,15 @@ void ListItem::paintEvent(QPaintEvent* event)
     painter.drawPath(path); // 绘制路径
 
     painter.setRenderHint(QPainter::TextAntialiasing, true);
-    QFont font("Microsoft YaHei", 10);
-    font.setStyleStrategy(QFont::PreferAntialias);
-    font.setHintingPreference(QFont::PreferNoHinting);
-    painter.setFont(font);
+    auto font = Util::getTextFont(14);
+    painter.setFont(*font);
     painter.setBrush(Qt::NoBrush);
     auto skin = Skin::get();
     painter.setPen(skin->listItemText1);
     painter.drawText(QPoint(8, 16), QString::fromLocal8Bit("这是日程的标题，这是日程的标题"));
 
-    font.setPointSize(9);
-    painter.setFont(font);
+    font->setPixelSize(12);
+    painter.setFont(*font);
     painter.setPen(skin->listItemText2);
     painter.drawText(QPoint(8, 38), QString::fromLocal8Bit("12：12 这是日程的简介，这是日程的标题"));
 }

@@ -23,16 +23,15 @@ void DayBtn::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::TextAntialiasing, true);
     auto skin = Skin::get();
     if (isHover) {
         painter.setBrush(skin->dayHover);
         painter.setPen(Qt::NoPen);
         painter.drawEllipse(rect());
     }
-    painter.setRenderHint(QPainter::TextAntialiasing, true);
-    QFont font("Microsoft YaHei", 12);
-    font.setPixelSize(15);
-    painter.setFont(font);
+    auto font = Util::getTextFont(16);
+    painter.setFont(*font);
     painter.setBrush(Qt::NoBrush);
     painter.setPen(skin->day);
 
@@ -42,8 +41,8 @@ void DayBtn::paintEvent(QPaintEvent* event)
     option.setAlignment(Qt::AlignHCenter);
     painter.drawText(textRect, QString::number(index), option);
 
-    font.setPixelSize(10);
-    painter.setFont(font);
+    font->setPixelSize(10);
+    painter.setFont(*font);
     textRect.setTop(textRect.top() + 19);
     painter.setPen(skin->lunar);
     painter.drawText(textRect, QString::fromLocal8Bit("惊蛰"), option);

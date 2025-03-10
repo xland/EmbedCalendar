@@ -1,5 +1,6 @@
 ﻿#include <QRect>
 #include <QPainter>
+#include "Util.h"
 #include "Skin.h"
 #include "WeekBar.h"
 
@@ -26,10 +27,8 @@ void WeekBar::paintEvent(QPaintEvent* event)
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing, true);
 	painter.setRenderHint(QPainter::TextAntialiasing, true);
-	QFont font("Microsoft YaHei", 10);
-	font.setStyleStrategy(QFont::PreferAntialias);
-	font.setHintingPreference(QFont::PreferNoHinting);
-	painter.setFont(font);
+	auto font = Util::getTextFont(10);
+	painter.setFont(*font);
 	auto skin = Skin::get();
 	painter.setPen(skin->week);
 	auto w = width() / 7;

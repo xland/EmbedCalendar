@@ -13,3 +13,15 @@ QFont* Util::getIconFont()
     }();
     return &font;
 }
+
+QFont* Util::getTextFont(const int& fontSize)
+{
+    static QFont font = []() {
+        QFont font("Microsoft YaHei");
+        font.setStyleStrategy(QFont::PreferAntialias);
+        font.setHintingPreference(QFont::PreferNoHinting);
+        return font;
+        }();
+    font.setPixelSize(fontSize);
+    return &font;
+}

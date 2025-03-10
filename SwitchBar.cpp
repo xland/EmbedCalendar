@@ -21,10 +21,8 @@ void SwitchBar::paintEvent(QPaintEvent* event)
 	auto skin = Skin::get();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 	painter.setRenderHint(QPainter::TextAntialiasing, true);
-	QFont font("Microsoft YaHei", 12);
-	font.setStyleStrategy(QFont::PreferAntialias);
-	font.setHintingPreference(QFont::PreferNoHinting);
-	painter.setFont(font);
+	auto font = Util::getTextFont(16);
+	painter.setFont(*font);
 	painter.setBrush(Qt::NoBrush);
 	painter.setPen(skin->switchText);
 	auto flag = window()->height() > 480;

@@ -22,10 +22,8 @@ void ListBar::paintEvent(QPaintEvent* event)
 	auto skin = Skin::get();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 	painter.setRenderHint(QPainter::TextAntialiasing, true);
-	QFont font("Microsoft YaHei", 14);
-	font.setStyleStrategy(QFont::PreferAntialias);
-	font.setHintingPreference(QFont::PreferNoHinting);
-	painter.setFont(font);
+	auto font = Util::getTextFont(18);
+	painter.setFont(*font);
 	painter.setBrush(Qt::NoBrush);
 	painter.setPen(skin->switchText);
 	painter.drawText(rect(), Qt::AlignVCenter, QString::fromLocal8Bit("今天 七月廿一"));
