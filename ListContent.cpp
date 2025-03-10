@@ -31,7 +31,7 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 })");
 
     QWidget* contentWidget = new QWidget(this);
-    contentWidget->setStyleSheet(R"(background: transparent;margin:0px;padding:0px;)");
+    contentWidget->setStyleSheet(R"(background:transparent;margin:0px;padding:0px;)");
     QVBoxLayout* layout = new QVBoxLayout(contentWidget);
     layout->setMargin(0);
     layout->setSpacing(8);

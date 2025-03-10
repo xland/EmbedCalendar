@@ -1,8 +1,10 @@
 #include <QPaintEvent>
 #include <QPainter>
 
+#include "MainWindow.h"
 #include "Skin.h"
 #include "Util.h"
+#include "TipInfo.h"
 #include "ListItemBtn.h"
 
 ListItemBtn::ListItemBtn(const uint& code, QWidget* parent) : QWidget(parent), code{code}
@@ -22,11 +24,6 @@ void ListItemBtn::paintEvent(QPaintEvent* event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     auto skin = Skin::get();
-    if (isHover) {
-        painter.setBrush(skin->titleBtnHover);
-        painter.setPen(Qt::NoPen);
-        painter.drawRoundedRect(rect(), 2, 2);
-    }
     painter.setRenderHint(QPainter::TextAntialiasing, true);
     auto font = Util::getIconFont(14);
     painter.setFont(*font);
@@ -38,17 +35,18 @@ void ListItemBtn::paintEvent(QPaintEvent* event)
 
 void ListItemBtn::enterEvent(QEvent* event)
 {
-    if (!isHover) {
-        isHover = true;
-        update();
-    }
+    if (!isEnter) {
+        emit enter();
+        isEnter = true;
+    }    
 }
 
 void ListItemBtn::leaveEvent(QEvent* event)
 {
-    if (isHover) {
-        isHover = false;
-        update();
+    if (isEnter) {
+        auto win = (MainWindow*)window();
+        win->tipInfo->hide();
+        isEnter = false;
     }
 }
 

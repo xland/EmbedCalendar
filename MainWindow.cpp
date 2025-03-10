@@ -15,6 +15,7 @@
 #include "SwitchBar.h"
 #include "ListBar.h"
 #include "Util.h"
+#include "TipInfo.h"
 #include "ListContent.h"
 
 MainWindow::MainWindow(bool isEmbeded,QWidget *parent) : QMainWindow(parent), isEmbeded{ isEmbeded }
@@ -35,6 +36,7 @@ MainWindow::MainWindow(bool isEmbeded,QWidget *parent) : QMainWindow(parent), is
     listBar = new ListBar(this);
     listContent = new ListContent(this);
     switchBar = new SwitchBar(this);
+    tipInfo = new TipInfo(this);
     if (isEmbeded) {
         auto workerW = Util::getWorkerW();
         auto hwnd = (HWND)winId();

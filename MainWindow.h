@@ -9,6 +9,7 @@ class DayBtn;
 class SwitchBar;
 class ListBar;
 class ListContent;
+class TipInfo;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -25,11 +26,10 @@ public:
     ListBar* listBar;
     ListContent* listContent;
     SwitchBar* switchBar;
+    TipInfo* tipInfo;
 protected:
     void paintEvent(QPaintEvent* event) override;
     void closeEvent(QCloseEvent* event);
-private:
-    HWND getWorkerW();
 private:
     bool isEmbeded;
 };

@@ -2,6 +2,8 @@
 #include <QPainterPath>
 #include "Util.h"
 #include "Skin.h"
+#include "TipInfo.h"
+#include "MainWindow.h"
 #include "ListItemBtn.h"
 #include "ListItem.h"
 
@@ -9,10 +11,13 @@ ListItem::ListItem(QWidget *parent) : QWidget(parent)
 {
 	setFixedSize(parent->width()-8,44);
     auto w = parent->width();
-    auto delBtn = new ListItemBtn(0xe712, this);
-    delBtn->move(w-62, 10);
-    auto editBtn = new ListItemBtn(0xe707, this);
-    editBtn->move(w-34,10);
+    delBtn = new ListItemBtn(0xe712, this);
+    delBtn->move(w-34, 10);
+    editBtn = new ListItemBtn(0xe707, this);
+    editBtn->move(w-62,10);
+
+    connect(delBtn, &ListItemBtn::enter, this, &ListItem::enterDel);
+    connect(editBtn, &ListItemBtn::enter, this, &ListItem::enterEdit);
 }
 
 ListItem::~ListItem()
@@ -57,4 +62,20 @@ void ListItem::paintEvent(QPaintEvent* event)
     painter.setFont(*font);
     painter.setPen(skin->listItemText2);
     painter.drawText(QPoint(8, 38), QString::fromLocal8Bit("12：12 这是日程的简介，这是日程的标题"));
+}
+
+void ListItem::enterEdit()
+{
+    auto win = (MainWindow*)window();
+    auto pos = mapTo(win, editBtn->pos());
+    pos.setX(pos.x() - win->tipInfo->width());
+    win->tipInfo->showInfo(QString::fromLocal8Bit("编辑日程"), pos);
+}
+
+void ListItem::enterDel()
+{
+    auto win = (MainWindow*)window();
+    auto pos = mapTo(win, delBtn->pos());
+    pos.setX(pos.x() - win->tipInfo->width());
+    win->tipInfo->showInfo(QString::fromLocal8Bit("删除日程"), pos);
 }

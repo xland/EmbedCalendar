@@ -1,15 +1,26 @@
-#include <QPainter>
+﻿#include <QPainter>
 
+#include "Util.h"
 #include "Skin.h"
 #include "TipInfo.h"
 
 TipInfo::TipInfo(QWidget *parent) : QWidget(parent)
 {
+    setFixedSize(72,32);
+    setVisible(false);
+    setAttribute(Qt::WA_TransparentForMouseEvents);
 }
 
 TipInfo::~TipInfo()
 {
 	
+}
+
+void TipInfo::showInfo(const QString& text,const QPoint& pos)
+{
+    this->text = text;
+    move(pos);
+    this->show();
 }
 
 void TipInfo::paintEvent(QPaintEvent* event)
@@ -20,4 +31,9 @@ void TipInfo::paintEvent(QPaintEvent* event)
     painter.setBrush(skin->tipInfoBg);
     painter.setPen(Qt::NoPen);
     painter.drawRoundedRect(rect(), 4, 4);
+    painter.setBrush(Qt::NoBrush);
+    painter.setPen(skin->tipInfo);
+    auto font = Util::getTextFont(14);
+    painter.setFont(*font);
+    painter.drawText(rect(), Qt::AlignCenter, text);
 }

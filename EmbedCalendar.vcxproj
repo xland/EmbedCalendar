@@ -100,6 +100,7 @@
     <ClCompile Include="ListItemBtn.cpp" />
     <ClCompile Include="Skin.cpp" />
     <ClCompile Include="SwitchBar.cpp" />
+    <ClCompile Include="TipInfo.cpp" />
     <ClCompile Include="TitleBar.cpp" />
     <ClCompile Include="TitleBarBtn.cpp" />
     <ClCompile Include="Util.cpp" />
@@ -128,6 +129,7 @@
     <QtMoc Include="SwitchBar.h" />
     <QtMoc Include="DayBtn.h" />
     <ClInclude Include="Skin.h" />
+    <QtMoc Include="TipInfo.h" />
     <ClInclude Include="Util.h" />
     <QtMoc Include="YearBarBtnBase.h" />
     <QtMoc Include="YearBarBtnToday.h" />
