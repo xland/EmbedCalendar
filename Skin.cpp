@@ -39,6 +39,7 @@ void Skin::initBlack()
 
 void Skin::initWhite()
 {
+	bg = QColor(255, 255, 255, 153);
 	titleBtn = QColor(100, 106, 115);
 	titleBtnHover = QColor(0, 0, 0, 38);
 
@@ -65,4 +66,7 @@ void Skin::initWhite()
 	listItemText1 = QColor(31, 35, 41);
 	listItemText2 = QColor(102, 102, 102);
 	listItemBtn = QColor(76, 79, 84);
+
+	tipInfoBg = QColor(26, 26, 26);
+	tipInfo = QColor(255, 255, 255);
 }

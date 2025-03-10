@@ -47,5 +47,5 @@ void TitleBar::mouseReleaseEvent(QMouseEvent* event)
 void TitleBar::pinBtnClick()
 {
 	auto win = (MainWindow*)window();
-	win->embed();
+	win->switchEmbed();
 }

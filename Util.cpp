@@ -1,3 +1,4 @@
+
 #include "Util.h"
 
 QFont* Util::getIconFont(const int& fontSize)
@@ -24,4 +25,23 @@ QFont* Util::getTextFont(const int& fontSize)
         }();
     font.setPixelSize(fontSize);
     return &font;
+}
+
+HWND Util::getWorkerW()
+{
+    static HWND workerW;
+    if (!workerW) {
+        HWND progman = FindWindow(L"Progman", NULL);
+        SendMessage(progman, 0x052C, 0xD, 0);
+        SendMessage(progman, 0x052C, 0xD, 1);
+        EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL {
+            HWND defView = FindWindowEx(hwnd, NULL, L"SHELLDLL_DefView", NULL);
+            if (defView != NULL) {
+                auto tar = (HWND*)lParam;
+                *tar = FindWindowEx(NULL, hwnd, L"WorkerW", NULL);
+            }
+            return TRUE;
+            }, (LPARAM)&workerW);
+    }
+    return workerW;
 }

@@ -36,6 +36,9 @@ public:
 	QColor listItemText2;
 	QColor listItemBtn;
 
+	QColor tipInfo;
+	QColor tipInfoBg;
+
 private:
 	void initBlack();
 	void initWhite();

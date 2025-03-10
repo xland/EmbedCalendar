@@ -14,12 +14,14 @@
 #include "DayBtn.h"
 #include "SwitchBar.h"
 #include "ListBar.h"
+#include "Util.h"
 #include "ListContent.h"
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
+MainWindow::MainWindow(bool isEmbeded,QWidget *parent) : QMainWindow(parent), isEmbeded{ isEmbeded }
 {
 	setFixedSize(QSize(372, 730));
-	setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
+	setWindowFlag(Qt::FramelessWindowHint);
+    setAttribute(Qt::WA_QuitOnClose, false);
     setAttribute(Qt::WA_TranslucentBackground, true);
 
     Skin::init();
@@ -33,6 +35,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     listBar = new ListBar(this);
     listContent = new ListContent(this);
     switchBar = new SwitchBar(this);
+    if (isEmbeded) {
+        auto workerW = Util::getWorkerW();
+        auto hwnd = (HWND)winId();
+        SetParent(hwnd, workerW);
+    }
 
 }
 MainWindow::~MainWindow()
@@ -43,41 +50,20 @@ void MainWindow::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.setBrush(QColor(255, 255, 255, 153));
+    auto skin = Skin::get();
+    painter.setBrush(skin->bg);
     painter.setPen(Qt::NoPen);
     painter.drawRoundedRect(rect(), 4, 4);  
 }
 
-void MainWindow::embed()
+void MainWindow::closeEvent(QCloseEvent* event)
 {
-    RECT rect;
-    auto workerW = getWorkerW();
-    auto hwnd = (HWND)winId();
-    GetWindowRect(hwnd, &rect);
-    SetParent(hwnd, workerW);
+    deleteLater();
 }
 
-void MainWindow::unembed()
+void MainWindow::switchEmbed()
 {
-    auto hwnd = (HWND)winId();
-    SetParent(hwnd, nullptr);
-}
-
-HWND MainWindow::getWorkerW()
-{
-    static HWND workerW;
-    if (!workerW) {
-        HWND progman = FindWindow(L"Progman", NULL);
-        SendMessage(progman, 0x052C, 0xD, 0);
-        SendMessage(progman, 0x052C, 0xD, 1);
-        EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL {
-            HWND defView = FindWindowEx(hwnd, NULL, L"SHELLDLL_DefView", NULL);
-            if (defView != NULL) {
-                auto tar = (HWND*)lParam;
-                *tar = FindWindowEx(NULL, hwnd, L"WorkerW", NULL);
-            }
-            return TRUE;
-            }, (LPARAM)&workerW);
-    }
-    return workerW;
+    close();
+    auto win = new MainWindow(!isEmbeded);
+    win->show();
 }

@@ -14,10 +14,9 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(bool isEmbeded,QWidget *parent = nullptr);
     ~MainWindow();
-    void embed();
-    void unembed();
+    void switchEmbed();
 public:    
     TitleBar* titleBar;
     YearBar* yearBar;
@@ -28,8 +27,9 @@ public:
     SwitchBar* switchBar;
 protected:
     void paintEvent(QPaintEvent* event) override;
+    void closeEvent(QCloseEvent* event);
 private:
     HWND getWorkerW();
 private:
-
+    bool isEmbeded;
 };

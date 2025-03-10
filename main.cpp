@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 
     QApplication a(argc, argv);
-    MainWindow mainWindow;
-    mainWindow.show();
+    auto win = new MainWindow(false);
+    win->show();
     return a.exec();
 }
