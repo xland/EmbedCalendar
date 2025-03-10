@@ -27,6 +27,7 @@ QFont* Util::getTextFont(const int& fontSize)
     return &font;
 }
 
+
 HWND Util::getWorkerW()
 {
     static HWND workerW;

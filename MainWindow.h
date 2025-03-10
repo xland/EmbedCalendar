@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Windows.h"
 #include <QtWidgets/QMainWindow>
 
 class TitleBar;
@@ -18,6 +18,9 @@ public:
     MainWindow(bool isEmbeded,QWidget *parent = nullptr);
     ~MainWindow();
     void switchEmbed();
+
+    static LRESULT CALLBACK mouseProc(int nCode, WPARAM wParam, LPARAM lParam);
+    static RAWINPUT* getRawInput(HRAWINPUT lParam);
 public:    
     TitleBar* titleBar;
     YearBar* yearBar;
@@ -30,6 +33,9 @@ public:
 protected:
     void paintEvent(QPaintEvent* event) override;
     void closeEvent(QCloseEvent* event);
+private:
+    void embed();
+    static LRESULT CALLBACK processMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 private:
     bool isEmbeded;
 };
