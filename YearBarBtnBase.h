@@ -9,6 +9,8 @@ class YearBarBtnBase : public QWidget
 public:
 	YearBarBtnBase(QWidget *parent = nullptr);
 	~YearBarBtnBase();
+signals:
+	void enter();
 protected:
 	virtual void paintEvent(QPaintEvent* event) override;
 	void enterEvent(QEvent* event) override;

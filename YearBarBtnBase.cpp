@@ -1,6 +1,8 @@
 #include <QPaintEvent>
 #include <QPainter>
 
+#include "MainWindow.h"
+#include "TipInfo.h"
 #include "Skin.h"
 #include "Util.h"
 #include "YearBarBtnBase.h"
@@ -41,6 +43,7 @@ void YearBarBtnBase::enterEvent(QEvent* event)
     if (!isHover) {
         isHover = true;
         update();
+        emit enter();
     }    
 }
 
@@ -49,6 +52,8 @@ void YearBarBtnBase::leaveEvent(QEvent* event)
     if (isHover) {
         isHover = false;
         update();
+        auto win = (MainWindow*)window();
+        win->tipInfo->hide();
     }    
 }
 

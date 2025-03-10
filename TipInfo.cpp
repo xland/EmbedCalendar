@@ -6,7 +6,7 @@
 
 TipInfo::TipInfo(QWidget *parent) : QWidget(parent)
 {
-    setFixedSize(72,32);
+    
     setVisible(false);
     setAttribute(Qt::WA_TransparentForMouseEvents);
 }
@@ -19,8 +19,13 @@ TipInfo::~TipInfo()
 void TipInfo::showInfo(const QString& text,const QPoint& pos)
 {
     this->text = text;
+    auto font = Util::getTextFont(14);
+    QFontMetrics fm(*font);
+    int textAdvance = fm.horizontalAdvance(text);
+    setFixedSize(textAdvance+18, 32);
     move(pos);
     this->show();
+    this->raise();
 }
 
 void TipInfo::paintEvent(QPaintEvent* event)

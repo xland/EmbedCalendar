@@ -10,6 +10,7 @@ public:
 	~TitleBarBtn();
 signals:
 	void click();
+	void enter();
 protected:
 	void paintEvent(QPaintEvent* event) override;
 	void enterEvent(QEvent* event) override;

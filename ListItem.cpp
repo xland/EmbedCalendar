@@ -69,6 +69,7 @@ void ListItem::enterEdit()
     auto win = (MainWindow*)window();
     auto pos = mapTo(win, editBtn->pos());
     pos.setX(pos.x() - win->tipInfo->width());
+    pos.setY(pos.y() - 4);
     win->tipInfo->showInfo(QString::fromLocal8Bit("编辑日程"), pos);
 }
 
@@ -77,5 +78,6 @@ void ListItem::enterDel()
     auto win = (MainWindow*)window();
     auto pos = mapTo(win, delBtn->pos());
     pos.setX(pos.x() - win->tipInfo->width());
+    pos.setY(pos.y() - 4);
     win->tipInfo->showInfo(QString::fromLocal8Bit("删除日程"), pos);
 }

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <QMouseEvent>
 #include <QWidget>
 #include "TitleBarBtn.h"
@@ -15,6 +15,7 @@ protected:
 	void mouseReleaseEvent(QMouseEvent* event) override;
 private:
 	void pinBtnClick();
+	void enterPinBtn();
 private:
 	QPoint pressPos;
 	bool isDragging = false;

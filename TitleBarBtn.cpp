@@ -1,6 +1,8 @@
 #include <QPaintEvent>
 #include <QPainter>
 
+#include "MainWindow.h"
+#include "TipInfo.h"
 #include "Skin.h"
 #include "Util.h"
 #include "TitleBarBtn.h"
@@ -40,6 +42,7 @@ void TitleBarBtn::enterEvent(QEvent* event)
     if (!isHover) {
         isHover = true;
         update();
+        emit enter();
     }
 }
 
@@ -48,6 +51,8 @@ void TitleBarBtn::leaveEvent(QEvent* event)
     if (isHover) {
         isHover = false;
         update();
+        auto win = (MainWindow*)window();
+        win->tipInfo->hide();
     }
 }
 

@@ -13,6 +13,10 @@ public:
 protected:
 	void paintEvent(QPaintEvent* event) override;
 private:
+	void leftBtnEnter();
+	void rightBtnEnter();
+	void todayBtnEnter();
+private:
 	YearBarBtn* leftBtn;
 	YearBarBtn* rightBtn;
 	YearBarBtnToday* todayBtn;

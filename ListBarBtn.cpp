@@ -1,6 +1,8 @@
-#include <QPaintEvent>
+﻿#include <QPaintEvent>
 #include <QPainter>
 
+#include "MainWindow.h"
+#include "TipInfo.h"
 #include "Skin.h"
 #include "Util.h"
 #include "ListBarBtn.h"
@@ -34,7 +36,8 @@ void ListBarBtn::enterEvent(QEvent* event)
 {
     if (!isHover) {
         isHover = true;
-        update();
+        auto win = (MainWindow*)window();
+        win->tipInfo->showInfo(QString::fromLocal8Bit("新建日程"), QPoint(246,432));
     }
 }
 
@@ -42,14 +45,11 @@ void ListBarBtn::leaveEvent(QEvent* event)
 {
     if (isHover) {
         isHover = false;
-        update();
+        auto win = (MainWindow*)window();
+        win->tipInfo->hide();
     }
 }
 
 void ListBarBtn::mousePressEvent(QMouseEvent* event)
-{
-}
-
-void ListBarBtn::mouseReleaseEvent(QMouseEvent* event)
 {
 }
