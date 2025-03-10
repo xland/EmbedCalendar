@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QPaintEvent>
 #include <QPainter>
+#include <QDebug>
 
 #include "Skin.h"
 #include "MainWindow.h"
@@ -33,9 +34,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     listContent = new ListContent(this);
     switchBar = new SwitchBar(this);
 
-    //auto workerW = getWorkerW();
-    //auto hwnd = (HWND)winId();
-    //SetParent(hwnd, workerW);
 }
 MainWindow::~MainWindow()
 {
@@ -47,12 +45,22 @@ void MainWindow::paintEvent(QPaintEvent* event)
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setBrush(QColor(255, 255, 255, 153));
     painter.setPen(Qt::NoPen);
-    painter.drawRoundedRect(rect(), 4, 4);
-    QMainWindow::paintEvent(event);    
+    painter.drawRoundedRect(rect(), 4, 4);  
 }
 
 void MainWindow::embed()
 {
+    RECT rect;
+    auto workerW = getWorkerW();
+    auto hwnd = (HWND)winId();
+    GetWindowRect(hwnd, &rect);
+    SetParent(hwnd, workerW);
+}
+
+void MainWindow::unembed()
+{
+    auto hwnd = (HWND)winId();
+    SetParent(hwnd, nullptr);
 }
 
 HWND MainWindow::getWorkerW()

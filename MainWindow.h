@@ -16,6 +16,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void embed();
+    void unembed();
 public:    
     TitleBar* titleBar;
     YearBar* yearBar;
@@ -27,7 +29,6 @@ public:
 protected:
     void paintEvent(QPaintEvent* event) override;
 private:
-    void embed();
     HWND getWorkerW();
 private:
 

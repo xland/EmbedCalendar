@@ -53,8 +53,5 @@ void TitleBarBtn::leaveEvent(QEvent* event)
 
 void TitleBarBtn::mousePressEvent(QMouseEvent* event)
 {
-}
-
-void TitleBarBtn::mouseReleaseEvent(QMouseEvent* event)
-{
+    emit click();
 }

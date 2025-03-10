@@ -14,6 +14,8 @@ protected:
 	void mouseMoveEvent(QMouseEvent* event) override;
 	void mouseReleaseEvent(QMouseEvent* event) override;
 private:
+	void pinBtnClick();
+private:
 	QPoint pressPos;
 	bool isDragging = false;
 	TitleBarBtn* pinBtn;

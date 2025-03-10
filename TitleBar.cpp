@@ -1,4 +1,5 @@
 #include <QRect>
+#include "MainWindow.h"
 #include "TitleBar.h"
 
 TitleBar::TitleBar(QWidget *parent) : QWidget(parent)
@@ -7,6 +8,7 @@ TitleBar::TitleBar(QWidget *parent) : QWidget(parent)
 	setGeometry(0, 0, winWidth, 48);
 	pinBtn = new TitleBarBtn(0xe70c,this);
 	pinBtn->move(winWidth - 80, 10);
+	connect(pinBtn, &TitleBarBtn::click, this, &TitleBar::pinBtnClick);
 	menuBtn = new TitleBarBtn(0xe6e8,this);
 	menuBtn->move(winWidth - 45, 10);
 }
@@ -40,4 +42,10 @@ void TitleBar::mouseMoveEvent(QMouseEvent* event)
 void TitleBar::mouseReleaseEvent(QMouseEvent* event)
 {
 	isDragging = false;
+}
+
+void TitleBar::pinBtnClick()
+{
+	auto win = (MainWindow*)window();
+	win->embed();
 }
