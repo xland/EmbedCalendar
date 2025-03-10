@@ -2,6 +2,9 @@
 #include <QPainter>
 #include "Skin.h"
 #include "Util.h"
+#include "ListBar.h"
+#include "ListContent.h"
+#include "MainWindow.h"
 #include "SwitchBar.h"
 
 SwitchBar::SwitchBar(QWidget *parent) : QWidget(parent)
@@ -33,8 +36,7 @@ void SwitchBar::paintEvent(QPaintEvent* event)
 		code = QChar(0xe70f);
 	}
 	painter.drawText(QPoint(8,36), text);
-	auto fontIcon = Util::getIconFont();
-	fontIcon->setPixelSize(16);
+	auto fontIcon = Util::getIconFont(16);
 	painter.setFont(*fontIcon);
 	painter.drawText(QPoint(76, 36), code);
 }
@@ -43,13 +45,17 @@ void SwitchBar::mousePressEvent(QMouseEvent* event)
 {
 	if (event->button() == Qt::LeftButton) 
 	{
-		auto win = window();
+		auto win = (MainWindow*)window();
 		auto flag = win->height() > 480;
 		if (flag) {
 			win->setFixedHeight(480);
+			win->listBar->hide();
+			win->listContent->hide();
 		}
 		else {
 			win->setFixedHeight(730);
+			win->listBar->show();
+			win->listContent->show();
 		}
 		setGeometry(260, win->height() - 60, 104, 60);
 	}

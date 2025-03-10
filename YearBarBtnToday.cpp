@@ -24,8 +24,7 @@ void YearBarBtnToday::paintEvent(QPaintEvent* event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::TextAntialiasing, true);
     auto r = rect().adjusted(2, 2, -2, -2);
-    auto font = Util::getIconFont();
-    font->setPixelSize(12);
+    auto font = Util::getIconFont(12);
     painter.setFont(*font);
     painter.setPen(color);
     painter.drawText(r, Qt::AlignCenter, QString::fromLocal8Bit("今"));

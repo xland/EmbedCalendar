@@ -64,4 +64,5 @@ void Skin::initWhite()
 
 	listItemText1 = QColor(31, 35, 41);
 	listItemText2 = QColor(102, 102, 102);
+	listItemBtn = QColor(76, 79, 84);
 }

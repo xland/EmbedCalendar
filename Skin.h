@@ -34,6 +34,7 @@ public:
 
 	QColor listItemText1;
 	QColor listItemText2;
+	QColor listItemBtn;
 
 private:
 	void initBlack();

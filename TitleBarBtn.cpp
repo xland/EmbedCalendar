@@ -28,8 +28,7 @@ void TitleBarBtn::paintEvent(QPaintEvent* event)
         painter.drawRoundedRect(rect(), 2, 2);
     }
     painter.setRenderHint(QPainter::TextAntialiasing, true);
-    auto font = Util::getIconFont();
-    font->setPixelSize(18);
+    auto font = Util::getIconFont(18);
     painter.setFont(*font);
     painter.setPen(skin->titleBtn);
     painter.drawText(rect(), Qt::AlignCenter, QChar(code));

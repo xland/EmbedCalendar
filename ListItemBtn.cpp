@@ -7,7 +7,7 @@
 
 ListItemBtn::ListItemBtn(const uint& code, QWidget* parent) : QWidget(parent), code{code}
 {
-    setFixedSize(28, 28);
+    setFixedSize(26, 26);
     setMouseTracking(true);
     setCursor(Qt::CursorShape::PointingHandCursor);
 }
@@ -28,10 +28,10 @@ void ListItemBtn::paintEvent(QPaintEvent* event)
         painter.drawRoundedRect(rect(), 2, 2);
     }
     painter.setRenderHint(QPainter::TextAntialiasing, true);
-    auto font = Util::getIconFont();
-    font->setPixelSize(18);
+    auto font = Util::getIconFont(14);
     painter.setFont(*font);
-    painter.setPen(skin->titleBtn);
+    painter.setBrush(Qt::NoBrush);
+    painter.setPen(skin->listItemBtn);
     painter.drawText(rect(), Qt::AlignCenter, QChar(code));
 }
 

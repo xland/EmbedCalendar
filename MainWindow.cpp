@@ -22,16 +22,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     setAttribute(Qt::WA_TranslucentBackground, true);
 
     Skin::init();
-    auto titleBar = new TitleBar(this);
-    auto yearBar = new YearBar(this);
-    auto weekBar = new WeekBar(this);
+    titleBar = new TitleBar(this);
+    yearBar = new YearBar(this);
+    weekBar = new WeekBar(this);
     for (int i=0;i<42;i++)
     {
-        auto dayBtn = new DayBtn(i,this);
+        dayBtns.append(new DayBtn(i,this));
     }
-    auto listBar = new ListBar(this);
-    auto listContent = new ListContent(this);
-    auto switchBar = new SwitchBar(this);
+    listBar = new ListBar(this);
+    listContent = new ListContent(this);
+    switchBar = new SwitchBar(this);
 
     //auto workerW = getWorkerW();
     //auto hwnd = (HWND)winId();

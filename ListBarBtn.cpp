@@ -23,8 +23,7 @@ void ListBarBtn::paintEvent(QPaintEvent* event)
     painter.setRenderHint(QPainter::Antialiasing, true);
     auto skin = Skin::get();
     painter.setRenderHint(QPainter::TextAntialiasing, true);
-    auto font = Util::getIconFont();
-    font->setPixelSize(20);
+    auto font = Util::getIconFont(20);
     painter.setFont(*font);
     painter.setPen(skin->switchText);
     painter.drawText(rect(), Qt::AlignCenter, QChar(0xe70b));

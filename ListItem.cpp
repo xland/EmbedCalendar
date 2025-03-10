@@ -2,11 +2,17 @@
 #include <QPainterPath>
 #include "Util.h"
 #include "Skin.h"
+#include "ListItemBtn.h"
 #include "ListItem.h"
 
 ListItem::ListItem(QWidget *parent) : QWidget(parent)
 {
-	setFixedSize(parent->width()-10,44);
+	setFixedSize(parent->width()-8,44);
+    auto w = parent->width();
+    auto delBtn = new ListItemBtn(0xe712, this);
+    delBtn->move(w-62, 10);
+    auto editBtn = new ListItemBtn(0xe707, this);
+    editBtn->move(w-34,10);
 }
 
 ListItem::~ListItem()
