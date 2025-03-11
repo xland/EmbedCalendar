@@ -1,4 +1,5 @@
 #include <QScrollBar>
+#include "WsConn.h"
 #include "ListItem.h"
 #include "ListContent.h"
 
@@ -36,6 +37,9 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
     QVBoxLayout* layout = new QVBoxLayout(contentWidget);
     layout->setMargin(0);
     layout->setSpacing(8);
+
+    auto arr = WsConn::get()->data["scheduleList"].toArray();
+
     for (int i = 0; i < 13; ++i) {
         auto item = new ListItem(this);
         layout->addWidget(item);

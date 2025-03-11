@@ -34,7 +34,6 @@ namespace {
 
 MainWindow::MainWindow(bool isEmbeded,QWidget *parent) : QMainWindow(parent), isEmbeded{ isEmbeded }
 {
-	setFixedSize(QSize(372, 730));
 	setWindowFlag(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_QuitOnClose, false);
     setAttribute(Qt::WA_TranslucentBackground, true);
@@ -50,6 +49,15 @@ MainWindow::MainWindow(bool isEmbeded,QWidget *parent) : QMainWindow(parent), is
     }
     listBar = new ListBar(this);
     listContent = new ListContent(this);
+    auto flag = WsConn::get()->data["displayScheduleList"].toBool();
+    if (flag) {
+        setFixedSize(QSize(372, 730));
+    }
+    else {
+        listBar->hide();
+        listContent->hide();
+        setFixedSize(QSize(372, 480));
+    }
     switchBtn = new SwitchBtn(this);
     tipInfo = new TipInfo(this);
     if (isEmbeded) {
