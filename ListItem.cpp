@@ -18,6 +18,8 @@ ListItem::ListItem(QWidget *parent) : QWidget(parent)
 
     connect(delBtn, &ListItemBtn::enter, this, &ListItem::enterDel);
     connect(editBtn, &ListItemBtn::enter, this, &ListItem::enterEdit);
+    connect(delBtn, &ListItemBtn::leave, this, &ListItem::leaveBtn);
+    connect(editBtn, &ListItemBtn::leave, this, &ListItem::leaveBtn);
 }
 
 ListItem::~ListItem()
@@ -66,18 +68,34 @@ void ListItem::paintEvent(QPaintEvent* event)
 
 void ListItem::enterEdit()
 {
+    auto p = (QWidget*)(parent()->parent()->parent());
+    auto rect = p->geometry();
+    auto btnPos = editBtn->mapTo(window(), QPoint(0, 0));
+    if (!rect.contains(btnPos)) return;
     auto win = (MainWindow*)window();
+    win->tipInfo->setText(QString::fromLocal8Bit("编辑日程"));
     auto pos = mapTo(win, editBtn->pos());
     pos.setX(pos.x() - win->tipInfo->width());
     pos.setY(pos.y() - 4);
-    win->tipInfo->showInfo(QString::fromLocal8Bit("编辑日程"), pos);
+    win->tipInfo->showInfo(pos);
 }
 
 void ListItem::enterDel()
 {
+    auto p = (QWidget*)(parent()->parent()->parent());
+    auto rect = p->geometry();
+    auto btnPos = editBtn->mapTo(window(), QPoint(0, 0));
+    if (!rect.contains(btnPos)) return;
     auto win = (MainWindow*)window();
+    win->tipInfo->setText(QString::fromLocal8Bit("删除日程"));
     auto pos = mapTo(win, delBtn->pos());
     pos.setX(pos.x() - win->tipInfo->width());
     pos.setY(pos.y() - 4);
-    win->tipInfo->showInfo(QString::fromLocal8Bit("删除日程"), pos);
+    win->tipInfo->showInfo(pos);
+}
+
+void ListItem::leaveBtn()
+{
+    auto win = (MainWindow*)window();
+    win->tipInfo->hide();
 }

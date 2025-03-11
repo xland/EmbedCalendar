@@ -1,22 +1,16 @@
 #pragma once
 #include <QMouseEvent>
 #include <QWidget>
+#include "BtnBase.h"
 
-class TitleBarBtn : public QWidget
+class TitleBarBtn : public BtnBase
 {
 	Q_OBJECT
 public:
 	TitleBarBtn(const uint& code, QWidget *parent = nullptr);
 	~TitleBarBtn();
-signals:
-	void click();
-	void enter();
 protected:
 	void paintEvent(QPaintEvent* event) override;
-	void enterEvent(QEvent* event) override;
-	void leaveEvent(QEvent* event) override;
-	void mousePressEvent(QMouseEvent* event) override;
 private:
-	bool isHover{ false };
 	uint code;
 };

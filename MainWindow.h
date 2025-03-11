@@ -6,7 +6,7 @@ class TitleBar;
 class YearBar;
 class WeekBar;
 class DayBtn;
-class SwitchBar;
+class SwitchBtn;
 class ListBar;
 class ListContent;
 class TipInfo;
@@ -18,8 +18,6 @@ public:
     MainWindow(bool isEmbeded,QWidget *parent = nullptr);
     ~MainWindow();
     void switchEmbed();
-
-    static LRESULT CALLBACK mouseProc(int nCode, WPARAM wParam, LPARAM lParam);
     static RAWINPUT* getRawInput(HRAWINPUT lParam);
 public:    
     TitleBar* titleBar;
@@ -28,12 +26,17 @@ public:
     QList<DayBtn*> dayBtns;
     ListBar* listBar;
     ListContent* listContent;
-    SwitchBar* switchBar;
+    SwitchBtn* switchBtn;
     TipInfo* tipInfo;
+    bool isEnter{ false };
 protected:
     void paintEvent(QPaintEvent* event) override;
     void closeEvent(QCloseEvent* event);
 private:
+    void onEmbedMouseMove();
+    void onEmbedMousePress();
+    void onEmbedMouseWheel(const int& wheelData);
+    void onEmbedLeaveWindow();
     void embed();
     static LRESULT CALLBACK processMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 private:

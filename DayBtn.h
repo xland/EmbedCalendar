@@ -1,8 +1,9 @@
 #pragma once
 #include <QMouseEvent>
 #include <QWidget>
+#include "BtnBase.h"
 
-class DayBtn : public QWidget
+class DayBtn : public BtnBase
 {
 	Q_OBJECT
 public:
@@ -10,11 +11,6 @@ public:
 	~DayBtn();
 protected:
 	void paintEvent(QPaintEvent* event) override;
-	void enterEvent(QEvent* event) override;
-	void leaveEvent(QEvent* event) override;
-	void mousePressEvent(QMouseEvent* event) override;
-	void mouseReleaseEvent(QMouseEvent* event) override;
 private:
-	bool isHover{ false };
 	int index;
 };

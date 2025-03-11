@@ -10,6 +10,7 @@ TitleBar::TitleBar(QWidget *parent) : QWidget(parent)
 	pinBtn = new TitleBarBtn(0xe70c,this);
 	pinBtn->move(winWidth - 80, 10);
 	connect(pinBtn, &TitleBarBtn::enter, this, &TitleBar::enterPinBtn);
+	connect(pinBtn, &TitleBarBtn::leave, this, &TitleBar::leavePinBtn);
 	connect(pinBtn, &TitleBarBtn::click, this, &TitleBar::pinBtnClick);
 	menuBtn = new TitleBarBtn(0xe6e8,this);
 	menuBtn->move(winWidth - 45, 10);
@@ -55,5 +56,12 @@ void TitleBar::pinBtnClick()
 void TitleBar::enterPinBtn()
 {
 	auto win = (MainWindow*)window();
-	win->tipInfo->showInfo(QString::fromLocal8Bit("置顶"), QPoint(width()-128, 8));
+	win->tipInfo->setText(QString::fromLocal8Bit("置顶"));
+	win->tipInfo->showInfo(QPoint(width()-128, 8));
+}
+
+void TitleBar::leavePinBtn()
+{
+	auto win = (MainWindow*)window();
+	win->tipInfo->hide();
 }

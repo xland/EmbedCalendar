@@ -1,3 +1,4 @@
+#include <QScrollBar>
 #include "ListItem.h"
 #include "ListContent.h"
 
@@ -46,4 +47,11 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 ListContent::~ListContent()
 {
 	
+}
+
+void ListContent::scroll(const int& dis)
+{
+    //scrollContentsBy(0, dis/3);
+    auto bar = verticalScrollBar();
+    bar->setValue(bar->value()+(0- dis / 3));
 }

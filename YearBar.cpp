@@ -19,6 +19,9 @@ YearBar::YearBar(QWidget *parent) : QWidget(parent)
 	connect(leftBtn, &YearBarBtn::enter, this, &YearBar::leftBtnEnter);
 	connect(rightBtn, &YearBarBtn::enter, this, &YearBar::rightBtnEnter);
 	connect(todayBtn, &YearBarBtn::enter, this, &YearBar::todayBtnEnter);
+	connect(leftBtn, &YearBarBtn::leave, this, &YearBar::btnLeave);
+	connect(rightBtn, &YearBarBtn::leave, this, &YearBar::btnLeave);
+	connect(todayBtn, &YearBarBtn::leave, this, &YearBar::btnLeave);
 }
 
 YearBar::~YearBar()
@@ -41,17 +44,26 @@ void YearBar::paintEvent(QPaintEvent* event)
 void YearBar::leftBtnEnter()
 {
 	auto win = (MainWindow*)window();
-	win->tipInfo->showInfo(QString::fromLocal8Bit("上个月"), QPoint(78, 26));
+	win->tipInfo->setText(QString::fromLocal8Bit("上个月"));
+	win->tipInfo->showInfo(QPoint(78, 26));
 }
 
 void YearBar::rightBtnEnter()
 {
 	auto win = (MainWindow*)window();
-	win->tipInfo->showInfo(QString::fromLocal8Bit("下个月"), QPoint(238, 26));
+	win->tipInfo->setText(QString::fromLocal8Bit("下个月"));
+	win->tipInfo->showInfo(QPoint(238, 26));
 }
 
 void YearBar::todayBtnEnter()
 {
 	auto win = (MainWindow*)window();
-	win->tipInfo->showInfo(QString::fromLocal8Bit("今天"), QPoint(324,26));
+	win->tipInfo->setText(QString::fromLocal8Bit("今天"));
+	win->tipInfo->showInfo(QPoint(324,26));
+}
+
+void YearBar::btnLeave()
+{
+	auto win = (MainWindow*)window();
+	win->tipInfo->hide();
 }

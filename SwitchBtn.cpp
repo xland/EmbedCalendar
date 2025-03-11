@@ -5,20 +5,19 @@
 #include "ListBar.h"
 #include "ListContent.h"
 #include "MainWindow.h"
-#include "SwitchBar.h"
+#include "SwitchBtn.h"
 
-SwitchBar::SwitchBar(QWidget *parent) : QWidget(parent)
+SwitchBtn::SwitchBtn(QWidget *parent) : BtnBase(parent)
 {
 	setGeometry(260, parent->height()-60, 104, 60);
-	setCursor(Qt::CursorShape::PointingHandCursor);
 }
 
-SwitchBar::~SwitchBar()
+SwitchBtn::~SwitchBtn()
 {
 	
 }
 
-void SwitchBar::paintEvent(QPaintEvent* event)
+void SwitchBtn::paintEvent(QPaintEvent* event)
 {
 	QPainter painter(this);
 	auto skin = Skin::get();
@@ -41,7 +40,7 @@ void SwitchBar::paintEvent(QPaintEvent* event)
 	painter.drawText(QPoint(76, 36), code);
 }
 
-void SwitchBar::mousePressEvent(QMouseEvent* event)
+void SwitchBtn::mousePressEvent(QMouseEvent* event)
 {
 	if (event->button() == Qt::LeftButton) 
 	{

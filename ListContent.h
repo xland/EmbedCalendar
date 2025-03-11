@@ -9,5 +9,6 @@ class ListContent : public QScrollArea
 public:
 	ListContent(QWidget *parent = nullptr);
 	~ListContent();
+	void scroll(const int& dis);
 private:
 };

@@ -3,24 +3,18 @@
 #include <QWidget>
 #include <QColor>
 
-class YearBarBtnBase : public QWidget
+#include "BtnBase.h"
+
+class YearBarBtnBase : public BtnBase
 {
 	Q_OBJECT
 public:
 	YearBarBtnBase(QWidget *parent = nullptr);
 	~YearBarBtnBase();
-signals:
-	void enter();
 protected:
 	virtual void paintEvent(QPaintEvent* event) override;
-	void enterEvent(QEvent* event) override;
-	void leaveEvent(QEvent* event) override;
-	void mousePressEvent(QMouseEvent* event) override;
-	void mouseReleaseEvent(QMouseEvent* event) override;
 protected:
 	QColor hoverColor;
 	QColor borderColor;
 	QColor color;
-private:
-	bool isHover{false};
 };

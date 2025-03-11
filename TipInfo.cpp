@@ -16,13 +16,17 @@ TipInfo::~TipInfo()
 	
 }
 
-void TipInfo::showInfo(const QString& text,const QPoint& pos)
+void TipInfo::setText(const QString& text)
 {
     this->text = text;
     auto font = Util::getTextFont(14);
     QFontMetrics fm(*font);
     int textAdvance = fm.horizontalAdvance(text);
-    setFixedSize(textAdvance+18, 32);
+    setFixedSize(textAdvance + 18, 32);
+}
+
+void TipInfo::showInfo(const QPoint& pos)
+{
     move(pos);
     this->show();
     this->raise();

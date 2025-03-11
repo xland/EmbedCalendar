@@ -7,11 +7,9 @@
 #include "Util.h"
 #include "TitleBarBtn.h"
 
-TitleBarBtn::TitleBarBtn(const uint& code, QWidget* parent) : QWidget(parent), code{code}
+TitleBarBtn::TitleBarBtn(const uint& code, QWidget* parent) : BtnBase(parent), code{code}
 {
     setFixedSize(28, 28);
-    setMouseTracking(true);
-    setCursor(Qt::CursorShape::PointingHandCursor);
 }
 
 TitleBarBtn::~TitleBarBtn()
@@ -34,29 +32,4 @@ void TitleBarBtn::paintEvent(QPaintEvent* event)
     painter.setFont(*font);
     painter.setPen(skin->titleBtn);
     painter.drawText(rect(), Qt::AlignCenter, QChar(code));
-}
-
-
-void TitleBarBtn::enterEvent(QEvent* event)
-{
-    if (!isHover) {
-        isHover = true;
-        update();
-        emit enter();
-    }
-}
-
-void TitleBarBtn::leaveEvent(QEvent* event)
-{
-    if (isHover) {
-        isHover = false;
-        update();
-        auto win = (MainWindow*)window();
-        win->tipInfo->hide();
-    }
-}
-
-void TitleBarBtn::mousePressEvent(QMouseEvent* event)
-{
-    emit click();
 }

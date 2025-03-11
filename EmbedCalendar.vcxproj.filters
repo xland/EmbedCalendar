@@ -67,7 +67,7 @@
     <ClCompile Include="DayBtn.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SwitchBar.cpp">
+    <ClCompile Include="SwitchBtn.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ListBar.cpp">
@@ -86,6 +86,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TipInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BtnBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -114,7 +117,7 @@
     <QtMoc Include="DayBtn.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="SwitchBar.h">
+    <QtMoc Include="SwitchBtn.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="ListBar.h">
@@ -133,6 +136,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="TipInfo.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="BtnBase.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

@@ -7,7 +7,7 @@
 #include "Util.h"
 #include "YearBarBtnBase.h"
 
-YearBarBtnBase::YearBarBtnBase(QWidget* parent) : QWidget(parent)
+YearBarBtnBase::YearBarBtnBase(QWidget* parent) : BtnBase(parent)
 {
     auto skin = Skin::get();
     hoverColor = skin->yearBtnHover;
@@ -36,31 +36,4 @@ void YearBarBtnBase::paintEvent(QPaintEvent* event)
     painter.setBrush(Qt::NoBrush);
     painter.setPen(borderColor);
     painter.drawEllipse(r);
-}
-
-void YearBarBtnBase::enterEvent(QEvent* event)
-{
-    if (!isHover) {
-        isHover = true;
-        update();
-        emit enter();
-    }    
-}
-
-void YearBarBtnBase::leaveEvent(QEvent* event)
-{
-    if (isHover) {
-        isHover = false;
-        update();
-        auto win = (MainWindow*)window();
-        win->tipInfo->hide();
-    }    
-}
-
-void YearBarBtnBase::mousePressEvent(QMouseEvent* event)
-{
-}
-
-void YearBarBtnBase::mouseReleaseEvent(QMouseEvent* event)
-{
 }

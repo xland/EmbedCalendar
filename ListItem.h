@@ -14,6 +14,7 @@ protected:
 private:
 	void enterEdit();
 	void enterDel();
+	void leaveBtn();
 private:
 	ListItemBtn* editBtn;
 	ListItemBtn* delBtn;

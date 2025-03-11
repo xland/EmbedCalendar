@@ -16,6 +16,7 @@ protected:
 private:
 	void pinBtnClick();
 	void enterPinBtn();
+	void leavePinBtn();
 private:
 	QPoint pressPos;
 	bool isDragging = false;

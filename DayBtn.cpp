@@ -5,7 +5,7 @@
 #include "Util.h"
 #include "DayBtn.h"
 
-DayBtn::DayBtn(const int& index, QWidget* parent) : QWidget(parent), index{index}
+DayBtn::DayBtn(const int& index, QWidget* parent) : BtnBase(parent), index{index}
 {
     int lineNum = index / 7;
     int colNum = index % 7;
@@ -57,29 +57,4 @@ void DayBtn::paintEvent(QPaintEvent* event)
     painter.setBrush(skin->dot);
     painter.setPen(Qt::NoPen);
     painter.drawEllipse(r2);
-}
-
-
-void DayBtn::enterEvent(QEvent* event)
-{
-    if (!isHover) {
-        isHover = true;
-        update();
-    }
-}
-
-void DayBtn::leaveEvent(QEvent* event)
-{
-    if (isHover) {
-        isHover = false;
-        update();
-    }
-}
-
-void DayBtn::mousePressEvent(QMouseEvent* event)
-{
-}
-
-void DayBtn::mouseReleaseEvent(QMouseEvent* event)
-{
 }

@@ -9,7 +9,8 @@ class TipInfo : public QWidget
 public:
 	TipInfo(QWidget *parent = nullptr);
 	~TipInfo();
-	void showInfo(const QString& text, const QPoint& pos);
+	void showInfo(const QPoint& pos);
+	void setText(const QString& text);
 protected:
 	void paintEvent(QPaintEvent* event) override;
 private:
