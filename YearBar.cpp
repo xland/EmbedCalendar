@@ -1,6 +1,7 @@
 ﻿#include <QRect>
 #include <QPainter>
 
+#include "WsConn.h"
 #include "MainWindow.h"
 #include "TipInfo.h"
 #include "Util.h"
@@ -38,26 +39,30 @@ void YearBar::paintEvent(QPaintEvent* event)
 	painter.setFont(*font);
 	auto skin = Skin::get();
 	painter.setPen(skin->year);
-	painter.drawText(rect(), Qt::AlignCenter, QString::fromLocal8Bit("2024年8月"));
+	auto str = WsConn::get()->data["activeDateMonth"].toString();
+	painter.drawText(rect(), Qt::AlignCenter, str);
 }
 
 void YearBar::leftBtnEnter()
 {
 	auto win = (MainWindow*)window();
-	win->tipInfo->setText(QString::fromLocal8Bit("上个月"));
+	auto str = WsConn::get()->data["lang"].toObject()["prevMonth"].toString();
+	win->tipInfo->setText(str);
 	win->tipInfo->showInfo(QPoint(78, 26));
 }
 
 void YearBar::rightBtnEnter()
 {
 	auto win = (MainWindow*)window();
-	win->tipInfo->setText(QString::fromLocal8Bit("下个月"));
+	auto str = WsConn::get()->data["lang"].toObject()["nextMonth"].toString();
+	win->tipInfo->setText(str);
 	win->tipInfo->showInfo(QPoint(238, 26));
 }
 
 void YearBar::todayBtnEnter()
 {
 	auto win = (MainWindow*)window();
+	//auto str = WsConn::get()->data["lang"].toObject()["embed"].toString();
 	win->tipInfo->setText(QString::fromLocal8Bit("今天"));
 	win->tipInfo->showInfo(QPoint(324,26));
 }

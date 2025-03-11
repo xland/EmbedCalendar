@@ -1,5 +1,7 @@
 ﻿#include <QRect>
 #include <QPainter>
+#include <QJsonArray>
+#include "WsConn.h"
 #include "Util.h"
 #include "Skin.h"
 #include "WeekBar.h"
@@ -8,13 +10,11 @@ WeekBar::WeekBar(QWidget *parent) : QWidget(parent)
 {
 	auto winWidth = parent->width();
 	setGeometry(11, 100, winWidth-22, 28);
-	list.append(QString::fromLocal8Bit("一"));
-	list.append(QString::fromLocal8Bit("二"));
-	list.append(QString::fromLocal8Bit("三"));
-	list.append(QString::fromLocal8Bit("四"));
-	list.append(QString::fromLocal8Bit("五"));
-	list.append(QString::fromLocal8Bit("六"));
-	list.append(QString::fromLocal8Bit("七"));
+	auto arr = WsConn::get()->data["weekLables"].toArray();
+	for (int i = 0; i < arr.size(); i++)
+	{
+		list.append(arr[i].toString());
+	}
 }
 
 WeekBar::~WeekBar()

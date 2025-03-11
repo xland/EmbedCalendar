@@ -14,11 +14,12 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-public:
-    MainWindow(bool isEmbeded,QWidget *parent = nullptr);
+public:    
     ~MainWindow();
     void switchEmbed();
     static RAWINPUT* getRawInput(HRAWINPUT lParam);
+    static void init();
+    static MainWindow* get();
 public:    
     TitleBar* titleBar;
     YearBar* yearBar;
@@ -33,6 +34,7 @@ protected:
     void paintEvent(QPaintEvent* event) override;
     void closeEvent(QCloseEvent* event);
 private:
+    MainWindow(bool isEmbeded, QWidget* parent = nullptr);
     void onEmbedMouseMove();
     void onEmbedMousePress();
     void onEmbedMouseWheel(const int& wheelData);

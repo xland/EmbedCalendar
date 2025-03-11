@@ -4,6 +4,7 @@
 #include "TipInfo.h"
 #include "Skin.h"
 #include "Util.h"
+#include "WsConn.h"
 #include "ListBar.h"
 #include "ListBarBtn.h"
 
@@ -30,13 +31,15 @@ void ListBar::paintEvent(QPaintEvent* event)
 	painter.setFont(*font);
 	painter.setBrush(Qt::NoBrush);
 	painter.setPen(skin->switchText);
-	painter.drawText(rect(), Qt::AlignVCenter, QString::fromLocal8Bit("今天 七月廿一"));
+	auto str = WsConn::get()->data["activeDateDay"].toString();
+	painter.drawText(rect(), Qt::AlignVCenter, str);
 }
 
 void ListBar::btnEnter()
 {
 	auto win = (MainWindow*)window();
-	win->tipInfo->setText(QString::fromLocal8Bit("新建日程"));
+	auto str = WsConn::get()->data["lang"].toObject()["createSchedule"].toString();
+	win->tipInfo->setText(str);
 	win->tipInfo->showInfo(QPoint(246, 432));
 }
 

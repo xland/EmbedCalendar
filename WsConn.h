@@ -8,12 +8,16 @@ class WsConn : public QObject
 {
 	Q_OBJECT
 public:
-	WsConn(QObject* parent=nullptr);
 	~WsConn();
-	void startConnect();
+	static void init();
+	static WsConn* get();
+public:
+	QJsonObject data;
 signals:
 	void sendMsg(QString message);
 private:
+	WsConn(QObject* parent = nullptr);
+	void startConnect();
 	void wsMsgReceived(const QString& message);
 	void wsDisconnected();
 	void wsConnected();

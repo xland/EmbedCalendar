@@ -1,13 +1,12 @@
 #pragma once
 #include <QColor>
-class Skin
+class Skin : public QObject
 {
 public:
-	Skin() = default;
-	~Skin() = default;
+	~Skin();
 	static void init();
 	static Skin* get();
-	//void SetData(rapidjson::Value& data);
+	void setData();
 public:
 	QColor bg;
 	QColor titleBtn;
@@ -40,6 +39,7 @@ public:
 	QColor tipInfoBg;
 
 private:
+	Skin(QObject* parent = nullptr);
 	void initBlack();
 	void initWhite();
 };

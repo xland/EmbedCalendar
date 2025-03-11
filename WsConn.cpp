@@ -3,11 +3,16 @@
 #include <QJsonArray>
 #include <QTimer>
 
+#include "Skin.h"
 #include "WsConn.h"
+#include "MainWindow.h"
+
+namespace {
+    WsConn* conn;
+}
 
 WsConn::WsConn(QObject* parent) : QObject(parent)
 {
-    startConnect();
 }
 
 WsConn::~WsConn()
@@ -39,6 +44,17 @@ void WsConn::startConnect()
     wsClient->open(url);
 }
 
+void WsConn::init()
+{
+    conn = new WsConn(qApp);
+    conn->startConnect();
+}
+
+WsConn* WsConn::get()
+{
+    return conn;
+}
+
 void WsConn::wsMsgReceived(const QString& message)
 {
     qDebug() << "receive one msg:" << message;
@@ -50,13 +66,9 @@ void WsConn::wsMsgReceived(const QString& message)
         qWarning() << message;
         return;
     }
-    auto obj = jd.object();
-    if (obj["type"].toString() == "addTask") {
-        auto arr = obj["tasks"].toArray();
-    }
-    else if (obj["type"].toString() == "execCmd") {
-        auto arr = obj["cmds"].toArray();
-    }
+    data = jd.object()["data"].toObject();
+    Skin::init();
+    MainWindow::init();
 }
 
 void WsConn::wsError(QAbstractSocket::SocketError error)

@@ -2,6 +2,7 @@
 #include "MainWindow.h"
 #include "TipInfo.h"
 #include "TitleBar.h"
+#include "WsConn.h"
 
 TitleBar::TitleBar(QWidget *parent) : QWidget(parent)
 {
@@ -56,7 +57,8 @@ void TitleBar::pinBtnClick()
 void TitleBar::enterPinBtn()
 {
 	auto win = (MainWindow*)window();
-	win->tipInfo->setText(QString::fromLocal8Bit("置顶"));
+	auto str = WsConn::get()->data["lang"].toObject()["embed"].toString();
+	win->tipInfo->setText(str);
 	win->tipInfo->showInfo(QPoint(width()-128, 8));
 }
 

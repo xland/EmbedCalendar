@@ -1,12 +1,18 @@
 ﻿#include <QPaintEvent>
 #include <QPainter>
+#include <QJsonArray>
 
+#include "WsConn.h"
 #include "Skin.h"
 #include "Util.h"
 #include "DayBtn.h"
 
-DayBtn::DayBtn(const int& index, QWidget* parent) : BtnBase(parent), index{index}
+DayBtn::DayBtn(const int& index, const QJsonObject& obj, QWidget* parent) : BtnBase(parent), index{index}
 {
+    day = QString::number(obj["date"].toInt());
+    lunar = obj["lunarInfo"].toString();
+    docStatus = obj["docStatus"].toString();
+    hasSchdule = obj["hasSchdule"].toBool();
     int lineNum = index / 7;
     int colNum = index % 7;
     setGeometry(colNum * 44+14+6*colNum, lineNum * 44+136 + 4 * lineNum, 44, 44);
@@ -39,19 +45,19 @@ void DayBtn::paintEvent(QPaintEvent* event)
     textRect.setTop(textRect.top() + 4);
     QTextOption option;
     option.setAlignment(Qt::AlignHCenter);
-    painter.drawText(textRect, QString::number(index), option);
+    painter.drawText(textRect, day, option);
 
     font->setPixelSize(10);
     painter.setFont(*font);
     textRect.setTop(textRect.top() + 19);
     painter.setPen(skin->lunar);
-    painter.drawText(textRect, QString::fromLocal8Bit("惊蛰"), option);
+    painter.drawText(textRect, lunar, option);
 
     QRect r1 = rect();
     auto x = r1.right() - 11;
     auto y = r1.top() + 14;
     painter.setPen(skin->dayWorking);
-    painter.drawText(QPoint(x, y), QString::fromLocal8Bit("休"));
+    painter.drawText(QPoint(x, y), docStatus);
 
     QRect r2(textRect.width() / 2 - 2, textRect.bottom() - 4, 4, 4);
     painter.setBrush(skin->dot);

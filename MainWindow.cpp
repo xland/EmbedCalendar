@@ -10,6 +10,7 @@
 #include <QEvent>
 #include <QTimer>
 #include <QApplication>
+#include <QJsonArray>
 
 #include "Skin.h"
 #include "MainWindow.h"
@@ -22,10 +23,12 @@
 #include "ListBar.h"
 #include "Util.h"
 #include "TipInfo.h"
+#include "WsConn.h"
 #include "ListContent.h"
 
 namespace {
     WNDPROC oldProc;
+    MainWindow* win;
 }
 
 
@@ -35,13 +38,15 @@ MainWindow::MainWindow(bool isEmbeded,QWidget *parent) : QMainWindow(parent), is
 	setWindowFlag(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_QuitOnClose, false);
     setAttribute(Qt::WA_TranslucentBackground, true);
-    Skin::init();
     titleBar = new TitleBar(this);
     yearBar = new YearBar(this);
     weekBar = new WeekBar(this);
-    for (int i=0;i<42;i++)
+    auto arr = WsConn::get()->data["viewData"].toArray();
+    for (int i=0;i<arr.size();i++)
     {
-        dayBtns.append(new DayBtn(i,this));
+        auto obj = arr[i].toObject();
+        auto day = new DayBtn(i, obj,this);
+        dayBtns.append(day);
     }
     listBar = new ListBar(this);
     listContent = new ListContent(this);
@@ -82,7 +87,7 @@ void MainWindow::switchEmbed()
     }
     auto pos = this->pos();
     close();
-    auto win = new MainWindow(!isEmbeded);
+    win = new MainWindow(!isEmbeded);
     win->move(pos);
     win->show();
 }
@@ -152,8 +157,8 @@ void MainWindow::embed()
 
 LRESULT CALLBACK MainWindow::processMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    auto win = (MainWindow*)QApplication::topLevelWidgets().first();
-    if (uMsg != WM_INPUT || !win ) {
+    //auto win = (MainWindow*)QApplication::topLevelWidgets().first();  //  || !win 
+    if (uMsg != WM_INPUT ) {
         return CallWindowProc(oldProc, hWnd, uMsg, wParam, lParam);
     }
     POINT globalPos;
@@ -209,4 +214,17 @@ RAWINPUT* MainWindow::getRawInput(HRAWINPUT lParam) {
     static BYTE lpb[sizeof(RAWINPUT)];
     GetRawInputData((HRAWINPUT)lParam, RID_INPUT, lpb, &dwSize, sizeof(RAWINPUTHEADER));
     return (RAWINPUT*)lpb;
+}
+
+void MainWindow::init()
+{
+    auto& data = WsConn::get()->data;
+    auto flag = data["hasEmbed"].toBool();
+    win = new MainWindow(flag);
+    win->show();
+}
+
+MainWindow* MainWindow::get()
+{
+    return win;
 }
