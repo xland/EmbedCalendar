@@ -6,6 +6,7 @@
 class Util
 {
 public:
+	static void initDebuger();
 	static QFont* getIconFont(const int& fontSize);
 	static QFont* getTextFont(const int& fontSize);
 	static HWND getWorkerW();

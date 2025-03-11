@@ -91,6 +91,9 @@
     <ClCompile Include="BtnBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WsConn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="TitleBarBtn.h">
@@ -139,6 +142,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="BtnBase.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="WsConn.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
