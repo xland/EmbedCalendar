@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QWidget>
 class ListItemBtn;
@@ -8,10 +8,17 @@ class ListItem : public QWidget
 	Q_OBJECT
 
 public:
-	ListItem(const QJsonObject& obj, QWidget *parent = nullptr);
+	ListItem(QWidget *parent = nullptr);
 	~ListItem();
+	QString title;
+	QString desc;
+	QColor calendarColor;
+	QString editTip;
+	QString delTip;
 protected:
 	void paintEvent(QPaintEvent* event) override;
+	void enterEvent(QEvent* event) override;
+	void leaveEvent(QEvent* event) override;
 private:
 	void enterEdit();
 	void enterDel();
@@ -19,10 +26,5 @@ private:
 private:
 	ListItemBtn* editBtn;
 	ListItemBtn* delBtn;
-	QString title;
-	QString desc;
-	bool isAllowEdit;
-	QColor calendarColor;
-	QString calendarNo;
-	QString scheduleNo;
+	bool isHover{ false };
 };

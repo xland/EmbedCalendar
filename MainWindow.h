@@ -21,10 +21,7 @@ public:
     static RAWINPUT* getRawInput(HRAWINPUT lParam);
     static void init();
     static MainWindow* get();
-    void updateData();
 public:    
-    TitleBar* titleBar;
-    YearBar* yearBar;
     WeekBar* weekBar;
     QList<DayBtn*> dayBtns;
     ListBar* listBar;
@@ -34,9 +31,9 @@ public:
     bool isEnter{ false };
 protected:
     void paintEvent(QPaintEvent* event) override;
-    void closeEvent(QCloseEvent* event);
 private:
-    MainWindow(bool isEmbeded, QWidget* parent = nullptr);
+    MainWindow(const QJsonObject& obj, QWidget* parent = nullptr);
+    void updateData(const QJsonObject& obj);
     void onEmbedMouseMove();
     void onEmbedMousePress();
     void onEmbedMouseWheel(const int& wheelData);
@@ -44,5 +41,5 @@ private:
     void embed();
     static LRESULT CALLBACK processMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 private:
-    bool isEmbeded;
+    
 };

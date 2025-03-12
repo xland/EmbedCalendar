@@ -10,15 +10,20 @@ class DayBtn : public BtnBase
 public:
 	DayBtn(const int& index,QWidget *parent = nullptr);
 	~DayBtn();
-public:
-	QString day;
-	QString lunar;
-	QString docStatus;
-	bool hasSchdule;
+	void updateData(const QJsonObject& obj);
 protected:
 	void paintEvent(QPaintEvent* event) override;
 private:
 	void onClick();
 private:
 	int index;
+	int year;
+	int month;
+	int date;
+	QString lunar;
+	QString docStatus;
+	bool hasSchdule;
+	bool isActive;
+	bool isToday;
+	bool isCurMonth;
 };

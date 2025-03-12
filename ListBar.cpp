@@ -8,20 +8,39 @@
 #include "ListBar.h"
 #include "ListBarBtn.h"
 
+ListBar* listBar;
+
+
 ListBar::ListBar(QWidget *parent) : QWidget(parent)
 {
 	setGeometry(20, 436, parent->width()-40, 26);
 	btn = new ListBarBtn(this);
 	connect(btn, &ListBarBtn::enter, this, &ListBar::btnEnter);
 	connect(btn, &ListBarBtn::leave, this, &ListBar::btnLeave);
-	if (parent->height() < 730) {
-		setVisible(false);
-	}
+	connect(btn, &ListBarBtn::click, this, &ListBar::btnClick);
 }
 
 ListBar::~ListBar()
 {
-	
+	listBar = nullptr;
+}
+
+void ListBar::init()
+{
+	connect(WsConn::get(), &WsConn::onData, [](const QJsonObject& obj) {
+		if (!listBar) {
+			listBar = new ListBar(MainWindow::get());
+		}
+		auto lang = obj["lang"].toObject();
+		listBar->activeDateDay = obj["activeDateDay"].toString();
+		listBar->tipInfo = obj["lang"].toObject()["createSchedule"].toString();
+		if (obj["displayScheduleList"].toBool()) {
+			listBar->show();
+		}
+		else {
+			listBar->hide();
+		}		
+	});
 }
 
 void ListBar::paintEvent(QPaintEvent* event)
@@ -34,15 +53,13 @@ void ListBar::paintEvent(QPaintEvent* event)
 	painter.setFont(*font);
 	painter.setBrush(Qt::NoBrush);
 	painter.setPen(skin->switchText);
-	auto str = WsConn::get()->data["activeDateDay"].toString();
-	painter.drawText(rect(), Qt::AlignVCenter, str);
+	painter.drawText(rect(), Qt::AlignVCenter, activeDateDay);
 }
 
 void ListBar::btnEnter()
 {
 	auto win = (MainWindow*)window();
-	auto str = WsConn::get()->data["lang"].toObject()["createSchedule"].toString();
-	win->tipInfo->setText(str);
+	win->tipInfo->setText(tipInfo);
 	win->tipInfo->showInfo(QPoint(246, 432));
 }
 
@@ -50,4 +67,10 @@ void ListBar::btnLeave()
 {
 	auto win = (MainWindow*)window();
 	win->tipInfo->hide();
+}
+
+void ListBar::btnClick()
+{
+	QString msg{ R"({"msgType":"EmbedCalendar","msgName":"createSchedule"})" };
+	WsConn::get()->sendMsg(msg);
 }

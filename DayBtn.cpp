@@ -23,18 +23,21 @@ DayBtn::~DayBtn()
 	
 }
 
+void DayBtn::updateData(const QJsonObject& obj)
+{
+    year = obj["year"].toInt();
+    month = obj["month"].toInt();
+    date = obj["date"].toInt();
+    lunar = obj["lunarInfo"].toString();
+    docStatus = obj["docStatus"].toString();
+    hasSchdule = obj["hasSchdule"].toBool();
+    isActive = obj["isActive"].toBool();
+    isToday = obj["isToday"].toBool();
+    isCurMonth = obj["type"].toString() == "currt";
+}
+
 void DayBtn::paintEvent(QPaintEvent* event)
 {
-    auto arr = WsConn::get()->data["viewData"].toArray();
-    auto obj = arr[index].toObject();
-    auto day = QString::number(obj["date"].toInt());
-    auto lunar = obj["lunarInfo"].toString();
-    auto docStatus = obj["docStatus"].toString();
-    auto hasSchdule = obj["hasSchdule"].toBool();
-    auto isActive = obj["isActive"].toBool();
-    auto isToday = obj["isToday"].toBool();
-    auto isCurMonth = obj["type"].toString() == "currt";
-
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setRenderHint(QPainter::TextAntialiasing, true);
@@ -70,7 +73,7 @@ void DayBtn::paintEvent(QPaintEvent* event)
     textRect.setTop(textRect.top() + 4);
     QTextOption option;
     option.setAlignment(Qt::AlignHCenter);
-    painter.drawText(textRect, day, option);
+    painter.drawText(textRect, QString::number(date), option);
 
     font->setPixelSize(10);
     painter.setFont(*font);
@@ -113,9 +116,7 @@ void DayBtn::paintEvent(QPaintEvent* event)
 
 void DayBtn::onClick()
 {
-    auto arr = WsConn::get()->data["viewData"].toArray();
-    auto obj = arr[index].toObject();
     QString msg{ R"({"msgType":"EmbedCalendar","msgName":"changeDate","data":{"year":%1,"month":%2,"date":%3}})" };
-    msg = msg.arg(obj["year"].toInt()).arg(obj["month"].toInt()).arg(obj["date"].toInt());
+    msg = msg.arg(year).arg(month).arg(date);
     WsConn::get()->sendMsg(msg);
 }

@@ -8,6 +8,9 @@
 #include "Skin.h"
 #include "YearBar.h"
 
+YearBar* yearBar;
+
+
 YearBar::YearBar(QWidget *parent) : QWidget(parent)
 {
 	setGeometry(0, 48, 372, 44);
@@ -19,7 +22,6 @@ YearBar::YearBar(QWidget *parent) : QWidget(parent)
 	todayBtn->move(335, 12);
 	connect(leftBtn, &YearBarBtn::enter, this, &YearBar::leftBtnEnter);
 	connect(rightBtn, &YearBarBtn::enter, this, &YearBar::rightBtnEnter);
-	connect(todayBtn, &YearBarBtn::enter, this, &YearBar::todayBtnEnter);
 
 
 	connect(leftBtn, &YearBarBtn::click, this, &YearBar::leftBtnClick);
@@ -33,7 +35,21 @@ YearBar::YearBar(QWidget *parent) : QWidget(parent)
 
 YearBar::~YearBar()
 {
-	
+	yearBar = nullptr;
+}
+
+void YearBar::init()
+{
+	connect(WsConn::get(), &WsConn::onData, [](const QJsonObject& obj) {
+		if (!yearBar) {
+			yearBar = new YearBar(MainWindow::get());
+		}
+		auto lang = obj["lang"].toObject();
+		yearBar->leftTip = lang["prevMonth"].toString();
+		yearBar->rightTip = lang["nextMonth"].toString();
+		yearBar->activeDateMonth = obj["activeDateMonth"].toString();
+		yearBar->show();
+		});
 }
 
 void YearBar::paintEvent(QPaintEvent* event)
@@ -45,32 +61,21 @@ void YearBar::paintEvent(QPaintEvent* event)
 	painter.setFont(*font);
 	auto skin = Skin::get();
 	painter.setPen(skin->year);
-	auto str = WsConn::get()->data["activeDateMonth"].toString();
-	painter.drawText(rect(), Qt::AlignCenter, str);
+	painter.drawText(rect(), Qt::AlignCenter, activeDateMonth);
 }
 
 void YearBar::leftBtnEnter()
 {
 	auto win = (MainWindow*)window();
-	auto str = WsConn::get()->data["lang"].toObject()["prevMonth"].toString();
-	win->tipInfo->setText(str);
+	win->tipInfo->setText(leftTip);
 	win->tipInfo->showInfo(QPoint(78, 26));
 }
 
 void YearBar::rightBtnEnter()
 {
 	auto win = (MainWindow*)window();
-	auto str = WsConn::get()->data["lang"].toObject()["nextMonth"].toString();
-	win->tipInfo->setText(str);
+	win->tipInfo->setText(rightTip);
 	win->tipInfo->showInfo(QPoint(238, 26));
-}
-
-void YearBar::todayBtnEnter()
-{
-	auto win = (MainWindow*)window();
-	//auto str = WsConn::get()->data["lang"].toObject()["embed"].toString();
-	win->tipInfo->setText(QString::fromLocal8Bit("今天"));
-	win->tipInfo->showInfo(QPoint(324,26));
 }
 
 void YearBar::leftBtnClick()

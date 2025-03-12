@@ -7,8 +7,8 @@ class TitleBar : public QWidget
 {
 	Q_OBJECT
 public:
-	TitleBar(QWidget *parent = nullptr);
 	~TitleBar();
+	static void init();
 protected:
 	void mousePressEvent(QMouseEvent* event) override;
 	void mouseMoveEvent(QMouseEvent* event) override;
@@ -18,8 +18,10 @@ private:
 	void enterPinBtn();
 	void leavePinBtn();
 private:
+	TitleBar(QWidget* parent = nullptr);
 	QPoint pressPos;
 	bool isDragging = false;
 	TitleBarBtn* pinBtn;
 	TitleBarBtn* menuBtn;
+	QString tipInfo;
 };

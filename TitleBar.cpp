@@ -4,6 +4,9 @@
 #include "TitleBar.h"
 #include "WsConn.h"
 
+TitleBar* titleBar;
+
+
 TitleBar::TitleBar(QWidget *parent) : QWidget(parent)
 {
 	auto winWidth = parent->width();
@@ -12,14 +15,25 @@ TitleBar::TitleBar(QWidget *parent) : QWidget(parent)
 	pinBtn->move(winWidth - 80, 10);
 	connect(pinBtn, &TitleBarBtn::enter, this, &TitleBar::enterPinBtn);
 	connect(pinBtn, &TitleBarBtn::leave, this, &TitleBar::leavePinBtn);
-	connect(pinBtn, &TitleBarBtn::click, this, &TitleBar::pinBtnClick);
+	connect(pinBtn, &TitleBarBtn::click, this, &TitleBar::pinBtnClick);	
 	menuBtn = new TitleBarBtn(0xe6e8,this);
 	menuBtn->move(winWidth - 45, 10);
 }
 
 TitleBar::~TitleBar()
 {
-	
+	titleBar = nullptr;
+}
+
+void TitleBar::init()
+{
+	connect(WsConn::get(), &WsConn::onData, [](const QJsonObject& obj) {
+		if (!titleBar) {
+			titleBar = new TitleBar(MainWindow::get());
+		}
+		titleBar->tipInfo = obj["lang"].toObject()["embed"].toString();
+		titleBar->show();
+	});
 }
 
 void TitleBar::mousePressEvent(QMouseEvent* event)
@@ -50,20 +64,19 @@ void TitleBar::mouseReleaseEvent(QMouseEvent* event)
 
 void TitleBar::pinBtnClick()
 {
-	auto win = (MainWindow*)window();
+	auto win = MainWindow::get();
 	win->switchEmbed();
 }
 
 void TitleBar::enterPinBtn()
 {
-	auto win = (MainWindow*)window();
-	auto str = WsConn::get()->data["lang"].toObject()["embed"].toString();
-	win->tipInfo->setText(str);
+	auto win = MainWindow::get();
+	win->tipInfo->setText(tipInfo);
 	win->tipInfo->showInfo(QPoint(width()-128, 8));
 }
 
 void TitleBar::leavePinBtn()
 {
-	auto win = (MainWindow*)window();
+	auto win = MainWindow::get();
 	win->tipInfo->hide();
 }

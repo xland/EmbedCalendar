@@ -4,6 +4,13 @@
 #include "Util.h"
 #include "Skin.h"
 #include "WsConn.h"
+#include "TitleBar.h"
+#include "YearBar.h"
+#include "WeekBar.h"
+#include "DayBtn.h"
+#include "SwitchBtn.h"
+#include "ListContent.h"
+#include "ListBar.h"
 
 int main(int argc, char *argv[])
 {
@@ -12,6 +19,14 @@ int main(int argc, char *argv[])
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     QApplication a(argc, argv);
     Util::initDebuger();
-    WsConn::init();
+    auto conn = WsConn::init();
+    Skin::init();
+    MainWindow::init();
+    TitleBar::init();
+    YearBar::init();
+    WeekBar::init();
+    ListBar::init();
+    ListContent::init();
+    conn->startConnect();
     return a.exec();
 }

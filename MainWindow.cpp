@@ -29,25 +29,14 @@
 namespace {
     WNDPROC oldProc;
     MainWindow* win;
+    bool isEmbeded{ true };
 }
-
-
-MainWindow::MainWindow(bool isEmbeded,QWidget *parent) : QMainWindow(parent), isEmbeded{ isEmbeded }
+MainWindow::MainWindow(const QJsonObject& obj,QWidget *parent) : QMainWindow(parent)
 {
 	setWindowFlag(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_QuitOnClose, false);
     setAttribute(Qt::WA_TranslucentBackground, true);
-    updateData();
-    titleBar = new TitleBar(this);
-    yearBar = new YearBar(this);
-    weekBar = new WeekBar(this);
-    for (int i=0;i<42;i++)
-    {
-        auto day = new DayBtn(i,this);
-        dayBtns.append(day);
-    }
-    listBar = new ListBar(this);
-    listContent = new ListContent(this);
+    updateData(obj);
     switchBtn = new SwitchBtn(this);
     tipInfo = new TipInfo(this);
     if (isEmbeded) {
@@ -69,11 +58,6 @@ void MainWindow::paintEvent(QPaintEvent* event)
     painter.drawRoundedRect(rect(), 4, 4);
 }
 
-void MainWindow::closeEvent(QCloseEvent* event)
-{
-    deleteLater();
-}
-
 void MainWindow::switchEmbed()
 {
     if (isEmbeded) {
@@ -82,12 +66,14 @@ void MainWindow::switchEmbed()
         SetParent(hwnd, nullptr);
     }
     auto pos = this->pos();
-    close();
-    win = new MainWindow(!isEmbeded);
-    win->move(pos);
-    win->show();
     QString msg{ R"({"msgType":"EmbedCalendar","msgName":"embedWin",data:{hasEmbed:%1,x:%2,y:%3}})" };
     msg = msg.arg(isEmbeded?"false":"true").arg(pos.x()).arg(pos.y());
+    WsConn::get()->sendMsg(msg);
+    close();
+    delete win;
+    win = nullptr;
+    isEmbeded = !isEmbeded;
+    msg = QString{ R"({"msgType":"EmbedCalendar","msgName":"updateRenderData"})" };
     WsConn::get()->sendMsg(msg);
 }
 
@@ -216,16 +202,17 @@ RAWINPUT* MainWindow::getRawInput(HRAWINPUT lParam) {
 
 void MainWindow::init()
 {
-    if (!win) {
-        auto flag = WsConn::get()->data["hasEmbed"].toBool();
-        win = new MainWindow(flag);
-        win->show();
-    }
-    else
-    {
-        win->updateData();
-        win->update();
-    }
+    connect(WsConn::get(), &WsConn::onData, [](const QJsonObject& obj) {
+        if (!win) {
+            win = new MainWindow(obj);
+            win->show();
+        }
+        else
+        {
+            win->updateData(obj);
+            win->update();
+        }
+    });
 }
 
 MainWindow* MainWindow::get()
@@ -233,26 +220,37 @@ MainWindow* MainWindow::get()
     return win;
 }
 
-void MainWindow::updateData()
+void MainWindow::updateData(const QJsonObject& obj)
 {
-    auto flag = WsConn::get()->data["hasEmbed"].toBool();
-    if (flag) {
-        //switchEmbed();
-        auto obj = WsConn::get()->data["embedPosition"].toObject();
-        auto x = obj["x"].toInt();
-        auto y = obj["y"].toInt();
-        move(x, y);
-        return;
-    }
-    flag = WsConn::get()->data["displayScheduleList"].toBool();
+    auto pos = obj["embedPosition"].toObject();
+    auto x = pos["x"].toInt();
+    auto y = pos["y"].toInt();
+    move(x, y);
+    auto flag = obj["displayScheduleList"].toBool();
     if (flag) {
         setFixedSize(QSize(372, 730));
     }
     else {
         setFixedSize(QSize(372, 480));
     }
-    if (listContent) {
-        delete listContent;
-        listContent = new ListContent(this);
+    auto arr = obj["viewData"].toArray();
+    if (dayBtns.isEmpty()) {
+        for (int i = 0; i < arr.size(); i++)
+        {
+            auto day = new DayBtn(i, this);
+            dayBtns.append(day);
+            day->updateData(arr[i].toObject());
+        }
     }
+    else {
+        for (int i = 0; i < arr.size(); i++) {
+            dayBtns[i]->updateData(arr[i].toObject());
+        }
+    }
+
+    //if (listContent) {
+    //    delete listContent;
+    //    listContent = new ListContent(this);
+    //    listContent->show();
+    //}
 }

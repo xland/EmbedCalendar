@@ -6,7 +6,7 @@ public:
 	~Skin();
 	static void init();
 	static Skin* get();
-	void setData();
+	void setData(const QJsonObject& data);
 public:
 	QColor bg;
 	QColor titleBtn;
@@ -35,6 +35,7 @@ public:
 	QColor listItemText1;
 	QColor listItemText2;
 	QColor listItemBtn;
+	QColor listItemBg;
 
 	QColor tipInfo;
 	QColor tipInfoBg;

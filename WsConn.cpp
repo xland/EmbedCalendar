@@ -43,10 +43,10 @@ void WsConn::startConnect()
     wsClient->open(url);
 }
 
-void WsConn::init()
+WsConn* WsConn::init()
 {
     conn = new WsConn(qApp);
-    conn->startConnect();
+    return conn;
 }
 
 WsConn* WsConn::get()
@@ -66,8 +66,7 @@ void WsConn::wsMsgReceived(const QString& message)
         return;
     }
     data = jd.object()["data"].toObject();
-    Skin::init();
-    MainWindow::init();
+    emit onData(data);
 }
 
 void WsConn::wsError(QAbstractSocket::SocketError error)

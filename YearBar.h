@@ -8,20 +8,23 @@ class YearBar : public QWidget
 {
 	Q_OBJECT
 public:
-	YearBar(QWidget *parent = nullptr);
 	~YearBar();
+	static void init();
 protected:
 	void paintEvent(QPaintEvent* event) override;
 private:
 	void leftBtnEnter();
 	void rightBtnEnter();
-	void todayBtnEnter();
 	void leftBtnClick();
 	void rightBtnClick();
 	void todayBtnClick();
 	void btnLeave();
 private:
+	YearBar(QWidget* parent = nullptr);
 	YearBarBtn* leftBtn;
 	YearBarBtn* rightBtn;
 	YearBarBtnToday* todayBtn;
+	QString leftTip;
+	QString rightTip;
+	QString activeDateMonth;
 };

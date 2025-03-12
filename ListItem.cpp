@@ -9,13 +9,12 @@
 #include "ListItemBtn.h"
 #include "ListItem.h"
 
-ListItem::ListItem(const QJsonObject& obj, QWidget *parent) : QWidget(parent)
+ListItem::ListItem(QWidget *parent) : QWidget(parent)
 {
-    title = obj["title"].toString();
-    desc = obj["desc"].toString();
-    calendarColor.setNamedColor(obj["calendarColor"].toString());
+    setMouseTracking(true);
 
-	setFixedSize(parent->width()-8,44);
+
+	setFixedSize(parent->width(),44);
     auto w = parent->width();
     delBtn = new ListItemBtn(0xe712, this);
     delBtn->move(w-34, 10);
@@ -35,11 +34,17 @@ ListItem::~ListItem()
 void ListItem::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing); // 抗锯齿，使边缘更平滑
+    painter.setRenderHint(QPainter::Antialiasing);
+    qreal radius = 3.0;
 
+    auto skin = Skin::get();
+    if (isHover) {
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(skin->listItemBg);
+        painter.drawRoundedRect(rect(), radius, radius);
+    }
     {
-        QRectF rect(0, 0, 3, 44);
-        qreal radius = 3.0;
+        QRectF rect(0, 0, 3, 44);        
         QPainterPath path;
         path.moveTo(rect.left() + radius, rect.top()); // 移动到左上角的圆弧起点
         path.arcTo(rect.left(), rect.top(), radius * 2, radius * 2, 90, 90); // 左上圆角
@@ -57,7 +62,6 @@ void ListItem::paintEvent(QPaintEvent* event)
     auto font = Util::getTextFont(14);
     painter.setFont(*font);
     painter.setBrush(Qt::NoBrush);
-    auto skin = Skin::get();
     painter.setPen(skin->listItemText1);
     painter.drawText(QPoint(8, 16), title);
 
@@ -65,6 +69,22 @@ void ListItem::paintEvent(QPaintEvent* event)
     painter.setFont(*font);
     painter.setPen(skin->listItemText2);
     painter.drawText(QPoint(8, 38), desc);
+}
+
+void ListItem::enterEvent(QEvent* event)
+{
+    if (!isHover) {
+        isHover = true;
+        update();
+    }
+}
+
+void ListItem::leaveEvent(QEvent* event)
+{
+    if (isHover) {
+        isHover = false;
+        update();
+    }
 }
 
 void ListItem::enterEdit()

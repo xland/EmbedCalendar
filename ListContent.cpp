@@ -1,15 +1,16 @@
 #include <QScrollBar>
 #include <QJsonArray>
 
+#include "MainWindow.h"
 #include "WsConn.h"
 #include "ListItem.h"
 #include "ListContent.h"
 
+ListContent* listContent;
+
+
 ListContent::ListContent(QWidget *parent) : QScrollArea(parent)
 {
-    if (parent->height() < 730) {
-        setVisible(false);
-    }
     setFrameShape(QFrame::NoFrame);
     setGeometry(20, 474, parent->width() - 40, 730 - 474 - 56);
     setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -37,16 +38,30 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
     background: none;     /* 滑块上下区域的背景 */
 })");
 
-    QWidget* contentWidget = new QWidget(this);
+   
+}
+
+void ListContent::updateData(const QJsonObject& obj)
+{
+    QWidget* contentWidget = widget();
+    if (contentWidget) {
+        delete contentWidget;
+    }
+    contentWidget = new QWidget(this);
+    contentWidget->setFixedWidth(this->width());
     contentWidget->setStyleSheet(R"(background:transparent;margin:0px;padding:0px;)");
-    QVBoxLayout* layout = new QVBoxLayout(contentWidget);
+    layout = new QVBoxLayout(contentWidget);
     layout->setMargin(0);
     layout->setSpacing(8);
-
-    auto arr = WsConn::get()->data["scheduleList"].toArray();
+    auto arr = obj["scheduleList"].toArray();
     for (int i = 0; i < arr.size(); ++i) {
-        auto obj = arr[i].toObject();
-        auto item = new ListItem(obj,this);
+        auto item = new ListItem(contentWidget);
+        auto data = arr[i].toObject();
+        item->title = data["title"].toString();
+        item->desc = data["desc"].toString();
+        item->calendarColor.setNamedColor(data["calendarColor"].toString());
+        item->editTip = obj["lang"].toObject()["editSchedule"].toString();
+        item->delTip = obj["lang"].toObject()["deleteSchedule"].toString();
         layout->addWidget(item);
     }
     layout->addStretch();
@@ -55,12 +70,27 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 
 ListContent::~ListContent()
 {
-	
+    listContent = nullptr;
 }
 
 void ListContent::scroll(const int& dis)
 {
-    //scrollContentsBy(0, dis/3);
     auto bar = verticalScrollBar();
     bar->setValue(bar->value()+(0- dis / 3));
+}
+
+void ListContent::init()
+{
+    connect(WsConn::get(), &WsConn::onData, [](const QJsonObject& obj) {
+        if (!listContent) {
+            listContent = new ListContent(MainWindow::get());
+        }
+        if (obj["displayScheduleList"].toBool()) {
+            listContent->updateData(obj);
+            listContent->show();
+        }
+        else {
+            listContent->hide();
+        }
+        });
 }

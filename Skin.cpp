@@ -9,6 +9,7 @@ namespace {
 
 Skin::Skin(QObject* parent) : QObject(parent)
 {
+	connect(WsConn::get(), &WsConn::onData, this, &Skin::setData);
 }
 
 Skin::~Skin()
@@ -17,11 +18,7 @@ Skin::~Skin()
 
 void Skin::init()
 {
-	//skin = std::make_unique<Skin>();
-	//skin->bg = QColor(255, 255, 255,255*0.6);
-	//skin->initWhite();
 	skin = new Skin(qApp);
-	skin->setData();
 }
 
 Skin* Skin::get()
@@ -29,9 +26,8 @@ Skin* Skin::get()
 	return skin;
 }
 
-void Skin::setData()
+void Skin::setData(const QJsonObject& data)
 {
-	auto& data = WsConn::get()->data;
 	auto theme = data["backgroundTheme"].toString();
 	auto alpha = data["backgroundOpacity"].toDouble();
 	auto alphaVal = static_cast<int>(std::round(alpha * 255));
@@ -79,6 +75,7 @@ void Skin::initWhite()
 
 	listItemText1 = QColor(31, 35, 41);
 	listItemText2 = QColor(102, 102, 102);
+	listItemBg = QColor(255, 255, 255,51);
 	listItemBtn = QColor(76, 79, 84);
 
 	tipInfoBg = QColor(26, 26, 26);
