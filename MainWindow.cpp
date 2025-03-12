@@ -237,10 +237,4 @@ void MainWindow::updateData(const QJsonObject& obj)
             dayBtns[i]->updateData(arr[i].toObject());
         }
     }
-
-    //if (listContent) {
-    //    delete listContent;
-    //    listContent = new ListContent(this);
-    //    listContent->show();
-    //}
 }

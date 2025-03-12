@@ -12,9 +12,8 @@ class ListItem : public BtnBase
 public:
 	ListItem(QWidget *parent = nullptr);
 	~ListItem();
-	QString title;
-	QString desc;
-	QColor calendarColor;
+	void setData(const QJsonObject& data);
+	
 	QString editTip;
 	QString delTip;
 protected:
@@ -26,4 +25,8 @@ private:
 private:
 	ListItemBtn* editBtn;
 	ListItemBtn* delBtn;
+	QString title;
+	QString desc;
+	QColor calendarColor;
+	bool isAllowEdit;
 };

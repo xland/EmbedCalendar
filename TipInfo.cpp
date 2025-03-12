@@ -47,7 +47,7 @@ void TipInfo::showInfo(const QPoint& pos)
 {
     move(pos);
     this->show();
-    //this->raise();
+    this->raise();
 }
 
 void TipInfo::paintEvent(QPaintEvent* event)

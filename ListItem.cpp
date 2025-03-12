@@ -12,23 +12,29 @@
 ListItem::ListItem(QWidget *parent) : BtnBase(parent)
 {
     setMouseTracking(true);
-
-
 	setFixedSize(parent->width(),44);
-    auto w = parent->width();
-    delBtn = new ListItemBtn(0xe712, this);
-    delBtn->move(w-34, 10);
-    editBtn = new ListItemBtn(0xe707, this);
-    editBtn->move(w-62,10);
-
-    connect(delBtn, &ListItemBtn::enter, this, &ListItem::enterDel);
-    connect(editBtn, &ListItemBtn::enter, this, &ListItem::enterEdit);
-    connect(delBtn, &ListItemBtn::leave, this, &ListItem::leaveBtn);
-    connect(editBtn, &ListItemBtn::leave, this, &ListItem::leaveBtn);
 }
 
 ListItem::~ListItem()
 {
+}
+
+void ListItem::setData(const QJsonObject& data)
+{
+    title = data["title"].toString();
+    desc = data["desc"].toString();
+    calendarColor.setNamedColor(data["calendarColor"].toString());
+    isAllowEdit = data["isAllowEdit"].toBool();
+    if (isAllowEdit) {
+        delBtn = new ListItemBtn(0xe712, this);
+        delBtn->move(width() - 34, 10);
+        editBtn = new ListItemBtn(0xe707, this);
+        editBtn->move(width() - 62, 10);
+        connect(delBtn, &ListItemBtn::enter, this, &ListItem::enterDel);
+        connect(editBtn, &ListItemBtn::enter, this, &ListItem::enterEdit);
+        connect(delBtn, &ListItemBtn::leave, this, &ListItem::leaveBtn);
+        connect(editBtn, &ListItemBtn::leave, this, &ListItem::leaveBtn);
+    }
 }
 
 void ListItem::paintEvent(QPaintEvent* event)
@@ -58,16 +64,25 @@ void ListItem::paintEvent(QPaintEvent* event)
         painter.drawPath(path);
     }
 
+    auto w = width() - (isAllowEdit?80:16);
     painter.setRenderHint(QPainter::TextAntialiasing, true);
     auto font = Util::getTextFont(14);
     painter.setFont(*font);
     painter.setBrush(Qt::NoBrush);
     painter.setPen(skin->listItemText1);
+    QFontMetrics metrics(*font);
+    if (metrics.horizontalAdvance(title) > w) {
+        title = metrics.elidedText(title, Qt::ElideRight, w);
+    }
     painter.drawText(QPoint(8, 16), title);
 
     font->setPixelSize(12);
     painter.setFont(*font);
     painter.setPen(skin->listItemText2);
+    QFontMetrics metrics2(*font);
+    if (metrics2.horizontalAdvance(desc) > w) {
+        desc = metrics2.elidedText(desc, Qt::ElideRight, w);
+    }
     painter.drawText(QPoint(8, 38), desc);
 }
 

@@ -57,11 +57,9 @@ void ListContent::updateData(const QJsonObject& obj)
     for (int i = 0; i < arr.size(); ++i) {
         auto item = new ListItem(contentWidget);
         auto data = arr[i].toObject();
-        item->title = data["title"].toString();
-        item->desc = data["desc"].toString();
-        item->calendarColor.setNamedColor(data["calendarColor"].toString());
         item->editTip = obj["lang"].toObject()["editSchedule"].toString();
         item->delTip = obj["lang"].toObject()["deleteSchedule"].toString();
+        item->setData(data);
         layout->addWidget(item);
     }
     layout->addStretch();
@@ -75,9 +73,12 @@ ListContent::~ListContent()
 
 void ListContent::scroll(const int& dis)
 {
-    auto pos = mapFromGlobal(QCursor::pos());
-    if (geometry().contains(pos)) {
-        auto bar = verticalScrollBar();
+    auto bar = verticalScrollBar();
+    if (!bar->isVisible()) return;
+    auto win = MainWindow::get();
+    auto pos = win->mapFromGlobal(QCursor::pos());
+    auto r = geometry();
+    if (r.contains(pos)) {        
         bar->setValue(bar->value() + (0 - dis / 3));
     }    
 }
