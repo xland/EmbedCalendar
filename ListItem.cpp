@@ -1,5 +1,7 @@
 ﻿#include <QPainter>
 #include <QPainterPath>
+
+#include "WsConn.h"
 #include "Util.h"
 #include "Skin.h"
 #include "TipInfo.h"
@@ -7,8 +9,12 @@
 #include "ListItemBtn.h"
 #include "ListItem.h"
 
-ListItem::ListItem(QWidget *parent) : QWidget(parent)
+ListItem::ListItem(const QJsonObject& obj, QWidget *parent) : QWidget(parent)
 {
+    title = obj["title"].toString();
+    desc = obj["desc"].toString();
+    calendarColor.setNamedColor(obj["calendarColor"].toString());
+
 	setFixedSize(parent->width()-8,44);
     auto w = parent->width();
     delBtn = new ListItemBtn(0xe712, this);
@@ -31,26 +37,21 @@ void ListItem::paintEvent(QPaintEvent* event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing); // 抗锯齿，使边缘更平滑
 
-    // 定义矩形区域
-    QRectF rect(0, 0, 3, 44); // x, y, width, height
-    qreal radius = 3.0; // 圆角半径
-
-    // 创建 QPainterPath 用于自定义形状
-    QPainterPath path;
-
-    // 从左上角开始（逆时针绘制）
-    path.moveTo(rect.left() + radius, rect.top()); // 移动到左上角的圆弧起点
-    path.arcTo(rect.left(), rect.top(), radius * 2, radius * 2, 90, 90); // 左上圆角
-    path.lineTo(rect.left(), rect.bottom() - radius); // 左侧直线
-    path.arcTo(rect.left(), rect.bottom() - radius * 2, radius * 2, radius * 2, 180, 90); // 左下圆角
-    path.lineTo(rect.right(), rect.bottom()); // 底部直线
-    path.lineTo(rect.right(), rect.top()); // 右侧直线
-    path.closeSubpath(); // 闭合路径
-
-    // 设置画笔和填充
-    painter.setPen(Qt::NoPen); // 边框颜色和宽度
-    painter.setBrush(Qt::darkBlue); // 填充颜色
-    painter.drawPath(path); // 绘制路径
+    {
+        QRectF rect(0, 0, 3, 44);
+        qreal radius = 3.0;
+        QPainterPath path;
+        path.moveTo(rect.left() + radius, rect.top()); // 移动到左上角的圆弧起点
+        path.arcTo(rect.left(), rect.top(), radius * 2, radius * 2, 90, 90); // 左上圆角
+        path.lineTo(rect.left(), rect.bottom() - radius); // 左侧直线
+        path.arcTo(rect.left(), rect.bottom() - radius * 2, radius * 2, radius * 2, 180, 90); // 左下圆角
+        path.lineTo(rect.right(), rect.bottom()); // 底部直线
+        path.lineTo(rect.right(), rect.top()); // 右侧直线
+        path.closeSubpath();
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(calendarColor);
+        painter.drawPath(path);
+    }
 
     painter.setRenderHint(QPainter::TextAntialiasing, true);
     auto font = Util::getTextFont(14);
@@ -58,12 +59,12 @@ void ListItem::paintEvent(QPaintEvent* event)
     painter.setBrush(Qt::NoBrush);
     auto skin = Skin::get();
     painter.setPen(skin->listItemText1);
-    painter.drawText(QPoint(8, 16), QString::fromLocal8Bit("这是日程的标题，这是日程的标题"));
+    painter.drawText(QPoint(8, 16), title);
 
     font->setPixelSize(12);
     painter.setFont(*font);
     painter.setPen(skin->listItemText2);
-    painter.drawText(QPoint(8, 38), QString::fromLocal8Bit("12：12 这是日程的简介，这是日程的标题"));
+    painter.drawText(QPoint(8, 38), desc);
 }
 
 void ListItem::enterEdit()
@@ -73,7 +74,8 @@ void ListItem::enterEdit()
     auto btnPos = editBtn->mapTo(window(), QPoint(0, 0));
     if (!rect.contains(btnPos)) return;
     auto win = (MainWindow*)window();
-    win->tipInfo->setText(QString::fromLocal8Bit("编辑日程"));
+    auto str = WsConn::get()->data["lang"].toObject()["editSchedule"].toString();
+    win->tipInfo->setText(str);
     auto pos = mapTo(win, editBtn->pos());
     pos.setX(pos.x() - win->tipInfo->width());
     pos.setY(pos.y() - 4);
@@ -87,7 +89,8 @@ void ListItem::enterDel()
     auto btnPos = editBtn->mapTo(window(), QPoint(0, 0));
     if (!rect.contains(btnPos)) return;
     auto win = (MainWindow*)window();
-    win->tipInfo->setText(QString::fromLocal8Bit("删除日程"));
+    auto str = WsConn::get()->data["lang"].toObject()["deleteSchedule"].toString();
+    win->tipInfo->setText(str);
     auto pos = mapTo(win, delBtn->pos());
     pos.setX(pos.x() - win->tipInfo->width());
     pos.setY(pos.y() - 4);

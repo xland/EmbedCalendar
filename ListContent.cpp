@@ -1,10 +1,15 @@
 #include <QScrollBar>
+#include <QJsonArray>
+
 #include "WsConn.h"
 #include "ListItem.h"
 #include "ListContent.h"
 
 ListContent::ListContent(QWidget *parent) : QScrollArea(parent)
 {
+    if (parent->height() < 730) {
+        setVisible(false);
+    }
     setFrameShape(QFrame::NoFrame);
     setGeometry(20, 474, parent->width() - 40, 730 - 474 - 56);
     setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -39,9 +44,9 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
     layout->setSpacing(8);
 
     auto arr = WsConn::get()->data["scheduleList"].toArray();
-
-    for (int i = 0; i < 13; ++i) {
-        auto item = new ListItem(this);
+    for (int i = 0; i < arr.size(); ++i) {
+        auto obj = arr[i].toObject();
+        auto item = new ListItem(obj,this);
         layout->addWidget(item);
     }
     layout->addStretch();

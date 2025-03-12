@@ -1,5 +1,7 @@
 ﻿#include <QRect>
 #include <QPainter>
+
+#include "WsConn.h"
 #include "Skin.h"
 #include "Util.h"
 #include "ListBar.h"
@@ -28,16 +30,21 @@ void SwitchBtn::paintEvent(QPaintEvent* event)
 	painter.setBrush(Qt::NoBrush);
 	painter.setPen(skin->switchText);
 	auto flag = window()->height() > 480;
-	QString text = QString::fromLocal8Bit("隐藏日程");
-	QChar code(0xe708);
-	if (!flag) {
-		text = QString::fromLocal8Bit("显示日程");
-		code = QChar(0xe70f);
-	}
-	painter.drawText(QPoint(8,36), text);
 	auto fontIcon = Util::getIconFont(16);
-	painter.setFont(*fontIcon);
-	painter.drawText(QPoint(76, 36), code);
+	if (flag) {
+		auto str = WsConn::get()->data["lang"].toObject()["hideSchedule"].toString();
+		QChar code(0xe708);
+		painter.drawText(QPoint(8, 36), str);
+		painter.setFont(*fontIcon);
+		painter.drawText(QPoint(76, 36), code);
+	}
+	else {
+		auto str = WsConn::get()->data["lang"].toObject()["displaySchedule"].toString();
+		QChar code = QChar(0xe70f);
+		painter.drawText(QPoint(8, 36), str);
+		painter.setFont(*fontIcon);
+		painter.drawText(QPoint(76, 36), code);
+	}	
 }
 
 void SwitchBtn::mousePressEvent(QMouseEvent* event)

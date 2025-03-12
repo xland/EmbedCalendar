@@ -37,6 +37,13 @@ MainWindow::MainWindow(bool isEmbeded,QWidget *parent) : QMainWindow(parent), is
 	setWindowFlag(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_QuitOnClose, false);
     setAttribute(Qt::WA_TranslucentBackground, true);
+    auto flag = WsConn::get()->data["displayScheduleList"].toBool();
+    if (flag) {
+        setFixedSize(QSize(372, 730));
+    }
+    else {
+        setFixedSize(QSize(372, 480));
+    }
     titleBar = new TitleBar(this);
     yearBar = new YearBar(this);
     weekBar = new WeekBar(this);
@@ -49,15 +56,6 @@ MainWindow::MainWindow(bool isEmbeded,QWidget *parent) : QMainWindow(parent), is
     }
     listBar = new ListBar(this);
     listContent = new ListContent(this);
-    auto flag = WsConn::get()->data["displayScheduleList"].toBool();
-    if (flag) {
-        setFixedSize(QSize(372, 730));
-    }
-    else {
-        listBar->hide();
-        listContent->hide();
-        setFixedSize(QSize(372, 480));
-    }
     switchBtn = new SwitchBtn(this);
     tipInfo = new TipInfo(this);
     if (isEmbeded) {
@@ -151,7 +149,7 @@ void MainWindow::embed()
     auto hwnd = (HWND)winId();
     SetParent(hwnd, workerW);
 
-    QTimer::singleShot(1000, [hwnd]() {
+    //QTimer::singleShot(1000, [hwnd]() {
         RAWINPUTDEVICE rids[1];
         rids[0].usUsagePage = 0x01;
         rids[0].usUsage = 0x02;
@@ -159,7 +157,7 @@ void MainWindow::embed()
         rids[0].hwndTarget = hwnd;
         RegisterRawInputDevices(rids, 1, sizeof(rids[0]));
         oldProc = (WNDPROC)SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)MainWindow::processMsg);
-    });
+    //});
 
 }
 

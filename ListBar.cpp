@@ -14,6 +14,9 @@ ListBar::ListBar(QWidget *parent) : QWidget(parent)
 	btn = new ListBarBtn(this);
 	connect(btn, &ListBarBtn::enter, this, &ListBar::btnEnter);
 	connect(btn, &ListBarBtn::leave, this, &ListBar::btnLeave);
+	if (parent->height() < 730) {
+		setVisible(false);
+	}
 }
 
 ListBar::~ListBar()
