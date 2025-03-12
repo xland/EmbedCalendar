@@ -1,8 +1,13 @@
 ﻿#include <QPainter>
 
+#include "WsConn.h"
+#include "MainWindow.h"
 #include "Util.h"
 #include "Skin.h"
 #include "TipInfo.h"
+
+TipInfo* tipInfo;
+
 
 TipInfo::TipInfo(QWidget *parent) : QWidget(parent)
 {    
@@ -12,7 +17,21 @@ TipInfo::TipInfo(QWidget *parent) : QWidget(parent)
 
 TipInfo::~TipInfo()
 {
-	
+    tipInfo = nullptr;
+}
+
+void TipInfo::init()
+{
+    connect(WsConn::get(), &WsConn::onData, [](const QJsonObject& obj) {
+        if (!tipInfo) {
+            tipInfo = new TipInfo(MainWindow::get());
+        }
+        });
+}
+
+TipInfo* TipInfo::get()
+{
+    return tipInfo;
 }
 
 void TipInfo::setText(const QString& text)
@@ -28,7 +47,7 @@ void TipInfo::showInfo(const QPoint& pos)
 {
     move(pos);
     this->show();
-    this->raise();
+    //this->raise();
 }
 
 void TipInfo::paintEvent(QPaintEvent* event)

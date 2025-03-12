@@ -77,13 +77,12 @@ void TitleBar::pinBtnClick()
 
 void TitleBar::enterPinBtn()
 {
-	auto win = MainWindow::get();
-	win->tipInfo->setText(tipInfo);
-	win->tipInfo->showInfo(QPoint(width()-128, 8));
+	auto tipObj = TipInfo::get();
+	tipObj->setText(tipInfo);
+	tipObj->showInfo(QPoint(width()-128, 8));
 }
 
 void TitleBar::leavePinBtn()
 {
-	auto win = MainWindow::get();
-	win->tipInfo->hide();
+	TipInfo::get()->hide();
 }

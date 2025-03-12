@@ -21,13 +21,8 @@ public:
     static RAWINPUT* getRawInput(HRAWINPUT lParam);
     static void init();
     static MainWindow* get();
-public:    
-    WeekBar* weekBar;
+public:
     QList<DayBtn*> dayBtns;
-    ListBar* listBar;
-    ListContent* listContent;
-    SwitchBtn* switchBtn;
-    TipInfo* tipInfo;
     bool isEnter{ false };
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -36,7 +31,6 @@ private:
     void updateData(const QJsonObject& obj);
     void onEmbedMouseMove();
     void onEmbedMousePress();
-    void onEmbedMouseWheel(const int& wheelData);
     void onEmbedLeaveWindow();
     void embed();
     static LRESULT CALLBACK processMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

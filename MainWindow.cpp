@@ -37,7 +37,6 @@ MainWindow::MainWindow(const QJsonObject& obj,QWidget *parent) : QMainWindow(par
     setAttribute(Qt::WA_QuitOnClose, false);
     setAttribute(Qt::WA_TranslucentBackground, true);
     updateData(obj);
-    tipInfo = new TipInfo(this);
     if (isEmbeded) {
         embed();
     }
@@ -45,7 +44,6 @@ MainWindow::MainWindow(const QJsonObject& obj,QWidget *parent) : QMainWindow(par
 MainWindow::~MainWindow()
 {
 }
-
 
 void MainWindow::paintEvent(QPaintEvent* event)
 {
@@ -100,14 +98,6 @@ void MainWindow::onEmbedMousePress()
     if (!child) return;
     QMouseEvent e(QEvent::MouseButtonPress, QPointF(0, 0), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
     child->mousePressEvent(&e);
-}
-
-void MainWindow::onEmbedMouseWheel(const int& wheelData)
-{
-    auto pos = mapFromGlobal(QCursor::pos());
-    if (listContent->geometry().contains(pos)) {
-        listContent->scroll(wheelData);
-    }
 }
 
 void MainWindow::onEmbedLeaveWindow()
@@ -171,7 +161,7 @@ LRESULT CALLBACK MainWindow::processMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
         if (rawMouse.usButtonFlags == RI_MOUSE_WHEEL)
         {
             auto wheelDelta = (short)rawMouse.usButtonData;
-            win->onEmbedMouseWheel(wheelDelta);
+            ListContent::get()->scroll(wheelDelta);
         }
         else {
             switch (rawMouse.ulButtons)

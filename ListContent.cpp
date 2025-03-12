@@ -75,8 +75,11 @@ ListContent::~ListContent()
 
 void ListContent::scroll(const int& dis)
 {
-    auto bar = verticalScrollBar();
-    bar->setValue(bar->value()+(0- dis / 3));
+    auto pos = mapFromGlobal(QCursor::pos());
+    if (geometry().contains(pos)) {
+        auto bar = verticalScrollBar();
+        bar->setValue(bar->value() + (0 - dis / 3));
+    }    
 }
 
 void ListContent::init()
@@ -93,4 +96,9 @@ void ListContent::init()
             listContent->hide();
         }
         });
+}
+
+ListContent* ListContent::get()
+{
+    return listContent;
 }

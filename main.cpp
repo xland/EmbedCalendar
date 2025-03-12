@@ -11,6 +11,7 @@
 #include "SwitchBtn.h"
 #include "ListContent.h"
 #include "ListBar.h"
+#include "TipInfo.h"
 
 int main(int argc, char *argv[])
 {
@@ -28,6 +29,7 @@ int main(int argc, char *argv[])
     ListBar::init();
     ListContent::init();
     SwitchBtn::init();
+    TipInfo::init();
     conn->startConnect();
     return a.exec();
 }

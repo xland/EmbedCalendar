@@ -66,16 +66,16 @@ void YearBar::paintEvent(QPaintEvent* event)
 
 void YearBar::leftBtnEnter()
 {
-	auto win = (MainWindow*)window();
-	win->tipInfo->setText(leftTip);
-	win->tipInfo->showInfo(QPoint(78, 26));
+	auto tipObj = TipInfo::get();
+	tipObj->setText(leftTip);
+	tipObj->showInfo(QPoint(78, 26));
 }
 
 void YearBar::rightBtnEnter()
 {
-	auto win = (MainWindow*)window();
-	win->tipInfo->setText(rightTip);
-	win->tipInfo->showInfo(QPoint(238, 26));
+	auto tipObj = TipInfo::get();
+	tipObj->setText(rightTip);
+	tipObj->showInfo(QPoint(238, 26));
 }
 
 void YearBar::leftBtnClick()
@@ -98,6 +98,5 @@ void YearBar::todayBtnClick()
 
 void YearBar::btnLeave()
 {
-	auto win = (MainWindow*)window();
-	win->tipInfo->hide();
+	TipInfo::get()->hide();
 }

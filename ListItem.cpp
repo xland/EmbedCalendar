@@ -78,12 +78,12 @@ void ListItem::enterEdit()
     auto btnPos = editBtn->mapTo(window(), QPoint(0, 0));
     if (!rect.contains(btnPos)) return;
     auto win = (MainWindow*)window();
-    auto str = WsConn::get()->data["lang"].toObject()["editSchedule"].toString();
-    win->tipInfo->setText(str);
+    auto tipObj = TipInfo::get();
+    tipObj->setText(editTip);
     auto pos = mapTo(win, editBtn->pos());
-    pos.setX(pos.x() - win->tipInfo->width());
+    pos.setX(pos.x() - tipObj->width());
     pos.setY(pos.y() - 4);
-    win->tipInfo->showInfo(pos);
+    tipObj->showInfo(pos);
 }
 
 void ListItem::enterDel()
@@ -93,16 +93,15 @@ void ListItem::enterDel()
     auto btnPos = editBtn->mapTo(window(), QPoint(0, 0));
     if (!rect.contains(btnPos)) return;
     auto win = (MainWindow*)window();
-    auto str = WsConn::get()->data["lang"].toObject()["deleteSchedule"].toString();
-    win->tipInfo->setText(str);
+    auto tipObj = TipInfo::get();
+    tipObj->setText(delTip);
     auto pos = mapTo(win, delBtn->pos());
-    pos.setX(pos.x() - win->tipInfo->width());
+    pos.setX(pos.x() - tipObj->width());
     pos.setY(pos.y() - 4);
-    win->tipInfo->showInfo(pos);
+    tipObj->showInfo(pos);
 }
 
 void ListItem::leaveBtn()
 {
-    auto win = (MainWindow*)window();
-    win->tipInfo->hide();
+    TipInfo::get()->hide();
 }

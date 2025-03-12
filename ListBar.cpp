@@ -58,15 +58,15 @@ void ListBar::paintEvent(QPaintEvent* event)
 
 void ListBar::btnEnter()
 {
-	auto win = (MainWindow*)window();
-	win->tipInfo->setText(tipInfo);
-	win->tipInfo->showInfo(QPoint(246, 432));
+	auto tipObj = TipInfo::get();
+	tipObj->setText(tipInfo);
+	tipObj->showInfo(QPoint(246, 432));
 }
 
 void ListBar::btnLeave()
 {
-	auto win = (MainWindow*)window();
-	win->tipInfo->hide();
+	auto tipObj = TipInfo::get();
+	tipObj->hide();
 }
 
 void ListBar::btnClick()
