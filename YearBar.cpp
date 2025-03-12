@@ -20,6 +20,12 @@ YearBar::YearBar(QWidget *parent) : QWidget(parent)
 	connect(leftBtn, &YearBarBtn::enter, this, &YearBar::leftBtnEnter);
 	connect(rightBtn, &YearBarBtn::enter, this, &YearBar::rightBtnEnter);
 	connect(todayBtn, &YearBarBtn::enter, this, &YearBar::todayBtnEnter);
+
+
+	connect(leftBtn, &YearBarBtn::click, this, &YearBar::leftBtnClick);
+	connect(rightBtn, &YearBarBtn::click, this, &YearBar::rightBtnClick);
+	connect(todayBtn, &YearBarBtn::click, this, &YearBar::todayBtnClick);
+
 	connect(leftBtn, &YearBarBtn::leave, this, &YearBar::btnLeave);
 	connect(rightBtn, &YearBarBtn::leave, this, &YearBar::btnLeave);
 	connect(todayBtn, &YearBarBtn::leave, this, &YearBar::btnLeave);
@@ -65,6 +71,24 @@ void YearBar::todayBtnEnter()
 	//auto str = WsConn::get()->data["lang"].toObject()["embed"].toString();
 	win->tipInfo->setText(QString::fromLocal8Bit("今天"));
 	win->tipInfo->showInfo(QPoint(324,26));
+}
+
+void YearBar::leftBtnClick()
+{
+	QString msg{ R"({"msgType":"EmbedCalendar","msgName":"changePrevMonth"})" };
+	WsConn::get()->sendMsg(msg);
+}
+
+void YearBar::rightBtnClick()
+{
+	QString msg{ R"({"msgType":"EmbedCalendar","msgName":"changeNextMonth"})" };
+	WsConn::get()->sendMsg(msg);
+}
+
+void YearBar::todayBtnClick()
+{
+	QString msg{ R"({"msgType":"EmbedCalendar","msgName":"changeToday"})" };
+	WsConn::get()->sendMsg(msg);
 }
 
 void YearBar::btnLeave()

@@ -16,6 +16,9 @@ private:
 	void leftBtnEnter();
 	void rightBtnEnter();
 	void todayBtnEnter();
+	void leftBtnClick();
+	void rightBtnClick();
+	void todayBtnClick();
 	void btnLeave();
 private:
 	YearBarBtn* leftBtn;

@@ -8,7 +8,7 @@ class DayBtn : public BtnBase
 {
 	Q_OBJECT
 public:
-	DayBtn(const int& index,const QJsonObject& obj,QWidget *parent = nullptr);
+	DayBtn(const int& index,QWidget *parent = nullptr);
 	~DayBtn();
 public:
 	QString day;
@@ -17,6 +17,8 @@ public:
 	bool hasSchdule;
 protected:
 	void paintEvent(QPaintEvent* event) override;
+private:
+	void onClick();
 private:
 	int index;
 };

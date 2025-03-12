@@ -1,6 +1,7 @@
 #pragma once
 #include "Windows.h"
 #include <QtWidgets/QMainWindow>
+#include <QJsonObject>
 
 class TitleBar;
 class YearBar;
@@ -20,6 +21,7 @@ public:
     static RAWINPUT* getRawInput(HRAWINPUT lParam);
     static void init();
     static MainWindow* get();
+    void updateData();
 public:    
     TitleBar* titleBar;
     YearBar* yearBar;

@@ -40,7 +40,6 @@ void WsConn::startConnect()
     connect(wsClient, &QWebSocket::disconnected, this, &WsConn::wsDisconnected);
     connect(wsClient, &QWebSocket::textMessageReceived, this, &WsConn::wsMsgReceived);
     connect(wsClient, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &WsConn::wsError);
-    connect(this, &WsConn::sendMsg, this, &WsConn::onSendMsg, Qt::QueuedConnection);
     wsClient->open(url);
 }
 
@@ -76,7 +75,7 @@ void WsConn::wsError(QAbstractSocket::SocketError error)
     qDebug() << "webSocketError" << error;
 }
 
-void WsConn::onSendMsg(QString message)
+void WsConn::sendMsg(const QString& message)
 {
     //qDebug() << "WsConn onSendMsg" << message;
     wsClient->sendBinaryMessage(message.toUtf8());

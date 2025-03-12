@@ -23,6 +23,7 @@ public:
 	QColor week;
 	QColor day;
 	QColor dayHover;
+	QColor dayActive;
 	QColor lunar;
 	QColor dayNotCurMonth;
 	QColor lunarNotCurMonth;

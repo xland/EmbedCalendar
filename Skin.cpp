@@ -72,6 +72,7 @@ void Skin::initWhite()
 	lunarNotCurMonth = QColor(102, 102, 102);
 	dot = QColor(102, 102, 102);
 	dayHover = QColor(255, 255, 255, 128);
+	dayActive = QColor(240, 44, 56);
 	dayWorking = QColor(0, 122, 255);
 
 	switchText = QColor(0, 122, 255);

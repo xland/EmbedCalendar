@@ -37,21 +37,13 @@ MainWindow::MainWindow(bool isEmbeded,QWidget *parent) : QMainWindow(parent), is
 	setWindowFlag(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_QuitOnClose, false);
     setAttribute(Qt::WA_TranslucentBackground, true);
-    auto flag = WsConn::get()->data["displayScheduleList"].toBool();
-    if (flag) {
-        setFixedSize(QSize(372, 730));
-    }
-    else {
-        setFixedSize(QSize(372, 480));
-    }
+    updateData();
     titleBar = new TitleBar(this);
     yearBar = new YearBar(this);
     weekBar = new WeekBar(this);
-    auto arr = WsConn::get()->data["viewData"].toArray();
-    for (int i=0;i<arr.size();i++)
+    for (int i=0;i<42;i++)
     {
-        auto obj = arr[i].toObject();
-        auto day = new DayBtn(i, obj,this);
+        auto day = new DayBtn(i,this);
         dayBtns.append(day);
     }
     listBar = new ListBar(this);
@@ -74,9 +66,7 @@ void MainWindow::paintEvent(QPaintEvent* event)
     auto skin = Skin::get();
     painter.setBrush(skin->bg);
     painter.setPen(Qt::NoPen);
-    painter.drawRoundedRect(rect(), 4, 4);  
-
-    //painter.drawRect(QRect(325, 10, 30, 30));
+    painter.drawRoundedRect(rect(), 4, 4);
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
@@ -96,6 +86,9 @@ void MainWindow::switchEmbed()
     win = new MainWindow(!isEmbeded);
     win->move(pos);
     win->show();
+    QString msg{ R"({"msgType":"EmbedCalendar","msgName":"embedWin",data:{hasEmbed:%1,x:%2,y:%3}})" };
+    msg = msg.arg(isEmbeded?"false":"true").arg(pos.x()).arg(pos.y());
+    WsConn::get()->sendMsg(msg);
 }
 
 
@@ -148,7 +141,6 @@ void MainWindow::embed()
     auto workerW = Util::getWorkerW();
     auto hwnd = (HWND)winId();
     SetParent(hwnd, workerW);
-
     //QTimer::singleShot(1000, [hwnd]() {
         RAWINPUTDEVICE rids[1];
         rids[0].usUsagePage = 0x01;
@@ -224,13 +216,43 @@ RAWINPUT* MainWindow::getRawInput(HRAWINPUT lParam) {
 
 void MainWindow::init()
 {
-    auto& data = WsConn::get()->data;
-    auto flag = data["hasEmbed"].toBool();
-    win = new MainWindow(flag);
-    win->show();
+    if (!win) {
+        auto flag = WsConn::get()->data["hasEmbed"].toBool();
+        win = new MainWindow(flag);
+        win->show();
+    }
+    else
+    {
+        win->updateData();
+        win->update();
+    }
 }
 
 MainWindow* MainWindow::get()
 {
     return win;
+}
+
+void MainWindow::updateData()
+{
+    auto flag = WsConn::get()->data["hasEmbed"].toBool();
+    if (flag) {
+        //switchEmbed();
+        auto obj = WsConn::get()->data["embedPosition"].toObject();
+        auto x = obj["x"].toInt();
+        auto y = obj["y"].toInt();
+        move(x, y);
+        return;
+    }
+    flag = WsConn::get()->data["displayScheduleList"].toBool();
+    if (flag) {
+        setFixedSize(QSize(372, 730));
+    }
+    else {
+        setFixedSize(QSize(372, 480));
+    }
+    if (listContent) {
+        delete listContent;
+        listContent = new ListContent(this);
+    }
 }

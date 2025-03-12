@@ -11,10 +11,9 @@ public:
 	~WsConn();
 	static void init();
 	static WsConn* get();
+	void sendMsg(const QString& message);
 public:
 	QJsonObject data;
-signals:
-	void sendMsg(QString message);
 private:
 	WsConn(QObject* parent = nullptr);
 	void startConnect();
@@ -22,7 +21,6 @@ private:
 	void wsDisconnected();
 	void wsConnected();
 	void wsError(QAbstractSocket::SocketError error);
-	void onSendMsg(QString message);
 private:
 	QWebSocket* wsClient;
 };
