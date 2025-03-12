@@ -2,8 +2,10 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QWidget>
+#include "BtnBase.h"
+
 class ListItemBtn;
-class ListItem : public QWidget
+class ListItem : public BtnBase
 {
 	Q_OBJECT
 
@@ -17,8 +19,6 @@ public:
 	QString delTip;
 protected:
 	void paintEvent(QPaintEvent* event) override;
-	void enterEvent(QEvent* event) override;
-	void leaveEvent(QEvent* event) override;
 private:
 	void enterEdit();
 	void enterDel();
@@ -26,5 +26,4 @@ private:
 private:
 	ListItemBtn* editBtn;
 	ListItemBtn* delBtn;
-	bool isHover{ false };
 };

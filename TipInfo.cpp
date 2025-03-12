@@ -5,8 +5,7 @@
 #include "TipInfo.h"
 
 TipInfo::TipInfo(QWidget *parent) : QWidget(parent)
-{
-    
+{    
     setVisible(false);
     setAttribute(Qt::WA_TransparentForMouseEvents);
 }

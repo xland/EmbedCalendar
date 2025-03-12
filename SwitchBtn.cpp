@@ -9,6 +9,8 @@
 #include "MainWindow.h"
 #include "SwitchBtn.h"
 
+SwitchBtn* switchBtn;
+
 SwitchBtn::SwitchBtn(QWidget *parent) : BtnBase(parent)
 {
 	setGeometry(260, parent->height()-60, 104, 60);
@@ -16,9 +18,21 @@ SwitchBtn::SwitchBtn(QWidget *parent) : BtnBase(parent)
 
 SwitchBtn::~SwitchBtn()
 {
-	
+	switchBtn = nullptr;
 }
-
+void SwitchBtn::init()
+{
+	connect(WsConn::get(), &WsConn::onData, [](const QJsonObject& obj) {
+		if (!switchBtn) {
+			switchBtn = new SwitchBtn(MainWindow::get());
+		}
+		auto lang = obj["lang"].toObject();
+		switchBtn->hideSchedule = lang["hideSchedule"].toString();
+		switchBtn->displaySchedule = lang["displaySchedule"].toString();
+		switchBtn->move(260, MainWindow::get()->height() - 60);
+		switchBtn->show();
+		});
+}
 void SwitchBtn::paintEvent(QPaintEvent* event)
 {
 	QPainter painter(this);
@@ -32,16 +46,14 @@ void SwitchBtn::paintEvent(QPaintEvent* event)
 	auto flag = window()->height() > 480;
 	auto fontIcon = Util::getIconFont(16);
 	if (flag) {
-		auto str = WsConn::get()->data["lang"].toObject()["hideSchedule"].toString();
 		QChar code(0xe708);
-		painter.drawText(QPoint(8, 36), str);
+		painter.drawText(QPoint(8, 36), hideSchedule);
 		painter.setFont(*fontIcon);
 		painter.drawText(QPoint(76, 36), code);
 	}
 	else {
-		auto str = WsConn::get()->data["lang"].toObject()["displaySchedule"].toString();
 		QChar code = QChar(0xe70f);
-		painter.drawText(QPoint(8, 36), str);
+		painter.drawText(QPoint(8, 36), displaySchedule);
 		painter.setFont(*fontIcon);
 		painter.drawText(QPoint(76, 36), code);
 	}	
@@ -51,18 +63,12 @@ void SwitchBtn::mousePressEvent(QMouseEvent* event)
 {
 	if (event->button() == Qt::LeftButton) 
 	{
-		auto win = (MainWindow*)window();
+		auto win = MainWindow::get();
 		auto flag = win->height() > 480;
-		if (flag) {
-			win->setFixedHeight(480);
-			win->listBar->hide();
-			win->listContent->hide();
-		}
-		else {
-			win->setFixedHeight(730);
-			win->listBar->show();
-			win->listContent->show();
-		}
-		setGeometry(260, win->height() - 60, 104, 60);
+		QString msg{ R"({"msgType":"EmbedCalendar","msgName":"displayScheduleList","data":%1})" };
+		msg = msg.arg(flag ? "false" : "true");
+		WsConn::get()->sendMsg(msg);
+		msg = QString{ R"({"msgType":"EmbedCalendar","msgName":"updateRenderData"})" };
+		WsConn::get()->sendMsg(msg);
 	}
 }

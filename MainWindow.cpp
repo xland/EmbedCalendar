@@ -37,7 +37,6 @@ MainWindow::MainWindow(const QJsonObject& obj,QWidget *parent) : QMainWindow(par
     setAttribute(Qt::WA_QuitOnClose, false);
     setAttribute(Qt::WA_TranslucentBackground, true);
     updateData(obj);
-    switchBtn = new SwitchBtn(this);
     tipInfo = new TipInfo(this);
     if (isEmbeded) {
         embed();
@@ -66,7 +65,7 @@ void MainWindow::switchEmbed()
         SetParent(hwnd, nullptr);
     }
     auto pos = this->pos();
-    QString msg{ R"({"msgType":"EmbedCalendar","msgName":"embedWin",data:{hasEmbed:%1,x:%2,y:%3}})" };
+    QString msg{ R"({"msgType":"EmbedCalendar","msgName":"embedWin","data":{"hasEmbed":%1,"x":%2,"y":%3}})" };
     msg = msg.arg(isEmbeded?"false":"true").arg(pos.x()).arg(pos.y());
     WsConn::get()->sendMsg(msg);
     close();
@@ -222,6 +221,7 @@ MainWindow* MainWindow::get()
 
 void MainWindow::updateData(const QJsonObject& obj)
 {
+    auto aaa = obj["hasEmbed"].toBool();
     auto pos = obj["embedPosition"].toObject();
     auto x = pos["x"].toInt();
     auto y = pos["y"].toInt();

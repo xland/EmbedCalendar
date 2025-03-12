@@ -9,8 +9,11 @@ class SwitchBtn : public BtnBase
 public:
 	SwitchBtn(QWidget *parent = nullptr);
 	~SwitchBtn();
+	static void init();
 protected:
 	void paintEvent(QPaintEvent* event) override;
 	void mousePressEvent(QMouseEvent* event) override;
 private:
+	QString hideSchedule;
+	QString displaySchedule;
 };

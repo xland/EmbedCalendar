@@ -33,7 +33,7 @@ void ListBar::init()
 		}
 		auto lang = obj["lang"].toObject();
 		listBar->activeDateDay = obj["activeDateDay"].toString();
-		listBar->tipInfo = obj["lang"].toObject()["createSchedule"].toString();
+		listBar->tipInfo = lang["createSchedule"].toString();
 		if (obj["displayScheduleList"].toBool()) {
 			listBar->show();
 		}

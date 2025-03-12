@@ -9,7 +9,7 @@
 #include "ListItemBtn.h"
 #include "ListItem.h"
 
-ListItem::ListItem(QWidget *parent) : QWidget(parent)
+ListItem::ListItem(QWidget *parent) : BtnBase(parent)
 {
     setMouseTracking(true);
 
@@ -69,22 +69,6 @@ void ListItem::paintEvent(QPaintEvent* event)
     painter.setFont(*font);
     painter.setPen(skin->listItemText2);
     painter.drawText(QPoint(8, 38), desc);
-}
-
-void ListItem::enterEvent(QEvent* event)
-{
-    if (!isHover) {
-        isHover = true;
-        update();
-    }
-}
-
-void ListItem::leaveEvent(QEvent* event)
-{
-    if (isHover) {
-        isHover = false;
-        update();
-    }
 }
 
 void ListItem::enterEdit()

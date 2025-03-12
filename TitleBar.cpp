@@ -59,7 +59,14 @@ void TitleBar::mouseMoveEvent(QMouseEvent* event)
 
 void TitleBar::mouseReleaseEvent(QMouseEvent* event)
 {
-	isDragging = false;
+	if (isDragging) {
+		auto win = MainWindow::get();
+		auto pos = win->pos();
+		QString msg{ R"({"msgType":"EmbedCalendar","msgName":"embedWin","data":{"hasEmbed":%1,"x":%2,"y":%3}})" };
+		msg = msg.arg("false").arg(pos.x()).arg(pos.y());
+		WsConn::get()->sendMsg(msg);
+		isDragging = false;
+	}
 }
 
 void TitleBar::pinBtnClick()

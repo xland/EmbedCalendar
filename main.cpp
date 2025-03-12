@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
     WeekBar::init();
     ListBar::init();
     ListContent::init();
+    SwitchBtn::init();
     conn->startConnect();
     return a.exec();
 }
