@@ -32,18 +32,49 @@ void Skin::setData(const QJsonObject& data)
 	auto alpha = data["backgroundOpacity"].toDouble();
 	auto alphaVal = static_cast<int>(std::round(alpha * 255));
 	if (theme == "type1") {
-		skin->bg = QColor(255, 255, 255, alphaVal);
-		skin->initWhite();
-	}
-	else {
 		skin->bg = QColor(0, 0, 0, alphaVal);
 		skin->initBlack();
+	}
+	else {
+		skin->bg = QColor(255, 255, 255, alphaVal);
+		skin->initWhite();
 	}
 }
 
 void Skin::initBlack()
 {
+	bg = QColor(0, 0, 0, 178);
+	titleBtn = QColor(210, 211, 212);
+	titleBtnHover = QColor(255, 255, 255, 51);
 
+	year = QColor(255, 255, 255);
+	yearBtnHover = QColor(255, 255, 255, 64);
+	yearBtnBorder = QColor(237, 238, 238);
+	yearBtn = QColor(255, 255, 255);
+
+	yearBtnTodayHover = QColor(255, 255, 255, 64);
+	yearBtnTodayBorder = QColor(240, 44, 56, 255);
+	yearBtnToday = QColor(240, 44, 56, 255);
+
+	week = QColor(210, 211, 212);
+	day = QColor(255, 255, 255);
+	lunar = QColor(210, 211, 212);
+	dayNotCurMonth = QColor(165, 167, 169);
+	lunarNotCurMonth = QColor(165, 167, 169);
+	dot = QColor(165, 167, 169);
+	dayHover = QColor(255, 255, 255, 90);
+	dayActive = QColor(240, 44, 56);
+	dayWorking = QColor(0, 122, 255);
+
+	switchText = QColor(0, 122, 255);
+
+	listItemText1 = QColor(255, 255, 255);
+	listItemText2 = QColor(165, 167, 169);
+	listItemBg = QColor(255, 255, 255, 51);
+	listItemBtn = QColor(210, 211, 212);
+
+	tipInfoBg = QColor(255, 255, 255);
+	tipInfo = QColor(31, 35, 41);
 }
 
 void Skin::initWhite()
