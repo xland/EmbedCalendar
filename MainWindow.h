@@ -26,6 +26,7 @@ public:
     bool isEnter{ false };
 protected:
     void paintEvent(QPaintEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
 private:
     MainWindow(const QJsonObject& obj, QWidget* parent = nullptr);
     void updateData(const QJsonObject& obj);

@@ -55,6 +55,11 @@ void MainWindow::paintEvent(QPaintEvent* event)
     painter.drawRoundedRect(rect(), 4, 4);
 }
 
+void MainWindow::mousePressEvent(QMouseEvent* event)
+{
+
+}
+
 void MainWindow::switchEmbed()
 {
     if (isEmbeded) {

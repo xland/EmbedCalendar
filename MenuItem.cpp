@@ -1,6 +1,7 @@
 #include "MenuItem.h"
 
-MenuItem::MenuItem(QWidget *parent) : BtnBase(parent)
+MenuItem::MenuItem(const QChar& icon, const QString& text, QWidget *parent) : BtnBase(parent),
+icon{ icon }, text{text}
 {
 
 }

@@ -12,6 +12,7 @@
 #include "ListContent.h"
 #include "ListBar.h"
 #include "TipInfo.h"
+#include "Menu.h"
 
 int main(int argc, char *argv[])
 {
@@ -24,6 +25,7 @@ int main(int argc, char *argv[])
     Skin::init();
     MainWindow::init();
     TitleBar::init();
+    Menu::init();
     YearBar::init();
     WeekBar::init();
     ListBar::init();

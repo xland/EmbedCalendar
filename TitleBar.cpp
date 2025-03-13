@@ -2,6 +2,7 @@
 #include "MainWindow.h"
 #include "TipInfo.h"
 #include "TitleBar.h"
+#include "Menu.h"
 #include "WsConn.h"
 
 TitleBar* titleBar;
@@ -13,11 +14,14 @@ TitleBar::TitleBar(QWidget *parent) : QWidget(parent)
 	setGeometry(0, 0, winWidth, 48);
 	pinBtn = new TitleBarBtn(0xe70c,this);
 	pinBtn->move(winWidth - 80, 10);
-	connect(pinBtn, &TitleBarBtn::enter, this, &TitleBar::enterPinBtn);
-	connect(pinBtn, &TitleBarBtn::leave, this, &TitleBar::leavePinBtn);
-	connect(pinBtn, &TitleBarBtn::click, this, &TitleBar::pinBtnClick);	
-	menuBtn = new TitleBarBtn(0xe6e8,this);
+	menuBtn = new TitleBarBtn(0xe6e8, this);
 	menuBtn->move(winWidth - 45, 10);
+	connect(menuBtn, &TitleBarBtn::enter, this, &TitleBar::menuBtnEnter);
+	connect(menuBtn, &TitleBarBtn::leave, this, &TitleBar::menuBtnLeave);
+	connect(pinBtn, &TitleBarBtn::enter, this, &TitleBar::pinBtnEnter);
+	connect(pinBtn, &TitleBarBtn::leave, this, &TitleBar::pinBtnLeave);
+	connect(pinBtn, &TitleBarBtn::click, this, &TitleBar::pinBtnClick);	
+
 }
 
 TitleBar::~TitleBar()
@@ -34,6 +38,11 @@ void TitleBar::init()
 		titleBar->tipInfo = obj["lang"].toObject()["embed"].toString();
 		titleBar->show();
 	});
+}
+
+TitleBar* TitleBar::get()
+{
+	return titleBar;
 }
 
 void TitleBar::mousePressEvent(QMouseEvent* event)
@@ -69,20 +78,34 @@ void TitleBar::mouseReleaseEvent(QMouseEvent* event)
 	}
 }
 
+void TitleBar::menuBtnEnter()
+{
+	auto menu = Menu::get();
+	menu->raise();
+	menu->show();
+}
+
+void TitleBar::menuBtnLeave()
+{
+	if (!menuBtn->isHover && !Menu::get()->isHover) {
+		Menu::get()->hide();
+	}
+}
+
 void TitleBar::pinBtnClick()
 {
 	auto win = MainWindow::get();
 	win->switchEmbed();
 }
 
-void TitleBar::enterPinBtn()
+void TitleBar::pinBtnEnter()
 {
 	auto tipObj = TipInfo::get();
 	tipObj->setText(tipInfo);
 	tipObj->showInfo(QPoint(width()-128, 8));
 }
 
-void TitleBar::leavePinBtn()
+void TitleBar::pinBtnLeave()
 {
 	TipInfo::get()->hide();
 }

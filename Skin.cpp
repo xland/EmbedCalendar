@@ -54,6 +54,8 @@ void Skin::initBlack()
 	titleBtn.setRgb(210, 211, 212);
 	titleBtnHover.setRgb(255, 255, 255, 51);
 
+	menuBg.setRgb(0, 0, 0);
+
 	year.setRgb(255, 255, 255);
 	yearBtnHover.setRgb(255, 255, 255, 64);
 	yearBtnBorder.setRgb(237, 238, 238);
@@ -82,6 +84,8 @@ void Skin::initWhite()
 	bg.setRgb(255, 255, 255, 153);
 	titleBtn.setRgb(100, 106, 115);
 	titleBtnHover.setRgb(0, 0, 0, 38);
+
+	menuBg.setRgb(237, 238, 238);
 
 	year.setRgb(31, 35, 41);
 	yearBtnHover.setRgb(255, 255, 255, 76);

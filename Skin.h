@@ -38,6 +38,7 @@ public:
 
 	QColor tipInfo;
 	QColor tipInfoBg;
+	QColor menuBg;
 
 private:
 	Skin(QObject* parent = nullptr);

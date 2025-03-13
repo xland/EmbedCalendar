@@ -9,19 +9,22 @@ class TitleBar : public QWidget
 public:
 	~TitleBar();
 	static void init();
+	static TitleBar* get();
+	TitleBarBtn* menuBtn;
 protected:
 	void mousePressEvent(QMouseEvent* event) override;
 	void mouseMoveEvent(QMouseEvent* event) override;
 	void mouseReleaseEvent(QMouseEvent* event) override;
 private:
+	void menuBtnEnter();
+	void menuBtnLeave();
 	void pinBtnClick();
-	void enterPinBtn();
-	void leavePinBtn();
+	void pinBtnEnter();
+	void pinBtnLeave();
 private:
 	TitleBar(QWidget* parent = nullptr);
 	QPoint pressPos;
 	bool isDragging = false;
 	TitleBarBtn* pinBtn;
-	TitleBarBtn* menuBtn;
 	QString tipInfo;
 };
