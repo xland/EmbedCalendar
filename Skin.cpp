@@ -50,7 +50,6 @@ Skin* Skin::get()
 
 void Skin::initBlack()
 {
-	bg.setRgb(0, 0, 0, 178);
 	titleBtn.setRgb(210, 211, 212);
 	titleBtnHover.setRgb(255, 255, 255, 51);
 
@@ -83,7 +82,6 @@ void Skin::initBlack()
 
 void Skin::initWhite()
 {
-	bg.setRgb(255, 255, 255, 153);
 	titleBtn.setRgb(100, 106, 115);
 	titleBtnHover.setRgb(0, 0, 0, 38);
 
