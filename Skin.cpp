@@ -55,6 +55,8 @@ void Skin::initBlack()
 	titleBtnHover.setRgb(255, 255, 255, 51);
 
 	menuBg.setRgb(0, 0, 0);
+	menuHover.setRgb(255, 255, 255, 51);
+	menu.setRgb(255, 255, 255);
 
 	year.setRgb(255, 255, 255);
 	yearBtnHover.setRgb(255, 255, 255, 64);
@@ -86,6 +88,8 @@ void Skin::initWhite()
 	titleBtnHover.setRgb(0, 0, 0, 38);
 
 	menuBg.setRgb(237, 238, 238);
+	menuHover.setRgb(224, 224, 224);
+	menu.setRgb(31, 35, 41);
 
 	year.setRgb(31, 35, 41);
 	yearBtnHover.setRgb(255, 255, 255, 76);

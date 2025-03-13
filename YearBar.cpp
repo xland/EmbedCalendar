@@ -1,6 +1,7 @@
 ﻿#include <QRect>
 #include <QPainter>
 
+#include "Menu.h"
 #include "WsConn.h"
 #include "MainWindow.h"
 #include "TipInfo.h"
@@ -73,6 +74,7 @@ void YearBar::leftBtnEnter()
 
 void YearBar::rightBtnEnter()
 {
+	if (Menu::get()->isVisible()) return;
 	auto tipObj = TipInfo::get();
 	tipObj->setText(rightTip);
 	tipObj->showInfo(QPoint(238, 26));

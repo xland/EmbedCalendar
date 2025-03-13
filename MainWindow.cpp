@@ -84,6 +84,7 @@ void MainWindow::onEmbedMouseMove()
 {
     auto pos = mapFromGlobal(QCursor::pos());
     auto children = findChildren<BtnBase*>();
+    auto flag1{ false };
     for (auto& child:children)
     {
         auto rect = QRect(child->mapTo(this, QPoint(0, 0)), child->size());;

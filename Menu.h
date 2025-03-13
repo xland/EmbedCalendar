@@ -19,6 +19,10 @@ protected:
 	void paintEvent(QPaintEvent* event) override;
 private:
 	void mouseLeave();
+	void menuClick0();
+	void menuClick1();
+	void menuClick2();
+	void menuClick3();
 	MenuItem* item0;
 	MenuItem* item1;
 	MenuItem* item2;

@@ -2,6 +2,7 @@
 #include <QPainter>
 #include <QJsonArray>
 
+#include "Menu.h"
 #include "WsConn.h"
 #include "Skin.h"
 #include "Util.h"
@@ -52,7 +53,7 @@ void DayBtn::paintEvent(QPaintEvent* event)
         painter.setPen(skin->dayActive);
         painter.drawEllipse(rect().adjusted(1,1,-1,-1));
     }
-    if (!isActive && isHover) {
+    if (!isActive && isHover && !Menu::get()->isVisible()) {
         painter.setBrush(skin->dayHover);
         painter.setPen(Qt::NoPen);
         painter.drawEllipse(rect());
@@ -116,6 +117,7 @@ void DayBtn::paintEvent(QPaintEvent* event)
 
 void DayBtn::onClick()
 {
+    if (Menu::get()->isVisible()) return;
     QString msg{ R"({"msgType":"EmbedCalendar","msgName":"changeDate","data":{"year":%1,"month":%2,"date":%3}})" };
     msg = msg.arg(year).arg(month).arg(date);
     WsConn::get()->sendMsg(msg);

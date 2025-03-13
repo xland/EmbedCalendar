@@ -1,4 +1,6 @@
 ﻿#include <QRect>
+#include <QTimer>
+
 #include "MainWindow.h"
 #include "TipInfo.h"
 #include "TitleBar.h"
@@ -87,9 +89,11 @@ void TitleBar::menuBtnEnter()
 
 void TitleBar::menuBtnLeave()
 {
-	if (!menuBtn->isHover && !Menu::get()->isHover) {
-		Menu::get()->hide();
-	}
+	QTimer::singleShot(600, [this]() {
+		if (!menuBtn->isHover && !Menu::get()->isHover) {
+			Menu::get()->hide();
+		}
+	});
 }
 
 void TitleBar::pinBtnClick()
