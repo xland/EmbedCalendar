@@ -6,7 +6,6 @@ public:
 	~Skin();
 	static void init();
 	static Skin* get();
-	void setData(const QJsonObject& data);
 public:
 	QColor bg;
 	QColor titleBtn;
