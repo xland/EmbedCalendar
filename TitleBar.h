@@ -26,5 +26,6 @@ private:
 	QPoint pressPos;
 	bool isDragging = false;
 	TitleBarBtn* pinBtn;
-	QString tipInfo;
+	QString tipInfo0;
+	QString tipInfo1;
 };

@@ -16,14 +16,13 @@ YearBar::YearBar(QWidget *parent) : QWidget(parent)
 {
 	setGeometry(0, 48, 372, 44);
 	leftBtn = new YearBarBtn(0xe709,this);
-	leftBtn->move(96, 12);
+	leftBtn->move(80, 12);
 	rightBtn = new YearBarBtn(0xe70e,this);
-	rightBtn->move(256, 12);
+	rightBtn->move(240, 12);
 	todayBtn = new YearBarBtnToday(this);
-	todayBtn->move(335, 12);
+	todayBtn->move(308, 12);
 	connect(leftBtn, &YearBarBtn::enter, this, &YearBar::leftBtnEnter);
 	connect(rightBtn, &YearBarBtn::enter, this, &YearBar::rightBtnEnter);
-
 
 	connect(leftBtn, &YearBarBtn::click, this, &YearBar::leftBtnClick);
 	connect(rightBtn, &YearBarBtn::click, this, &YearBar::rightBtnClick);
@@ -49,6 +48,7 @@ void YearBar::init()
 		yearBar->leftTip = lang["prevMonth"].toString();
 		yearBar->rightTip = lang["nextMonth"].toString();
 		yearBar->activeDateMonth = obj["activeDateMonth"].toString();
+		yearBar->todayBtn->isCn = obj["isCn"].toBool();
 		yearBar->show();
 		});
 }

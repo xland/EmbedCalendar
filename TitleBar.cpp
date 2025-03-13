@@ -22,8 +22,7 @@ TitleBar::TitleBar(QWidget *parent) : QWidget(parent)
 	connect(menuBtn, &TitleBarBtn::leave, this, &TitleBar::menuBtnLeave);
 	connect(pinBtn, &TitleBarBtn::enter, this, &TitleBar::pinBtnEnter);
 	connect(pinBtn, &TitleBarBtn::leave, this, &TitleBar::pinBtnLeave);
-	connect(pinBtn, &TitleBarBtn::click, this, &TitleBar::pinBtnClick);	
-
+	connect(pinBtn, &TitleBarBtn::click, this, &TitleBar::pinBtnClick);
 }
 
 TitleBar::~TitleBar()
@@ -37,7 +36,9 @@ void TitleBar::init()
 		if (!titleBar) {
 			titleBar = new TitleBar(MainWindow::get());
 		}
-		titleBar->tipInfo = obj["lang"].toObject()["embed"].toString();
+		auto lang = obj["lang"].toObject();
+		titleBar->tipInfo0 = lang["embed"].toString();
+		titleBar->tipInfo1 = lang["unEmbed"].toString();
 		titleBar->show();
 	});
 }
@@ -105,7 +106,12 @@ void TitleBar::pinBtnClick()
 void TitleBar::pinBtnEnter()
 {
 	auto tipObj = TipInfo::get();
-	tipObj->setText(tipInfo);
+	if (MainWindow::isEmbed()) {
+		tipObj->setText(tipInfo1);
+	}
+	else {
+		tipObj->setText(tipInfo0);
+	}	
 	tipObj->showInfo(QPoint(width()-128, 8));
 }
 

@@ -8,6 +8,7 @@ class YearBarBtnToday : public YearBarBtnBase
 public:
 	YearBarBtnToday(QWidget *parent = nullptr);
 	~YearBarBtnToday();
+	bool isCn;
 protected:
 	void paintEvent(QPaintEvent* event) override;
 private:

@@ -21,6 +21,7 @@ public:
     static RAWINPUT* getRawInput(HRAWINPUT lParam);
     static void init();
     static MainWindow* get();
+    static bool isEmbed();
 public:
     QList<DayBtn*> dayBtns;
     bool isEnter{ false };

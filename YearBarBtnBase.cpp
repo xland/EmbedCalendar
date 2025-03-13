@@ -13,7 +13,7 @@ YearBarBtnBase::YearBarBtnBase(QWidget* parent) : BtnBase(parent)
     hoverColor = skin->yearBtnHover;
     borderColor = skin->yearBtnBorder;
     color = skin->yearBtn;
-	setFixedSize(22, 22);
+	setFixedSize(48, 22);
     setMouseTracking(true);
     setCursor(Qt::CursorShape::PointingHandCursor);
 }
@@ -27,7 +27,7 @@ void YearBarBtnBase::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
-    auto r = rect().adjusted(2, 2, -2, -2);
+    auto r = rect().adjusted(16, 2, -14, -2);
     if (isHover) {
         painter.setBrush(hoverColor);
         painter.setPen(Qt::NoPen);

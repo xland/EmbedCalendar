@@ -215,6 +215,11 @@ MainWindow* MainWindow::get()
     return win;
 }
 
+bool MainWindow::isEmbed()
+{
+    return isEmbeded;
+}
+
 void MainWindow::updateData(const QJsonObject& obj)
 {
     auto aaa = obj["hasEmbed"].toBool();
