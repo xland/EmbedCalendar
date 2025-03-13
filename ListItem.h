@@ -21,12 +21,16 @@ protected:
 private:
 	void enterEdit();
 	void enterDel();
+	void clickEdit();
+	void clickDel();
 	void leaveBtn();
 private:
 	ListItemBtn* editBtn;
 	ListItemBtn* delBtn;
 	QString title;
 	QString desc;
+	QString scheduleNo;
+	QString calendarNo;
 	QColor calendarColor;
 	bool isAllowEdit;
 };

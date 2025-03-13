@@ -23,6 +23,8 @@ void ListItem::setData(const QJsonObject& data)
 {
     title = data["title"].toString();
     desc = data["desc"].toString();
+    scheduleNo = data["scheduleNo"].toString();
+    calendarNo = data["calendarNo"].toString();
     calendarColor.setNamedColor(data["calendarColor"].toString());
     isAllowEdit = data["isAllowEdit"].toBool();
     if (isAllowEdit) {
@@ -32,6 +34,8 @@ void ListItem::setData(const QJsonObject& data)
         editBtn->move(width() - 62, 10);
         connect(delBtn, &ListItemBtn::enter, this, &ListItem::enterDel);
         connect(editBtn, &ListItemBtn::enter, this, &ListItem::enterEdit);
+        connect(delBtn, &ListItemBtn::click, this, &ListItem::clickDel);
+        connect(editBtn, &ListItemBtn::click, this, &ListItem::clickEdit);
         connect(delBtn, &ListItemBtn::leave, this, &ListItem::leaveBtn);
         connect(editBtn, &ListItemBtn::leave, this, &ListItem::leaveBtn);
     }
@@ -114,6 +118,20 @@ void ListItem::enterDel()
     pos.setX(pos.x() - tipObj->width());
     pos.setY(pos.y() - 4);
     tipObj->showInfo(pos);
+}
+
+void ListItem::clickEdit()
+{
+    QString msg{ R"({"msgType":"EmbedCalendar","msgName":"updateSchedule","data":{"scheduleNo":"%1","calendarNo":"%2"}})" };
+    msg = msg.arg(scheduleNo).arg(calendarNo);
+    WsConn::get()->sendMsg(msg);
+}
+
+void ListItem::clickDel()
+{
+    QString msg{ R"({"msgType":"EmbedCalendar","msgName":"deleteSchedule","data":{"scheduleNo":"%1","calendarNo":"%2"}})" };
+    msg = msg.arg(scheduleNo).arg(calendarNo);
+    WsConn::get()->sendMsg(msg);
 }
 
 void ListItem::leaveBtn()
