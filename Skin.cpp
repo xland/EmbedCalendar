@@ -72,6 +72,7 @@ void Skin::initBlack()
 	dot.setRgb(165, 167, 169);
 	dayHover.setRgb(255, 255, 255, 90);
 
+	listHeader.setRgb(255, 255, 255);
 	listItemText1.setRgb(255, 255, 255);
 	listItemText2.setRgb(165, 167, 169);
 	listItemBtn.setRgb(210, 211, 212);
@@ -104,6 +105,7 @@ void Skin::initWhite()
 	dot.setRgb(102, 102, 102);
 	dayHover.setRgb(255, 255, 255, 128);
 
+	listHeader.setRgb(31, 35, 41);
 	listItemText1.setRgb(31, 35, 41);
 	listItemText2.setRgb(102, 102, 102);
 	listItemBtn.setRgb(76, 79, 84);

@@ -52,7 +52,7 @@ void ListBar::paintEvent(QPaintEvent* event)
 	auto font = Util::getTextFont(18);
 	painter.setFont(*font);
 	painter.setBrush(Qt::NoBrush);
-	painter.setPen(skin->switchText);
+	painter.setPen(skin->listHeader);
 	painter.drawText(rect(), Qt::AlignVCenter, activeDateDay);
 }
 

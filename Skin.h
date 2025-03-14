@@ -31,6 +31,7 @@ public:
 
 	QColor switchText;
 
+	QColor listHeader;
 	QColor listItemText1;
 	QColor listItemText2;
 	QColor listItemBtn;

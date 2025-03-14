@@ -14,7 +14,4 @@ public:
 protected:
 	virtual void paintEvent(QPaintEvent* event) override;
 protected:
-	QColor hoverColor;
-	QColor borderColor;
-	QColor color;
 };

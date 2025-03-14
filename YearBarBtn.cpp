@@ -1,6 +1,7 @@
 #include <QPaintEvent>
 #include <QPainter>
 
+#include "Skin.h"
 #include "Util.h"
 #include "YearBarBtn.h"
 
@@ -21,6 +22,7 @@ void YearBarBtn::paintEvent(QPaintEvent* event)
     painter.setRenderHint(QPainter::TextAntialiasing, true);
     auto font = Util::getIconFont(12);
     painter.setFont(*font);
-    painter.setPen(color);
+    auto skin = Skin::get();
+    painter.setPen(skin->yearBtn);
     painter.drawText(r, Qt::AlignCenter, QChar(code));
 }
