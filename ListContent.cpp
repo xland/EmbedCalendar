@@ -54,11 +54,14 @@ void ListContent::updateData(const QJsonObject& obj)
     layout->setMargin(0);
     layout->setSpacing(8);
     auto arr = obj["scheduleList"].toArray();
+    auto lang = obj["lang"].toObject();
     for (int i = 0; i < arr.size(); ++i) {
         auto item = new ListItem(contentWidget);
         auto data = arr[i].toObject();
-        item->editTip = obj["lang"].toObject()["editSchedule"].toString();
-        item->delTip = obj["lang"].toObject()["deleteSchedule"].toString();
+        item->editTip = lang["editSchedule"].toString();
+        item->delTip = lang["deleteSchedule"].toString();
+        item->clickToCompleteTodo = lang["clickToCompleteTodo"].toString();
+        item->clickToRestartTodo = lang["clickToRestartTodo"].toString();
         item->setData(data);
         layout->addWidget(item);
     }

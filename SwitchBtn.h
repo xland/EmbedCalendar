@@ -16,4 +16,5 @@ protected:
 private:
 	QString hideSchedule;
 	QString displaySchedule;
+	bool isCn;
 };

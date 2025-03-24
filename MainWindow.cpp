@@ -235,17 +235,20 @@ void MainWindow::updateData(const QJsonObject& obj)
         setFixedSize(QSize(372, 480));
     }
     auto arr = obj["viewData"].toArray();
+	auto isCn = obj["isCn"].toBool();
     if (dayBtns.isEmpty()) {
         for (int i = 0; i < arr.size(); i++)
         {
-            auto day = new DayBtn(i, this);
+            auto day = new DayBtn(i,this);
             dayBtns.append(day);
+            dayBtns[i]->isCn = isCn;
             day->updateData(arr[i].toObject());
         }
     }
     else {
         for (int i = 0; i < arr.size(); i++) {
             dayBtns[i]->updateData(arr[i].toObject());
+            dayBtns[i]->isCn = isCn;
         }
     }
 }

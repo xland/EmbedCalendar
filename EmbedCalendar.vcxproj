@@ -109,6 +109,7 @@
     <ClCompile Include="ListContent.cpp" />
     <ClCompile Include="ListItem.cpp" />
     <ClCompile Include="ListItemBtn.cpp" />
+    <ClCompile Include="ListItemCheckBtn.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="MenuItem.cpp" />
     <ClCompile Include="Skin.cpp" />
@@ -146,6 +147,7 @@
     <QtMoc Include="BtnBase.h" />
     <QtMoc Include="Menu.h" />
     <QtMoc Include="MenuItem.h" />
+    <QtMoc Include="ListItemCheckBtn.h" />
     <ClInclude Include="Skin.h" />
     <QtMoc Include="TipInfo.h" />
     <ClInclude Include="Util.h" />

@@ -8,9 +8,8 @@
 #include "Util.h"
 #include "DayBtn.h"
 
-DayBtn::DayBtn(const int& index,QWidget* parent) : BtnBase(parent), index{index}
+DayBtn::DayBtn(const int& index, QWidget* parent) : BtnBase(parent), index{ index }
 {
-
     int lineNum = index / 7;
     int colNum = index % 7;
     setGeometry(colNum * 44+14+6*colNum, lineNum * 44+136 + 4 * lineNum, 44, 44);
@@ -102,8 +101,7 @@ void DayBtn::paintEvent(QPaintEvent* event)
     }
     painter.drawText(QPoint(x, y), docStatus);
 
-    if (hasSchdule) {
-        QRect r2(textRect.width() / 2 - 2, textRect.bottom() - 6, 4, 4);        
+    if (hasSchdule) {    
         if (isActive) {
             painter.setBrush(QColor(255, 255, 255));
         }
@@ -111,6 +109,8 @@ void DayBtn::paintEvent(QPaintEvent* event)
             painter.setBrush(skin->dot);
         }
         painter.setPen(Qt::NoPen);
+        
+        QRect r2(textRect.width() / 2 - 2, textRect.bottom() - (isCn?6:10), 4, 4);
         painter.drawEllipse(r2);
     }
 }

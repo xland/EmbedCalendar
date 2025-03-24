@@ -23,7 +23,7 @@ WsConn::~WsConn()
 void WsConn::startConnect()
 {
     auto arguments = QCoreApplication::arguments();
-    QString port{ "56620" };
+    QString port{ "54235" };
     for (int i = 0; i < arguments.length(); i++)
     {
         if (arguments[i].startsWith("EmbedCalendar_")) {

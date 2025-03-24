@@ -11,6 +11,8 @@ public:
 	DayBtn(const int& index,QWidget *parent = nullptr);
 	~DayBtn();
 	void updateData(const QJsonObject& obj);
+public:
+	bool isCn{ true };
 protected:
 	void paintEvent(QPaintEvent* event) override;
 private:

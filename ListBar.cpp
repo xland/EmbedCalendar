@@ -58,9 +58,12 @@ void ListBar::paintEvent(QPaintEvent* event)
 
 void ListBar::btnEnter()
 {
-	auto tipObj = TipInfo::get();
-	tipObj->setText(tipInfo);
-	tipObj->showInfo(QPoint(246, 432));
+	if (window()->height() > 480) {
+		auto tipObj = TipInfo::get();
+		tipObj->setText(tipInfo);
+		auto left = btn->pos().x() - tipObj->width() + 18;
+		tipObj->showInfo(QPoint(left, 432));
+	}
 }
 
 void ListBar::btnLeave()

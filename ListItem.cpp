@@ -7,6 +7,7 @@
 #include "TipInfo.h"
 #include "MainWindow.h"
 #include "ListItemBtn.h"
+#include "ListItemCheckBtn.h"
 #include "ListItem.h"
 
 ListItem::ListItem(QWidget *parent) : BtnBase(parent)
@@ -27,10 +28,13 @@ void ListItem::setData(const QJsonObject& data)
     calendarNo = data["calendarNo"].toString();
     calendarColor.setNamedColor(data["calendarColor"].toString());
     isAllowEdit = data["isAllowEdit"].toBool();
+	isAllowView = data["isAllowView"].toBool();
     if (isAllowEdit) {
         delBtn = new ListItemBtn(0xe712, this);
+        delBtn->setVisible(false);
         delBtn->move(width() - 34, 10);
         editBtn = new ListItemBtn(0xe707, this);
+        editBtn->setVisible(false);
         editBtn->move(width() - 62, 10);
         connect(delBtn, &ListItemBtn::enter, this, &ListItem::enterDel);
         connect(editBtn, &ListItemBtn::enter, this, &ListItem::enterEdit);
@@ -39,6 +43,43 @@ void ListItem::setData(const QJsonObject& data)
         connect(delBtn, &ListItemBtn::leave, this, &ListItem::leaveBtn);
         connect(editBtn, &ListItemBtn::leave, this, &ListItem::leaveBtn);
     }
+    auto str = data["platformCode"].toString();
+    if (str == "HIKKEUSER" || str == "HIKKEPROJ") {
+		checkBtn = new ListItemCheckBtn(this);
+        checkBtn->taskProcess = data["taskProcess"].toInt();
+		checkBtn->move(5, 1);
+        connect(checkBtn, &ListItemBtn::enter, this, &ListItem::enterCheck);
+        connect(checkBtn, &ListItemBtn::leave, this, &ListItem::leaveBtn);
+        connect(checkBtn, &ListItemBtn::click, this, &ListItem::clickCheck);
+	}
+}
+
+void ListItem::enterEvent(QEvent* event)
+{
+    BtnBase::enterEvent(event);
+    if (delBtn) {
+        delBtn->show();
+        editBtn->show();
+    }
+}
+
+void ListItem::leaveEvent(QEvent* event)
+{
+    BtnBase::leaveEvent(event);
+    if (delBtn) {
+        delBtn->hide();
+        editBtn->hide();
+    }
+}
+
+void ListItem::mousePressEvent(QMouseEvent* event)
+{
+	BtnBase::mousePressEvent(event);
+	if (isAllowView) {
+        QString msg{ R"({"msgType":"EmbedCalendar","msgName":"viewSchedule","data":{"scheduleNo":"%1","calendarNo":"%2"}})" };
+        msg = msg.arg(scheduleNo).arg(calendarNo);
+        WsConn::get()->sendMsg(msg);
+	}
 }
 
 void ListItem::paintEvent(QPaintEvent* event)
@@ -67,27 +108,53 @@ void ListItem::paintEvent(QPaintEvent* event)
         painter.setBrush(calendarColor);
         painter.drawPath(path);
     }
-
     auto w = width() - (isAllowEdit?80:16);
     painter.setRenderHint(QPainter::TextAntialiasing, true);
-    auto font = Util::getTextFont(14);
-    painter.setFont(*font);
-    painter.setBrush(Qt::NoBrush);
-    painter.setPen(skin->listItemText1);
-    QFontMetrics metrics(*font);
-    if (metrics.horizontalAdvance(title) > w) {
-        title = metrics.elidedText(title, Qt::ElideRight, w);
-    }
-    painter.drawText(QPoint(8, 16), title);
 
-    font->setPixelSize(12);
-    painter.setFont(*font);
+
+    QFont font = *Util::getTextFont(12);
+    painter.setFont(font);
     painter.setPen(skin->listItemText2);
-    QFontMetrics metrics2(*font);
+    QFontMetrics metrics2(font);
     if (metrics2.horizontalAdvance(desc) > w) {
         desc = metrics2.elidedText(desc, Qt::ElideRight, w);
     }
     painter.drawText(QPoint(8, 38), desc);
+
+    font.setPixelSize(14);
+    if (checkBtn && checkBtn->taskProcess == 0) {
+        font.setStrikeOut(true);
+    }
+    painter.setFont(font);
+    painter.setBrush(Qt::NoBrush);
+    painter.setPen(skin->listItemText1);
+    QFontMetrics metrics(font);
+    if (metrics.horizontalAdvance(title) > w) {
+        title = metrics.elidedText(title, Qt::ElideRight, w);
+    }
+    painter.drawText(QPoint(checkBtn ? 26 : 8, 16), title);
+}
+
+void ListItem::enterCheck()
+{
+    auto p = (QWidget*)(parent()->parent()->parent());
+    auto rect = p->geometry();
+    auto btnPos = checkBtn->mapTo(window(), QPoint(0, 0));
+    if (!rect.contains(btnPos)) return;
+    auto win = (MainWindow*)window();
+    auto tipObj = TipInfo::get();
+    tipObj->setText(checkBtn->taskProcess?clickToCompleteTodo: clickToRestartTodo);
+    auto pos = mapTo(win, checkBtn->pos());
+    pos.setX(pos.x());
+    pos.setY(pos.y() - tipObj->height());
+    tipObj->showInfo(pos);
+}
+
+void ListItem::clickCheck()
+{
+    QString msg{ R"({"msgType":"EmbedCalendar","msgName":"updatePersonTodo","data":{"scheduleNo":"%1","calendarNo":"%2","taskProcess":%3}})" };
+    msg = msg.arg(scheduleNo).arg(calendarNo).arg(checkBtn->taskProcess);
+    WsConn::get()->sendMsg(msg);
 }
 
 void ListItem::enterEdit()
@@ -119,6 +186,7 @@ void ListItem::enterDel()
     pos.setY(pos.y() - 4);
     tipObj->showInfo(pos);
 }
+
 
 void ListItem::clickEdit()
 {

@@ -13,7 +13,7 @@ SwitchBtn* switchBtn;
 
 SwitchBtn::SwitchBtn(QWidget *parent) : BtnBase(parent)
 {
-	setGeometry(260, parent->height()-60, 104, 60);
+	setGeometry(200, parent->height()-60, 164, 60);
 }
 
 SwitchBtn::~SwitchBtn()
@@ -29,7 +29,8 @@ void SwitchBtn::init()
 		auto lang = obj["lang"].toObject();
 		switchBtn->hideSchedule = lang["hideSchedule"].toString();
 		switchBtn->displaySchedule = lang["displaySchedule"].toString();
-		switchBtn->move(260, MainWindow::get()->height() - 60);
+		switchBtn->isCn = obj["isCn"].toBool();
+		switchBtn->move(200, MainWindow::get()->height() - 60);
 		switchBtn->show();
 		});
 }
@@ -40,22 +41,26 @@ void SwitchBtn::paintEvent(QPaintEvent* event)
 	painter.setRenderHint(QPainter::Antialiasing, true);
 	painter.setRenderHint(QPainter::TextAntialiasing, true);
 	auto font = Util::getTextFont(16);
+	QFontMetrics metrics(*font);
 	painter.setFont(*font);
 	painter.setBrush(Qt::NoBrush);
 	painter.setPen(skin->switchText);
 	auto flag = window()->height() > 480;
 	auto fontIcon = Util::getIconFont(16);
+	auto right = rect().right();
 	if (flag) {
 		QChar code(0xe708);
-		painter.drawText(QPoint(8, 36), hideSchedule);
+		int width = metrics.horizontalAdvance(hideSchedule);
+		painter.drawText(QPoint(right-28-8-width, 36), hideSchedule);
 		painter.setFont(*fontIcon);
-		painter.drawText(QPoint(76, 36), code);
+		painter.drawText(QPoint(right - 28, 36), code);
 	}
 	else {
 		QChar code = QChar(0xe70f);
-		painter.drawText(QPoint(8, 36), displaySchedule);
-		painter.setFont(*fontIcon);
-		painter.drawText(QPoint(76, 36), code);
+		int width = metrics.horizontalAdvance(displaySchedule);
+		painter.drawText(QPoint(right - 28 - 8 - width, 36), displaySchedule);
+		painter.setFont(*fontIcon);		
+		painter.drawText(QPoint(right - 28, 36), code);
 	}	
 }
 
