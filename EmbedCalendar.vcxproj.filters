@@ -103,6 +103,9 @@
     <ClCompile Include="ListItemCheckBtn.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Toast.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="TitleBarBtn.h">
@@ -163,6 +166,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="ListItemCheckBtn.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Toast.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

@@ -23,7 +23,7 @@ WsConn::~WsConn()
 void WsConn::startConnect()
 {
     auto arguments = QCoreApplication::arguments();
-    QString port{ "54235" };
+    QString port{ "52032" };
     for (int i = 0; i < arguments.length(); i++)
     {
         if (arguments[i].startsWith("EmbedCalendar_")) {
@@ -56,17 +56,21 @@ WsConn* WsConn::get()
 
 void WsConn::wsMsgReceived(const QString& message)
 {
-    qDebug() << "receive one msg:" << message;
     QJsonParseError err;
     QJsonDocument jd = QJsonDocument::fromJson(message.toUtf8(), &err);
     if (err.error != QJsonParseError::NoError || jd.isNull())
     {
         qWarning() << "json parse error" << err.errorString();
-        qWarning() << message;
         return;
     }
-    data = jd.object()["data"].toObject();
-    emit onData(data);
+    auto obj = jd.object();
+    if (obj["msgName"].toString() == "showToast") {
+
+    }
+    else {
+        data = obj["data"].toObject();
+        emit onData(data);
+    }
 }
 
 void WsConn::wsError(QAbstractSocket::SocketError error)

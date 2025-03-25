@@ -8,6 +8,7 @@
 #include "Util.h"
 #include "Skin.h"
 #include "YearBar.h"
+#include "Toast.h"
 
 YearBar* yearBar;
 
@@ -96,6 +97,7 @@ void YearBar::todayBtnClick()
 {
 	QString msg{ R"({"msgType":"EmbedCalendar","msgName":"changeToday"})" };
 	WsConn::get()->sendMsg(msg);
+	//Toast::start("error","asdf asdf");
 }
 
 void YearBar::btnLeave()

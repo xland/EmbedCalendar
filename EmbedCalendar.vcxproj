@@ -117,6 +117,7 @@
     <ClCompile Include="TipInfo.cpp" />
     <ClCompile Include="TitleBar.cpp" />
     <ClCompile Include="TitleBarBtn.cpp" />
+    <ClCompile Include="Toast.cpp" />
     <ClCompile Include="Util.cpp" />
     <ClCompile Include="WeekBar.cpp" />
     <ClCompile Include="WsConn.cpp" />
@@ -150,6 +151,7 @@
     <QtMoc Include="ListItemCheckBtn.h" />
     <ClInclude Include="Skin.h" />
     <QtMoc Include="TipInfo.h" />
+    <QtMoc Include="Toast.h" />
     <ClInclude Include="Util.h" />
     <QtMoc Include="YearBarBtnBase.h" />
     <QtMoc Include="YearBarBtnToday.h" />
