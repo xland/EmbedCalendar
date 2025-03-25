@@ -15,8 +15,8 @@ public:
 	void sendMsg(const QString& message);
 signals:
 	void onData(const QJsonObject& data);
+	void onToast(const QJsonObject& data);
 public:
-	QJsonObject data;
 private:
 	WsConn(QObject* parent = nullptr);
 	void wsMsgReceived(const QString& message);

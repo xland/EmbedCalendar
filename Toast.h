@@ -11,13 +11,14 @@ class Toast : public QWidget
 public:
 	Toast(QWidget *parent = nullptr);
 	~Toast();
-	static void start(const QString& type, const QString& text);
+	static void init();
 protected:
 	void showEvent(QShowEvent* event) override;
 	void paintEvent(QPaintEvent* event) override;
 private:
 	QString text;
 	QColor color;
+	QColor bg;
 	ushort code;
 	qint64 showTime;
 };

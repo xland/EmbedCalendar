@@ -48,9 +48,11 @@ void ListItem::setData(const QJsonObject& data)
 		checkBtn = new ListItemCheckBtn(this);
         checkBtn->taskProcess = data["taskProcess"].toInt();
 		checkBtn->move(5, 1);
-        connect(checkBtn, &ListItemBtn::enter, this, &ListItem::enterCheck);
-        connect(checkBtn, &ListItemBtn::leave, this, &ListItem::leaveBtn);
-        connect(checkBtn, &ListItemBtn::click, this, &ListItem::clickCheck);
+        if (str == "HIKKEUSER") {
+            connect(checkBtn, &ListItemBtn::enter, this, &ListItem::enterCheck);
+            connect(checkBtn, &ListItemBtn::leave, this, &ListItem::leaveBtn);
+            connect(checkBtn, &ListItemBtn::click, this, &ListItem::clickCheck);
+        }
 	}
 }
 
@@ -122,7 +124,7 @@ void ListItem::paintEvent(QPaintEvent* event)
     painter.drawText(QPoint(8, 38), desc);
 
     font.setPixelSize(14);
-    if (checkBtn && checkBtn->taskProcess == 0) {
+    if (checkBtn && checkBtn->taskProcess == -1) {
         font.setStrikeOut(true);
     }
     painter.setFont(font);
@@ -143,7 +145,7 @@ void ListItem::enterCheck()
     if (!rect.contains(btnPos)) return;
     auto win = (MainWindow*)window();
     auto tipObj = TipInfo::get();
-    tipObj->setText(checkBtn->taskProcess?clickToCompleteTodo: clickToRestartTodo);
+    tipObj->setText(checkBtn->taskProcess == 0?clickToCompleteTodo: clickToRestartTodo);
     auto pos = mapTo(win, checkBtn->pos());
     pos.setX(pos.x());
     pos.setY(pos.y() - tipObj->height());

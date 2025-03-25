@@ -13,6 +13,7 @@
 #include "ListBar.h"
 #include "TipInfo.h"
 #include "Menu.h"
+#include "Toast.h"
 
 int main(int argc, char *argv[])
 {
@@ -32,6 +33,7 @@ int main(int argc, char *argv[])
     ListContent::init();
     SwitchBtn::init();
     TipInfo::init();
+    Toast::init();
     conn->startConnect();
     return a.exec();
 }

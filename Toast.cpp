@@ -1,8 +1,10 @@
 #include <QPainter>
 #include <QTimer>
 #include <QDateTime>
+#include <QCoreApplication>
 #include "Toast.h"
 #include "Util.h"
+#include "WsConn.h"
 #include "MainWindow.h"
 
 Toast* toast;
@@ -22,39 +24,41 @@ Toast::~Toast()
 	toast = nullptr;
 }
 
-void Toast::start(const QString& type, const QString& text)
+void Toast::init()
 {
-	if (!toast) {
-		toast = new Toast(MainWindow::get());
-	}
-	if (toast->isVisible()) {
-		toast->hide();
-	}
-	if (type == "success")
-	{
-		toast->color.setRgb(68, 159, 45);
-		toast->code = 0xe74e;
-	}
-	else if (type == "error")
-	{
-		toast->color.setRgb(224, 54, 59);
-		toast->code = 0xe74d;
-	}
-	else if (type == "warning")
-	{
-		toast->color.setRgb(245, 169, 43);
-		toast->code = 0xe74f;
-	}
-	toast->text = text;
-
-	auto font = Util::getTextFont(16);
-	QFontMetrics metrics(*font);
-	auto width = metrics.horizontalAdvance(text) + 30 + 14;
-	auto height = 28;
-	toast->setGeometry((toast->window()->width() - width) / 2, 18, width, height);
-	toast->show();
-	toast->showTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-
+	connect(WsConn::get(), &WsConn::onToast, [](const QJsonObject& data) {
+		if (!toast) {
+			toast = new Toast(MainWindow::get());
+		}
+		auto type = data["type"].toString();
+		auto text = data["text"].toString();
+		if (type == "success")
+		{
+			toast->color.setRgb(68, 159, 45);
+			toast->bg.setRgb(240, 250, 242);
+			toast->code = 0xe74e;
+		}
+		else if (type == "error")
+		{
+			toast->color.setRgb(224, 54, 59);
+			toast->bg.setRgb(255, 241, 240);
+			toast->code = 0xe74d;
+		}
+		else if (type == "warning")
+		{
+			toast->color.setRgb(245, 169, 43);
+			toast->bg.setRgb(255, 251, 230);
+			toast->code = 0xe74f;
+		}
+		toast->text = text;
+		auto font = Util::getTextFont(14);
+		QFontMetrics metrics(*font);
+		auto width = metrics.horizontalAdvance(text) + 30 + 14;
+		auto height = 40;
+		toast->setGeometry((toast->window()->width() - width) / 2, 22, width, height);
+		toast->show();
+		toast->showTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+	});
 }
 
 void Toast::showEvent(QShowEvent* event)
@@ -72,23 +76,20 @@ void Toast::paintEvent(QPaintEvent* event)
 	QPainter p(this);
 	p.setRenderHint(QPainter::Antialiasing);
 	p.setRenderHint(QPainter::TextAntialiasing, true);
-	//p.setBrush(QColor(0, 0, 0, 128));
-	//p.setPen(Qt::NoPen);
-	//p.drawRoundedRect(r0, 4, 4);
 
-	auto font = Util::getTextFont(16);
+	auto font = Util::getTextFont(14);
 	QFontMetrics metrics(*font);
 	p.setFont(*font);
 	p.setBrush(Qt::NoBrush);
 	p.setPen(color); 
-	p.setBrush(Qt::white);
+	p.setBrush(bg);
 	p.setPen(color);
 	p.drawRoundedRect(rect().adjusted(1,1,-1,-1), 4, 4);
-	p.drawText(32, 20, text);
+	p.drawText(32, 26, text);
 
-	font = Util::getIconFont(16);
+	font = Util::getIconFont(14);
 	p.setFont(*font);
 	p.setBrush(Qt::NoBrush);
 	p.setPen(color);
-	p.drawText(10,20,QChar(code));
+	p.drawText(10,26,QChar(code));
 }

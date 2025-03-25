@@ -20,7 +20,7 @@ void ListItemCheckBtn::paintEvent(QPaintEvent * event)
     painter.setFont(*font);
     painter.setBrush(Qt::NoBrush);
     auto skin = Skin::get();
-    if (taskProcess == -1) {
+    if (taskProcess == 0) {
         painter.setPen(QColor(178, 178, 178));
         painter.drawText(rect(), Qt::AlignCenter, QChar(0xe72b));
     }
